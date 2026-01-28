@@ -43,7 +43,9 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal mb-3">Complete top-to-bottom restoration.</p>
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$199</p>
-                <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
+                <button 
+                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>
               </div>
@@ -66,7 +68,9 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal mb-3">Grease removal and appliance detailing.</p>
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$89</p>
-                <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
+                <button 
+                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>
               </div>
@@ -89,7 +93,9 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal mb-3">Tile scrubbing and fixture polishing.</p>
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$69</p>
-                <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
+                <button 
+                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>
               </div>
@@ -112,7 +118,9 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal mb-3">Deep shampoo and fabric care.</p>
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$120</p>
-                <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
+                <button 
+                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>
               </div>
