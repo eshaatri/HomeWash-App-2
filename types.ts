@@ -14,4 +14,6 @@ export interface NavigationProps {
   navigateTo: (screen: AppScreen) => void;
   isPremium: boolean;
   togglePremium: () => void;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
 }

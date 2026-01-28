@@ -12,30 +12,44 @@ import { AppScreen } from './types';
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.HOME);
   const [isPremium, setIsPremium] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Apply theme colors via CSS variables
   useEffect(() => {
     const root = document.documentElement;
     if (isPremium) {
-      // Premium Theme: #daa520 (Gold)
-      root.style.setProperty('--primary-r', '218');
-      root.style.setProperty('--primary-g', '165');
-      root.style.setProperty('--primary-b', '32');
-      root.style.setProperty('--primary-dim', '#856d20');
-      root.style.setProperty('--gradient-start', '#daa520');
-      root.style.setProperty('--gradient-end', '#b8860b');
-    } else {
-      // Freemium Theme: #ffff33 (Bright Yellow)
+      // Premium Theme: #ffd633 (New Gold)
+      // RGB: 255, 214, 51
       root.style.setProperty('--primary-r', '255');
-      root.style.setProperty('--primary-g', '255');
+      root.style.setProperty('--primary-g', '214');
       root.style.setProperty('--primary-b', '51');
-      root.style.setProperty('--primary-dim', '#cccc00');
-      root.style.setProperty('--gradient-start', '#ffff33');
-      root.style.setProperty('--gradient-end', '#e6e600');
+      root.style.setProperty('--primary-dim', '#b39624');
+      root.style.setProperty('--gradient-start', '#ffd633');
+      root.style.setProperty('--gradient-end', '#e6c229');
+    } else {
+      // Freemium Theme: #e68a00 (Orange)
+      // RGB: 230, 138, 0
+      root.style.setProperty('--primary-r', '230');
+      root.style.setProperty('--primary-g', '138');
+      root.style.setProperty('--primary-b', '0');
+      root.style.setProperty('--primary-dim', '#b36b00');
+      root.style.setProperty('--gradient-start', '#e68a00');
+      root.style.setProperty('--gradient-end', '#cc7a00');
     }
   }, [isPremium]);
 
+  // Apply Dark Mode class
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
   const togglePremium = () => setIsPremium(prev => !prev);
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   const navigateTo = (screen: AppScreen) => {
     // Scroll to top when changing screens
@@ -47,7 +61,9 @@ export default function App() {
     currentScreen,
     navigateTo,
     isPremium,
-    togglePremium
+    togglePremium,
+    isDarkMode,
+    toggleDarkMode
   };
 
   const renderScreen = () => {
@@ -75,8 +91,8 @@ export default function App() {
 
   return (
     // Mobile container wrapper for desktop viewing
-    <div className="flex justify-center min-h-screen bg-neutral-900">
-      <div className="w-full max-w-md bg-black shadow-2xl overflow-hidden min-h-screen">
+    <div className="flex justify-center min-h-screen bg-gray-100 dark:bg-neutral-900 transition-colors duration-300">
+      <div className="w-full max-w-md bg-white dark:bg-black shadow-2xl overflow-hidden min-h-screen transition-colors duration-300">
         {renderScreen()}
       </div>
     </div>
