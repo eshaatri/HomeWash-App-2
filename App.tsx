@@ -7,19 +7,23 @@ import { SupportScreen } from './screens/SupportScreen';
 import { ServiceSelectionScreen } from './screens/ServiceSelectionScreen';
 import { CartScreen } from './screens/CartScreen';
 import { CheckoutScreen } from './screens/CheckoutScreen';
-import { AppScreen } from './types';
+import { LoginScreen } from './screens/LoginScreen';
+import { PartnerDashboardScreen } from './screens/PartnerDashboardScreen';
+import { BookingDetailScreen } from './screens/BookingDetailScreen';
+import { AppScreen, User, UserRole } from './types';
+import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from './mockData';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.HOME);
-  const [isPremium, setIsPremium] = useState(true);
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.LOGIN);
+  const [isPremium, setIsPremium] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
 
   // Apply theme colors via CSS variables
   useEffect(() => {
     const root = document.documentElement;
     if (isPremium) {
       // Premium Theme: #ffd633 (New Gold)
-      // RGB: 255, 214, 51
       root.style.setProperty('--primary-r', '255');
       root.style.setProperty('--primary-g', '214');
       root.style.setProperty('--primary-b', '51');
@@ -28,7 +32,6 @@ export default function App() {
       root.style.setProperty('--gradient-end', '#e6c229');
     } else {
       // Freemium Theme: #e68a00 (Orange)
-      // RGB: 230, 138, 0
       root.style.setProperty('--primary-r', '230');
       root.style.setProperty('--primary-g', '138');
       root.style.setProperty('--primary-b', '0');
@@ -52,9 +55,23 @@ export default function App() {
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   const navigateTo = (screen: AppScreen) => {
-    // Scroll to top when changing screens
     window.scrollTo(0, 0);
     setCurrentScreen(screen);
+  };
+
+  const login = (phone: string, role: UserRole) => {
+    if (role === UserRole.PARTNER) {
+      setUser(MOCK_PARTNER);
+      setCurrentScreen(AppScreen.PARTNER_DASHBOARD);
+    } else {
+      setUser(MOCK_USER);
+      setCurrentScreen(AppScreen.HOME);
+    }
+  };
+
+  const logout = () => {
+    setUser(null);
+    setCurrentScreen(AppScreen.LOGIN);
   };
 
   const commonProps = {
@@ -63,11 +80,18 @@ export default function App() {
     isPremium,
     togglePremium,
     isDarkMode,
-    toggleDarkMode
+    toggleDarkMode,
+    user,
+    login,
+    logout
   };
 
   const renderScreen = () => {
     switch (currentScreen) {
+      case AppScreen.LOGIN:
+        return <LoginScreen {...commonProps} />;
+      case AppScreen.PARTNER_DASHBOARD:
+        return <PartnerDashboardScreen {...commonProps} />;
       case AppScreen.HOME:
         return <HomeScreen {...commonProps} />;
       case AppScreen.MEMBERSHIP:
@@ -76,6 +100,8 @@ export default function App() {
         return <AddressScreen {...commonProps} />;
       case AppScreen.BOOKING:
         return <BookingScreen {...commonProps} />;
+      case AppScreen.BOOKING_DETAIL:
+        return <BookingDetailScreen {...commonProps} booking={MOCK_BOOKINGS[0]} />;
       case AppScreen.SUPPORT:
         return <SupportScreen {...commonProps} />;
       case AppScreen.SERVICE_SELECTION:
@@ -90,7 +116,6 @@ export default function App() {
   };
 
   return (
-    // Mobile container wrapper for desktop viewing
     <div className="flex justify-center min-h-screen bg-gray-100 dark:bg-neutral-900 transition-colors duration-300">
       <div className="w-full max-w-md bg-white dark:bg-black shadow-2xl overflow-hidden min-h-screen transition-colors duration-300">
         {renderScreen()}
