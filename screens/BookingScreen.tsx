@@ -3,8 +3,12 @@ import { AppScreen, Booking, BookingStatus, NavigationProps } from '../types';
 import { BottomNav } from '../components/BottomNav';
 import { MOCK_BOOKINGS } from '../mockData';
 
-export const BookingScreen: React.FC<NavigationProps> = (props) => {
-  const { navigateTo } = props;
+interface BookingScreenProps extends NavigationProps {
+  onSelectBooking?: (booking: Booking) => void;
+}
+
+export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
+  const { navigateTo, onSelectBooking } = props;
   const [activeTab, setActiveTab] = useState<'ACTIVE' | 'HISTORY' | 'CANCELLED'>('ACTIVE');
 
   const filteredBookings = MOCK_BOOKINGS.filter(b => {
@@ -76,7 +80,11 @@ export const BookingScreen: React.FC<NavigationProps> = (props) => {
                     key={booking.id}
                     onClick={() => {
                         if (booking.status !== BookingStatus.CANCELLED) {
-                            navigateTo(AppScreen.BOOKING_DETAIL);
+                            if (onSelectBooking) {
+                                onSelectBooking(booking);
+                            } else {
+                                navigateTo(AppScreen.BOOKING_DETAIL);
+                            }
                         }
                     }}
                     className="group bg-white dark:bg-[#1a1a1a] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-white/5 active:scale-[0.99] transition-all cursor-pointer hover:shadow-md hover:border-primary/20"

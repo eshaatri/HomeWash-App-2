@@ -12,7 +12,7 @@ import { CheckoutScreen } from './screens/CheckoutScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { PartnerDashboardScreen } from './screens/PartnerDashboardScreen';
 import { BookingDetailScreen } from './screens/BookingDetailScreen';
-import { AppScreen, User, UserRole } from './types';
+import { AppScreen, User, UserRole, Booking } from './types';
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from './mockData';
 
 export default function App() {
@@ -20,6 +20,7 @@ export default function App() {
   const [isPremium, setIsPremium] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   // Apply theme colors via CSS variables
   useEffect(() => {
@@ -101,11 +102,14 @@ export default function App() {
       case AppScreen.ADDRESSES:
         return <AddressScreen {...commonProps} />;
       case AppScreen.BOOKING:
-        return <BookingScreen {...commonProps} />;
+        return <BookingScreen {...commonProps} onSelectBooking={(b) => {
+          setSelectedBooking(b);
+          navigateTo(AppScreen.BOOKING_DETAIL);
+        }} />;
       case AppScreen.SLOT_SELECTION:
         return <SlotSelectionScreen {...commonProps} />;
       case AppScreen.BOOKING_DETAIL:
-        return <BookingDetailScreen {...commonProps} booking={MOCK_BOOKINGS[0]} />;
+        return <BookingDetailScreen {...commonProps} booking={selectedBooking || MOCK_BOOKINGS[0]} />;
       case AppScreen.SUPPORT:
         return <SupportScreen {...commonProps} />;
       case AppScreen.SUB_CATEGORY:
