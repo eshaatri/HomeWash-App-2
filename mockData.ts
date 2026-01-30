@@ -23,7 +23,7 @@ export const CATEGORIES: ServiceCategory[] = [
   { id: 'c1', name: 'Home Cleaning', icon: 'cleaning_services', color: 'bg-blue-100 text-blue-600' },
   { id: 'c2', name: 'Bathroom Cleaning', icon: 'bathroom', color: 'bg-indigo-100 text-indigo-600' },
   { id: 'c3', name: 'Kitchen Cleaning', icon: 'kitchen', color: 'bg-orange-100 text-orange-600' },
-  { id: 'c4', name: 'Water Tank', icon: 'water_drop', color: 'bg-cyan-100 text-cyan-600' },
+  { id: 'c4', name: 'Water Tank Cleaning', icon: 'water_drop', color: 'bg-cyan-100 text-cyan-600' },
   { id: 'c5', name: 'Sofa Cleaning', icon: 'chair', color: 'bg-amber-100 text-amber-600' },
   { id: 'c6', name: 'Car Wash', icon: 'directions_car', color: 'bg-slate-100 text-slate-600' },
 ];

@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { AppScreen, Booking, BookingStatus, NavigationProps } from '../types';
 import { BottomNav } from '../components/BottomNav';
-import { MOCK_BOOKINGS } from '../mockData';
 
 interface BookingScreenProps extends NavigationProps {
   onSelectBooking?: (booking: Booking) => void;
 }
 
 export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
-  const { navigateTo, onSelectBooking } = props;
+  const { navigateTo, onSelectBooking, bookings } = props;
   const [activeTab, setActiveTab] = useState<'ACTIVE' | 'HISTORY' | 'CANCELLED'>('ACTIVE');
 
-  const filteredBookings = MOCK_BOOKINGS.filter(b => {
+  const filteredBookings = bookings.filter(b => {
     if (activeTab === 'ACTIVE') {
       return [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.PARTNER_ASSIGNED, BookingStatus.PARTNER_EN_ROUTE, BookingStatus.IN_PROGRESS].includes(b.status);
     } else if (activeTab === 'HISTORY') {

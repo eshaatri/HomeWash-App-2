@@ -74,6 +74,11 @@ export interface Booking {
   otp?: string;
 }
 
+export interface CartItem {
+  service: Service;
+  quantity: number;
+}
+
 export interface NavigationProps {
   currentScreen: AppScreen;
   navigateTo: (screen: AppScreen) => void;
@@ -84,8 +89,17 @@ export interface NavigationProps {
   user: User | null;
   login: (phone: string, role: UserRole) => void;
   logout: () => void;
-  cart: Service[];
+  
+  // Data State
+  bookings: Booking[];
+  cart: CartItem[];
+  // Map serviceId -> { date, time }
+  serviceSlots: Record<string, { date: string; time: string }>;
+
+  // Actions
   addToCart: (service: Service) => void;
   removeFromCart: (serviceId: string) => void;
   decreaseQuantity: (service: Service) => void;
+  setServiceSlot: (serviceId: string, date: string, time: string) => void;
+  onPaymentComplete: () => void;
 }

@@ -1,22 +1,11 @@
 import React from 'react';
-import { AppScreen, NavigationProps, Service } from '../types';
+import { AppScreen, NavigationProps } from '../types';
 
-export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, removeFromCart, decreaseQuantity, addToCart, isPremium }) => {
-  const subTotal = cart.reduce((sum, item) => sum + item.price, 0);
+export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, removeFromCart, addToCart, decreaseQuantity, isPremium }) => {
+  const subTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const tax = subTotal * 0.05;
   const discount = isPremium ? 25 : 0;
   const total = Math.max(0, subTotal + tax - discount);
-
-  // Group cart items
-  const groupedCart = cart.reduce((acc, item) => {
-    const existing = acc.find(i => i.service.id === item.id);
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        acc.push({ service: item, quantity: 1 });
-    }
-    return acc;
-  }, [] as { service: Service, quantity: number }[]);
 
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-32 bg-alabaster dark:bg-onyx text-onyx dark:text-alabaster font-display antialiased transition-colors duration-300">
@@ -27,21 +16,19 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
         >
           <span className="material-symbols-outlined text-sm">arrow_back_ios_new</span>
         </button>
-        <span className="text-xs font-bold tracking-[0.2em] uppercase text-gray-400 dark:text-white/60">Checkout</span>
-        <button className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-onyx-light text-gray-400 dark:text-white/60 transition-colors hover:text-black dark:hover:text-white">
-          <span className="material-symbols-outlined">more_horiz</span>
-        </button>
+        <span className="text-xs font-bold tracking-[0.2em] uppercase text-gray-400 dark:text-white/60">Cart</span>
+        <div className="h-10 w-10"></div>
       </header>
 
       <div className="px-6 pt-4 pb-2">
         <h1 className="text-[3rem] font-black leading-none tracking-tighter text-onyx dark:text-alabaster">
-          Cart<span className="text-primary">.</span>
+          Your<br/><span className="text-primary">Order.</span>
         </h1>
-        <p className="mt-2 text-sm text-gray-400 dark:text-white/40 font-medium">{cart.length} services selected</p>
+        <p className="mt-2 text-sm text-gray-400 dark:text-white/40 font-medium">{cart.length} service types</p>
       </div>
 
       <section className="mt-4 px-6 min-h-[200px]">
-        {groupedCart.length === 0 ? (
+        {cart.length === 0 ? (
            <div className="flex flex-col items-center justify-center py-12 opacity-50">
              <span className="material-symbols-outlined text-6xl mb-4">remove_shopping_cart</span>
              <p>Your cart is empty</p>
@@ -49,46 +36,48 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
            </div>
         ) : (
             <div className="space-y-6">
-            {groupedCart.map(({ service, quantity }) => (
-                <div key={service.id} className="relative flex items-start gap-4 border-b border-gray-200 dark:border-white/5 pb-6">
+            {cart.map((item) => (
+                <div key={item.service.id} className="relative flex items-start gap-4 border-b border-gray-200 dark:border-white/5 pb-6">
                     <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-onyx-light border border-gray-200 dark:border-white/5 overflow-hidden">
-                        <img src={service.image} alt={service.title} className="w-full h-full object-cover opacity-80" />
+                        <img src={item.service.image} alt={item.service.title} className="w-full h-full object-cover opacity-80" />
                     </div>
                     <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                        <div>
-                        <h3 className="text-lg font-bold text-onyx dark:text-alabaster leading-tight">{service.title}</h3>
-                        <p className="mt-1 text-xs font-medium text-gray-500 dark:text-white/40">{service.duration}</p>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-lg font-bold text-onyx dark:text-alabaster leading-tight">{item.service.title}</h3>
+                                <p className="mt-1 text-xs font-medium text-gray-500 dark:text-white/40">{item.service.duration}</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold tracking-tight text-onyx dark:text-white">${item.service.price * item.quantity}</span>
+                            </div>
                         </div>
-                        <div className="text-right">
-                             <span className="text-lg font-semibold tracking-tight text-onyx dark:text-white">${service.price * quantity}</span>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mt-3">
-                         <div className="flex items-center bg-gray-100 dark:bg-white/5 rounded-lg h-8">
-                            <button 
-                                onClick={() => decreaseQuantity(service)}
-                                className="w-8 h-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 rounded-l-lg transition-colors"
-                            >
-                                <span className="material-symbols-outlined text-sm">remove</span>
-                            </button>
-                            <span className="w-8 text-center text-sm font-bold">{quantity}</span>
-                            <button 
-                                onClick={() => addToCart(service)}
-                                className="w-8 h-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 rounded-r-lg transition-colors"
-                            >
-                                <span className="material-symbols-outlined text-sm">add</span>
-                            </button>
-                         </div>
-                         <button 
-                             onClick={() => removeFromCart(service.id)}
-                             className="text-xs text-red-500 font-medium hover:underline"
-                         >
-                             Remove
-                         </button>
-                    </div>
+                        
+                        <div className="flex items-center justify-between mt-3">
+                             {/* Quantity Controls */}
+                             <div className="flex items-center bg-gray-100 dark:bg-white/5 rounded-lg h-8">
+                                <button 
+                                    onClick={() => decreaseQuantity(item.service)}
+                                    className="w-8 h-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 rounded-l-lg transition-colors"
+                                >
+                                    <span className="material-symbols-outlined text-sm">remove</span>
+                                </button>
+                                <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
+                                <button 
+                                    onClick={() => addToCart(item.service)}
+                                    className="w-8 h-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 rounded-r-lg transition-colors"
+                                >
+                                    <span className="material-symbols-outlined text-sm">add</span>
+                                </button>
+                             </div>
 
+                            <button 
+                                onClick={() => removeFromCart(item.service.id)}
+                                className="text-xs text-red-500 font-medium hover:underline flex items-center gap-1"
+                            >
+                                <span className="material-symbols-outlined text-[14px]">delete</span>
+                                Remove
+                            </button>
+                        </div>
                     </div>
                 </div>
             ))}
@@ -147,10 +136,10 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
 
             <div className="fixed bottom-0 left-0 right-0 z-50 w-full max-w-md mx-auto border-t border-gray-200 dark:border-white/5 bg-white/90 dark:bg-onyx/90 p-6 backdrop-blur-xl transition-colors duration-300">
                 <button 
-                onClick={() => navigateTo(AppScreen.CHECKOUT)}
+                onClick={() => navigateTo(AppScreen.SLOT_SELECTION)}
                 className="group relative flex w-full items-center justify-center overflow-hidden rounded-full bg-onyx dark:bg-alabaster py-4 transition-all hover:bg-black dark:hover:bg-white active:scale-[0.98]"
                 >
-                <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-white dark:text-onyx">Proceed to Payment</span>
+                <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-white dark:text-onyx">Select Slot</span>
                 <div className="absolute inset-0 -translate-x-full bg-primary opacity-0 transition-transform duration-300 group-hover:translate-x-0 group-hover:opacity-10"></div>
                 </button>
                 <div className="h-2 w-full"></div>
