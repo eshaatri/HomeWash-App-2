@@ -84,4 +84,8 @@ export interface NavigationProps {
   user: User | null;
   login: (phone: string, role: UserRole) => void;
   logout: () => void;
+  cart: Service[];
+  addToCart: (service: Service) => void;
+  removeFromCart: (serviceId: string) => void;
+  decreaseQuantity: (service: Service) => void;
 }

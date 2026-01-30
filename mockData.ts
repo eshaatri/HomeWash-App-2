@@ -54,11 +54,11 @@ export const SUB_CATEGORIES_DATA = {
 export const SERVICES: Service[] = [
   { 
     id: 's1', 
-    title: 'Full Home Deep Cleaning', 
+    title: 'Deep Home Cleaning', 
     price: 199, 
     originalPrice: 249,
     duration: '4 Hrs', 
-    description: 'Complete top-to-bottom restoration including machine floor scrubbing and sanitization.',
+    description: 'Complete top-to-bottom restoration.',
     rating: 4.8,
     reviewCount: 1240,
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD5c6hvQ269iGoWpfvLQDj7bmbtgQqliAJq7BfBgfU8BHSZcE672IWwFIUyJwLcXTmRxl-d_6CJGFY8mrBW_yYweVNb0Z8pwQMyLnSDTo0OkDBx3H2C6kv7t6i8CmM--y6OgboO4_hRAVdAPLhRcmW5Iwf_tTuBbeplYcIo5l2upmHCwrLpjiX4GjFVevtkalgAkoM7Zmx65Lz5m_wtRsf-iJCLDXu9twEi1DRlqL1TtgrE-tHdbGkjNlYM0C2O5h4WFVNfyD4uPNY',
@@ -66,23 +66,33 @@ export const SERVICES: Service[] = [
   },
   { 
     id: 's2', 
-    title: 'Premium Sofa Cleaning', 
-    price: 49, 
-    duration: '1 Hr', 
-    description: 'Vacuuming and shampooing for 3-seater sofa using specialized fabric care.',
+    title: 'Kitchen Sanitization', 
+    price: 89, 
+    duration: '2 Hrs', 
+    description: 'Grease removal and appliance detailing.',
     rating: 4.7,
-    reviewCount: 850,
+    reviewCount: 450,
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQyKII_vIaYbueglrCgh8F-6OF2PmOkj_bk4X1NuaRUaG6y4NFTB8zkvoUBZifEDIflhH_vZTPVTbUi9ppddj_PADLZ0Il4Vsmr9H9nVcoY0k-neYBhDNDzKMHL24IdQyDdjbg9z_AA9ueRIAis-0JpNbTycooHUHFjvfvfW12Ph2DWiEhKPP_W2nkZpSEYQ4K-opYDnVrif3S7JtLwW5khRfD5qc-wFSUznoff5_xsW1tqqLI73qRV4Sx0ZH-fvpasYD6YzS7f20'
   },
   { 
     id: 's3', 
-    title: 'Intense Bathroom Scrub', 
-    price: 39, 
-    duration: '45 Mins', 
-    description: 'Hard water scale removal, deep tile scrubbing and germ-kill sanitization.',
+    title: 'Bathroom Sparkle', 
+    price: 69, 
+    duration: '1.5 Hrs', 
+    description: 'Tile scrubbing and fixture polishing.',
     rating: 4.9,
     reviewCount: 2100,
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDhMOlSsEXRDt3sDDyty-vRXWr9jTMfio4HeOZi-wMf023A4X41bpDbxNoMTChDF3Q7UsnfNjf4uO9K3KvdwtLVUq9OsiWgG827dJOoZ8asEZ3pr14pe72BEq5VkZ82epmnm4AUhIuDiL6TM_ev5YD5WhGGC2EWBxbosU6TMvisuWQs2qtTKt-f2FcexXRiQUbbC0IAy9oUDhO3H4gH-aDNn_C25obcofREoGJcAnmog7P2vfTgtxgrAvoJ1XCfM1K14feVlYB71eo'
+  },
+  { 
+    id: 's4', 
+    title: 'Sofa & Carpet Grooming', 
+    price: 120, 
+    duration: '3 Hrs', 
+    description: 'Deep shampoo and fabric care.',
+    rating: 4.8,
+    reviewCount: 320,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCxfgxTKVL3pzVbOj0bxIsLzORLmiwHUocaoDIr3VK0eMNh2-xL8OaiKej1o7duNf9CGGFUEH_DYX84BsAUIJjJClBT5WFsDHKfqOuXr0PnxAc4M25nFQuJuRNGHPM9npjmlRHgbm1LC2lCt6LaxRo7HDUNkJ5cB3r7YXArocq0d1-K9aXTgu7pw0zBhLG-nqz3qyz6QgUVewEQIi8XaSV5G3poBZnOfDI7Da3k6YhgWEhGJs9FAjjobjyCarCekl_fszz01AYxhiM'
   }
 ];
 

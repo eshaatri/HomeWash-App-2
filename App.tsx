@@ -12,7 +12,7 @@ import { CheckoutScreen } from './screens/CheckoutScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { PartnerDashboardScreen } from './screens/PartnerDashboardScreen';
 import { BookingDetailScreen } from './screens/BookingDetailScreen';
-import { AppScreen, User, UserRole, Booking } from './types';
+import { AppScreen, User, UserRole, Booking, Service } from './types';
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from './mockData';
 
 export default function App() {
@@ -21,6 +21,7 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [cart, setCart] = useState<Service[]>([]);
 
   // Apply theme colors via CSS variables
   useEffect(() => {
@@ -77,6 +78,24 @@ export default function App() {
     setCurrentScreen(AppScreen.LOGIN);
   };
 
+  const addToCart = (service: Service) => {
+    setCart((prev) => [...prev, service]);
+  };
+
+  const decreaseQuantity = (service: Service) => {
+    setCart((prev) => {
+      const index = prev.findIndex((item) => item.id === service.id);
+      if (index === -1) return prev;
+      const newCart = [...prev];
+      newCart.splice(index, 1);
+      return newCart;
+    });
+  };
+
+  const removeFromCart = (serviceId: string) => {
+    setCart((prev) => prev.filter((item) => item.id !== serviceId));
+  };
+
   const commonProps = {
     currentScreen,
     navigateTo,
@@ -86,7 +105,11 @@ export default function App() {
     toggleDarkMode,
     user,
     login,
-    logout
+    logout,
+    cart,
+    addToCart,
+    removeFromCart,
+    decreaseQuantity
   };
 
   const renderScreen = () => {
