@@ -5,12 +5,12 @@ import { SERVICES, CATEGORIES } from '../mockData';
 export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, cart, addToCart, decreaseQuantity }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   
-  // Drag to scroll refs and state
+  // Drag-to-Scroll Refs
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isDown, setIsDown] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const isDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+  const isDragging = useRef(false);
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -32,48 +32,62 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
   const currentCategoryName = MENU_ITEMS.find(i => i.id === selectedCategory)?.name || 'All Services';
   const isSelectedComingSoon = MENU_ITEMS.find(i => i.id === selectedCategory)?.isComingSoon;
 
-  // Mouse Events for Drag Scrolling
+  const handleCategoryClick = (id: string) => {
+      // Prevent click if we were dragging (accidental click protection)
+      if (isDragging.current) return;
+      
+      setSelectedCategory(id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // --- Mouse Drag Handlers ---
   const onMouseDown = (e: React.MouseEvent) => {
-    setIsDown(true);
-    if(scrollRef.current) {
-        setStartX(e.pageX - scrollRef.current.offsetLeft);
-        setScrollLeft(scrollRef.current.scrollLeft);
+    isDown.current = true;
+    isDragging.current = false;
+    if (scrollRef.current) {
+        scrollRef.current.classList.add('cursor-grabbing');
+        scrollRef.current.classList.remove('cursor-grab');
+        startX.current = e.pageX - scrollRef.current.offsetLeft;
+        scrollLeft.current = scrollRef.current.scrollLeft;
     }
   };
 
   const onMouseLeave = () => {
-    setIsDown(false);
-    setIsDragging(false);
-  };
-
-  const onMouseUp = () => {
-    setIsDown(false);
-    setTimeout(() => setIsDragging(false), 0);
-  };
-
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDown) return;
-    e.preventDefault();
-    if(scrollRef.current) {
-        const x = e.pageX - scrollRef.current.offsetLeft;
-        const walk = (x - startX) * 2; // Scroll speed multiplier
-        scrollRef.current.scrollLeft = scrollLeft - walk;
-        if (Math.abs(walk) > 5) {
-            setIsDragging(true);
-        }
+    isDown.current = false;
+    if (scrollRef.current) {
+        scrollRef.current.classList.remove('cursor-grabbing');
+        scrollRef.current.classList.add('cursor-grab');
     }
   };
 
-  const handleCategoryClick = (id: string) => {
-      if (isDragging) return;
-      setSelectedCategory(id);
+  const onMouseUp = () => {
+    isDown.current = false;
+    if (scrollRef.current) {
+        scrollRef.current.classList.remove('cursor-grabbing');
+        scrollRef.current.classList.add('cursor-grab');
+    }
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDown.current) return;
+    e.preventDefault();
+    if (scrollRef.current) {
+        const x = e.pageX - scrollRef.current.offsetLeft;
+        const walk = (x - startX.current) * 2; // Scroll speed multiplier
+        scrollRef.current.scrollLeft = scrollLeft.current - walk;
+        
+        // Detect drag intent (move > 5px) to prevent accidental clicks
+        if (Math.abs(x - startX.current) > 5) {
+            isDragging.current = true;
+        }
+    }
   };
 
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-alabaster dark:bg-black font-display text-onyx dark:text-white antialiased transition-colors duration-300">
       
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors">
+      {/* Header - Sticky with Horizontal Drag-Scroll Menu */}
+      <div className="sticky top-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors shadow-sm">
           <div className="flex items-center p-4 justify-between">
             <div 
               onClick={() => navigateTo(AppScreen.HOME)}
@@ -98,14 +112,14 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
             </div>
           </div>
 
-          {/* Horizontally Scrollable Menu */}
+          {/* Horizontal Scrollable Menu with Drag Logic */}
           <div 
-            ref={scrollRef}
-            onMouseDown={onMouseDown}
-            onMouseLeave={onMouseLeave}
-            onMouseUp={onMouseUp}
-            onMouseMove={onMouseMove}
-            className="flex w-full overflow-x-auto gap-2 pb-3 px-4 no-scrollbar cursor-grab active:cursor-grabbing"
+              ref={scrollRef}
+              onMouseDown={onMouseDown}
+              onMouseLeave={onMouseLeave}
+              onMouseUp={onMouseUp}
+              onMouseMove={onMouseMove}
+              className="flex w-full overflow-x-auto gap-2 px-4 pb-4 no-scrollbar cursor-grab active:cursor-grabbing select-none"
           >
               {MENU_ITEMS.map((item) => {
                   const isActive = selectedCategory === item.id;
@@ -113,14 +127,14 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
                       <button
                           key={item.id}
                           onClick={() => handleCategoryClick(item.id)}
-                          className={`flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border select-none ${
+                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border select-none whitespace-nowrap ${
                               isActive 
-                              ? 'bg-primary border-primary text-black shadow-md shadow-primary/20' 
-                              : 'bg-transparent border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-white/30'
+                              ? 'bg-primary border-primary text-onyx shadow-md shadow-primary/20' 
+                              : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
                           }`}
                       >
                           {item.name}
-                          {item.isComingSoon && <span className="ml-1 text-[9px] opacity-70">(Soon)</span>}
+                          {item.isComingSoon && <span className="ml-1 opacity-60 font-medium">(SOON)</span>}
                       </button>
                   );
               })}
@@ -144,9 +158,9 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
               </p>
           </div>
       ) : (
-          <div className="space-y-4 pb-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-3 pb-4">
             {filteredServices.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 px-6 opacity-60">
+                <div className="flex flex-col items-center justify-center py-12 px-6 opacity-60 col-span-full">
                     <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">search_off</span>
                     <p className="text-center text-gray-500 dark:text-gray-400 font-medium">
                         No active services found for this category.
@@ -158,45 +172,47 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
                     const quantity = cartItem ? cartItem.quantity : 0;
                     
                     return (
-                        <div key={service.id} className="px-4 py-2 @container">
-                        <div className="flex flex-col items-stretch justify-start rounded-xl bg-white dark:bg-[#121212] shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 overflow-hidden transition-all">
+                        <div key={service.id} className="w-full">
+                        <div className="flex flex-col h-full justify-between rounded-xl bg-white dark:bg-[#121212] shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 overflow-hidden transition-all hover:shadow-md hover:ring-primary/50">
                             <div 
-                            className="w-full bg-center bg-no-repeat aspect-video bg-cover" 
+                            className="w-full bg-center bg-no-repeat bg-cover h-32 md:h-40" 
                             style={{ backgroundImage: `url("${service.image}")` }}
                             ></div>
-                            <div className="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 p-4">
-                            <div className="flex justify-between items-start">
-                                <p className="text-onyx dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">{service.title}</p>
-                                <span className="material-symbols-outlined text-gray-400 dark:text-gray-500 text-xl">info</span>
+                            <div className="flex w-full min-w-0 grow flex-col gap-1 p-3">
+                            <div className="flex justify-between items-start gap-1">
+                                <p className="text-onyx dark:text-white text-sm font-bold leading-tight tracking-[-0.015em] line-clamp-2">{service.title}</p>
                             </div>
-                            <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal mb-3">{service.description}</p>
-                            <div className="flex items-center gap-3 justify-between mt-auto">
-                                <p className="text-onyx dark:text-white text-lg font-bold leading-normal">₹{service.price}</p>
-                                
-                                {quantity === 0 ? (
-                                <button 
-                                    onClick={() => addToCart(service)}
-                                    className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-white dark:bg-[#121212] border border-primary text-primary hover:bg-primary hover:text-black transition-colors text-sm font-bold leading-normal active:scale-95"
-                                >
-                                    Add
-                                </button>
-                                ) : (
-                                    <div className="flex items-center justify-between min-w-[100px] h-9 rounded-lg bg-primary/10 border border-primary overflow-hidden">
-                                        <button 
-                                            onClick={() => decreaseQuantity(service)}
-                                            className="w-8 h-full flex items-center justify-center text-primary hover:bg-primary hover:text-black transition-colors active:bg-primary/80"
-                                        >
-                                            <span className="material-symbols-outlined text-lg">remove</span>
-                                        </button>
-                                        <span className="font-bold text-sm text-primary w-8 text-center">{quantity}</span>
-                                        <button 
-                                            onClick={() => addToCart(service)}
-                                            className="w-8 h-full flex items-center justify-center text-primary hover:bg-primary hover:text-black transition-colors active:bg-primary/80"
-                                        >
-                                            <span className="material-symbols-outlined text-lg">add</span>
-                                        </button>
-                                    </div>
-                                )}
+                            <p className="text-gray-500 dark:text-gray-400 text-[11px] font-normal leading-tight mb-2 line-clamp-2">{service.description}</p>
+                            
+                            <div className="flex flex-col gap-2 mt-auto">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-onyx dark:text-white text-sm font-bold leading-normal">₹{service.price}</p>
+                                    
+                                    {quantity === 0 ? (
+                                    <button 
+                                        onClick={() => addToCart(service)}
+                                        className="flex h-7 px-3 items-center justify-center rounded-md bg-white dark:bg-[#121212] border border-primary text-primary hover:bg-primary hover:text-black transition-colors text-xs font-bold active:scale-95"
+                                    >
+                                        Add
+                                    </button>
+                                    ) : (
+                                        <div className="flex items-center justify-between h-7 bg-primary/10 border border-primary rounded-md overflow-hidden">
+                                            <button 
+                                                onClick={() => decreaseQuantity(service)}
+                                                className="w-7 h-full flex items-center justify-center text-primary hover:bg-primary hover:text-black transition-colors active:bg-primary/80"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">remove</span>
+                                            </button>
+                                            <span className="font-bold text-xs text-primary px-1 min-w-[1.5rem] text-center">{quantity}</span>
+                                            <button 
+                                                onClick={() => addToCart(service)}
+                                                className="w-7 h-full flex items-center justify-center text-primary hover:bg-primary hover:text-black transition-colors active:bg-primary/80"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">add</span>
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             </div>
                         </div>
@@ -208,8 +224,8 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
       )}
 
       {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white/95 dark:bg-black/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)] z-50 transition-colors">
-          <div className="flex items-center justify-between gap-4">
+        <div className="fixed bottom-0 left-0 right-0 md:left-64 max-w-md md:max-w-none mx-auto p-4 bg-white/95 dark:bg-black/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)] z-50 transition-colors">
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             <div className="flex flex-col">
               <span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Total</span>
               <span className="text-xl font-bold text-onyx dark:text-white">
@@ -218,7 +234,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
             </div>
             <button 
               onClick={() => navigateTo(AppScreen.CART)}
-              className="flex-1 bg-onyx dark:bg-white hover:opacity-90 text-white dark:text-black font-bold rounded-lg h-12 px-6 flex items-center justify-center shadow-lg shadow-black/10 dark:shadow-white/10 transition-all active:scale-95"
+              className="flex-1 bg-onyx dark:bg-white hover:opacity-90 text-white dark:text-black font-bold rounded-lg h-12 px-6 flex items-center justify-center shadow-lg shadow-black/10 dark:shadow-white/10 transition-all active:scale-95 max-w-xs"
             >
               Go to Cart ({cartItemCount})
             </button>

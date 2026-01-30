@@ -10,7 +10,7 @@ export const BottomNav: React.FC<NavigationProps> = ({ currentScreen, navigateTo
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 z-50 w-full border-t border-gray-200 dark:border-white/5 bg-white/90 dark:bg-onyx/90 pb-safe backdrop-blur-xl max-w-md mx-auto right-0 transition-colors duration-300">
+    <nav className="md:hidden fixed bottom-0 left-0 z-50 w-full border-t border-gray-200 dark:border-white/5 bg-white/90 dark:bg-onyx/90 pb-safe backdrop-blur-xl max-w-md mx-auto right-0 transition-colors duration-300">
       <div className="flex h-16 items-center justify-around px-2">
         {navItems.map((item) => {
           const isActive = currentScreen === item.screen;

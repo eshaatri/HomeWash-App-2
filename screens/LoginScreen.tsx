@@ -19,7 +19,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ login }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white p-6 items-center justify-center font-display transition-colors duration-300">
+    <div className="flex flex-col min-h-screen w-full bg-white p-6 items-center justify-center font-display transition-colors duration-300">
         {/* Main Content Container */}
         <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm">
             
@@ -54,7 +54,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ login }) => {
                         </div>
                         <button 
                             onClick={handleSendOtp}
-                            className="w-full bg-black text-white font-bold h-12 rounded-lg text-sm active:scale-[0.98] transition-transform"
+                            className="w-full bg-black text-white font-bold h-12 rounded-lg text-sm active:scale-[0.98] transition-transform hover:opacity-90"
                         >
                             Get Verification Code
                         </button>
@@ -82,7 +82,7 @@ export const LoginScreen: React.FC<NavigationProps> = ({ login }) => {
                         </div>
                         <button 
                             onClick={handleVerify}
-                            className="w-full bg-primary text-black font-bold h-12 rounded-lg text-sm active:scale-[0.98] transition-transform"
+                            className="w-full bg-primary text-black font-bold h-12 rounded-lg text-sm active:scale-[0.98] transition-transform hover:brightness-110"
                         >
                             Verify & Login
                         </button>

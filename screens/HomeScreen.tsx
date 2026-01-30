@@ -27,7 +27,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
   const cardStyle = isPremium ? premiumStyles : freemiumStyles;
 
   return (
-    <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-alabaster dark:bg-onyx text-onyx dark:text-alabaster transition-colors duration-300">
+    <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 md:pb-8 bg-alabaster dark:bg-onyx text-onyx dark:text-alabaster transition-colors duration-300">
       {/* Top App Bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between bg-white/90 dark:bg-onyx/90 px-6 py-4 backdrop-blur-md border-b border-gray-200 dark:border-white/5 transition-colors duration-300">
         <div className="flex flex-col cursor-pointer hover:opacity-80" onClick={() => navigateTo(AppScreen.ADDRESSES)}>
@@ -61,11 +61,11 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       </header>
 
       {/* Hero / Search */}
-      <div className="px-6 pt-6 pb-2">
-        <h1 className="text-3xl font-black tracking-tighter text-onyx dark:text-alabaster mb-4">
+      <div className="px-6 pt-6 pb-2 md:pt-10">
+        <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-onyx dark:text-alabaster mb-4">
           Hello, <span className="text-primary">{user?.name.split(' ')[0]}</span>
         </h1>
-        <div className="relative">
+        <div className="relative max-w-2xl">
             <input 
                 type="text" 
                 placeholder="Search for 'AC Repair'" 
@@ -75,14 +75,14 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
         </div>
       </div>
 
-      {/* Categories Grid - Matching Screenshot */}
+      {/* Categories Grid - Responsive */}
       <section className="px-6 py-4">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {CATEGORIES.map(cat => (
                 <button 
                     key={cat.id} 
                     onClick={() => navigateTo(AppScreen.SUB_CATEGORY)}
-                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform h-28"
+                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform h-28 hover:shadow-md hover:border-gray-200 dark:hover:border-white/10"
                 >
                     <div className={`h-10 w-10 rounded-full flex items-center justify-center mb-2 ${cat.color}`}>
                         <span className="material-symbols-outlined text-[22px]">{cat.icon}</span>
@@ -97,7 +97,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       <section className="px-6 mb-6">
           <div 
             onClick={() => navigateTo(AppScreen.BOOKING_DETAIL)}
-            className={`group relative rounded-xl p-5 overflow-hidden cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] border ${isPremium ? 'border-[#c5a059]/50' : 'border-transparent'}`}
+            className={`group relative rounded-xl p-5 overflow-hidden cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] border max-w-2xl ${isPremium ? 'border-[#c5a059]/50' : 'border-transparent'}`}
             style={cardStyle}
           >
               {/* Premium Specific Effects */}
@@ -182,7 +182,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       <section className="px-6 py-2">
         <div 
           onClick={() => navigateTo(AppScreen.MEMBERSHIP)}
-          className="group relative overflow-hidden rounded-xl border border-primary/40 bg-onyx-gradient p-1 shadow-lg cursor-pointer"
+          className="group relative overflow-hidden rounded-xl border border-primary/40 bg-onyx-gradient p-1 shadow-lg cursor-pointer max-w-2xl"
         >
           <div className="relative z-10 flex flex-col justify-between rounded-lg bg-[#121212] p-5">
             <div className="flex items-start justify-between">
@@ -204,7 +204,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
         </div>
       </section>
 
-      {/* Coming Soon Section - Compact Grid */}
+      {/* Coming Soon Section - Responsive Grid */}
       <section className="px-6 mt-6">
         <div className="flex items-center justify-between pb-4">
           <h3 className="text-lg font-bold tracking-tight text-onyx dark:text-white">Coming Soon</h3>
@@ -214,7 +214,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             Stay Tuned
           </span>
         </div>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
           {[
             { icon: 'solar_power', title: 'Solar', sub: 'Panel', color: 'bg-yellow-50 text-yellow-600' },
             { icon: 'pest_control', title: 'Pest', sub: 'Control', color: 'bg-green-50 text-green-600' },

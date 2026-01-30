@@ -67,14 +67,15 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-4 py-6 pb-32 space-y-4">
+      <main className="flex-1 px-4 py-6 pb-32 md:pb-8 space-y-4">
         {filteredBookings.length === 0 ? (
             <div className="flex flex-col items-center justify-center pt-20 opacity-50">
                 <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-700 mb-4">calendar_today</span>
                 <p className="text-gray-500 dark:text-gray-400 font-medium">No {activeTab.toLowerCase()} bookings found</p>
             </div>
         ) : (
-            filteredBookings.map((booking) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {filteredBookings.map((booking) => (
                 <div 
                     key={booking.id}
                     onClick={() => {
@@ -86,26 +87,28 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
                             }
                         }
                     }}
-                    className="group bg-white dark:bg-[#1a1a1a] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-white/5 active:scale-[0.99] transition-all cursor-pointer hover:shadow-md hover:border-primary/20"
+                    className="group bg-white dark:bg-[#1a1a1a] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-white/5 active:scale-[0.99] transition-all cursor-pointer hover:shadow-md hover:border-primary/20 h-full flex flex-col justify-between"
                 >
-                    <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400">
-                                <span className="material-symbols-outlined">cleaning_services</span>
+                    <div>
+                        <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                                    <span className="material-symbols-outlined">cleaning_services</span>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-onyx dark:text-white leading-tight">{booking.serviceName}</h3>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium mt-0.5">
+                                        {booking.date} • {booking.time}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-bold text-onyx dark:text-white leading-tight">{booking.serviceName}</h3>
-                                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium mt-0.5">
-                                    {booking.date} • {booking.time}
-                                </p>
-                            </div>
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wide ${getStatusColor(booking.status)}`}>
+                                {getStatusText(booking.status)}
+                            </span>
                         </div>
-                        <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wide ${getStatusColor(booking.status)}`}>
-                            {getStatusText(booking.status)}
-                        </span>
+                        
+                        <div className="h-px bg-gray-100 dark:bg-white/5 w-full my-3"></div>
                     </div>
-                    
-                    <div className="h-px bg-gray-100 dark:bg-white/5 w-full my-3"></div>
                     
                     <div className="flex items-center justify-between">
                          <div className="flex items-center gap-2">
@@ -139,7 +142,8 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
                          </div>
                     </div>
                 </div>
-            ))
+            ))}
+            </div>
         )}
       </main>
 
