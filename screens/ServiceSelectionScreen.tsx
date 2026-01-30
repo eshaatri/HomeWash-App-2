@@ -44,7 +44,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$199</p>
                 <button 
-                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  onClick={() => navigateTo(AppScreen.SLOT_SELECTION)}
                   className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>
@@ -69,7 +69,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$89</p>
                 <button 
-                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  onClick={() => navigateTo(AppScreen.SLOT_SELECTION)}
                   className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>
@@ -94,7 +94,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$69</p>
                 <button 
-                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  onClick={() => navigateTo(AppScreen.SLOT_SELECTION)}
                   className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>
@@ -119,7 +119,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo }
               <div className="flex items-center gap-3 justify-between mt-auto">
                 <p className="text-onyx dark:text-white text-lg font-bold leading-normal">$120</p>
                 <button 
-                  onClick={() => navigateTo(AppScreen.BOOKING)}
+                  onClick={() => navigateTo(AppScreen.SLOT_SELECTION)}
                   className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-onyx dark:bg-white border border-onyx dark:border-white text-white dark:text-black hover:opacity-90 transition-opacity text-sm font-semibold leading-normal active:scale-95">
                   <span className="truncate">Select</span>
                 </button>

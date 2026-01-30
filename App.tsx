@@ -3,8 +3,10 @@ import { HomeScreen } from './screens/HomeScreen';
 import { MembershipScreen } from './screens/MembershipScreen';
 import { AddressScreen } from './screens/AddressScreen';
 import { BookingScreen } from './screens/BookingScreen';
+import { SlotSelectionScreen } from './screens/SlotSelectionScreen';
 import { SupportScreen } from './screens/SupportScreen';
 import { ServiceSelectionScreen } from './screens/ServiceSelectionScreen';
+import { SubCategoryScreen } from './screens/SubCategoryScreen';
 import { CartScreen } from './screens/CartScreen';
 import { CheckoutScreen } from './screens/CheckoutScreen';
 import { LoginScreen } from './screens/LoginScreen';
@@ -100,10 +102,14 @@ export default function App() {
         return <AddressScreen {...commonProps} />;
       case AppScreen.BOOKING:
         return <BookingScreen {...commonProps} />;
+      case AppScreen.SLOT_SELECTION:
+        return <SlotSelectionScreen {...commonProps} />;
       case AppScreen.BOOKING_DETAIL:
         return <BookingDetailScreen {...commonProps} booking={MOCK_BOOKINGS[0]} />;
       case AppScreen.SUPPORT:
         return <SupportScreen {...commonProps} />;
+      case AppScreen.SUB_CATEGORY:
+        return <SubCategoryScreen {...commonProps} />;
       case AppScreen.SERVICE_SELECTION:
         return <ServiceSelectionScreen {...commonProps} />;
       case AppScreen.CART:

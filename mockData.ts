@@ -28,6 +28,29 @@ export const CATEGORIES: ServiceCategory[] = [
   { id: 'c6', name: 'Car Wash', icon: 'directions_car', color: 'bg-slate-100 text-slate-600' },
 ];
 
+export const SUB_CATEGORIES_DATA = {
+  title: "Cleaning & Pest Control",
+  sections: [
+    {
+      title: "Cleaning",
+      items: [
+        { id: 'sc1', name: 'Bathroom Cleaning', icon: 'bathtub', color: 'bg-blue-50 text-blue-500' },
+        { id: 'sc2', name: 'Kitchen Cleaning', icon: 'skillet', color: 'bg-gray-100 text-gray-600' },
+        { id: 'sc3', name: 'Full Home Cleaning', icon: 'home', color: 'bg-amber-50 text-amber-600' },
+        { id: 'sc4', name: 'Sofa & Carpet', icon: 'weekend', color: 'bg-yellow-50 text-yellow-600' },
+      ]
+    },
+    {
+      title: "Pest Control",
+      items: [
+        { id: 'sc5', name: 'Cockroach & Ant', icon: 'pest_control', color: 'bg-red-50 text-red-500' },
+        { id: 'sc6', name: 'Termite Control', icon: 'bug_report', color: 'bg-orange-50 text-orange-600' },
+        { id: 'sc7', name: 'Bed Bugs Control', icon: 'bed', color: 'bg-rose-50 text-rose-500' },
+      ]
+    }
+  ]
+};
+
 export const SERVICES: Service[] = [
   { 
     id: 's1', 
@@ -83,5 +106,32 @@ export const MOCK_BOOKINGS: Booking[] = [
     time: '11:00 AM',
     amount: 29.00,
     partnerName: 'Mike Ross'
+  },
+  {
+    id: 'b3',
+    serviceName: 'Sofa Cleaning',
+    status: BookingStatus.CANCELLED,
+    date: 'July 28',
+    time: '10:00 AM',
+    amount: 49.00,
+    partnerName: 'Sarah Connor'
+  },
+  {
+    id: 'b4',
+    serviceName: 'AC Service',
+    status: BookingStatus.COMPLETED,
+    date: 'June 15',
+    time: '04:00 PM',
+    amount: 59.00,
+    partnerName: 'John Doe'
+  },
+  {
+    id: 'b5',
+    serviceName: 'Plumbing Repair',
+    status: BookingStatus.CONFIRMED,
+    date: 'Tomorrow',
+    time: '09:00 AM',
+    amount: 35.00,
+    partnerName: 'Not Assigned'
   }
 ];

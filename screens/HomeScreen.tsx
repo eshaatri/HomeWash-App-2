@@ -81,7 +81,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             {CATEGORIES.map(cat => (
                 <button 
                     key={cat.id} 
-                    onClick={() => navigateTo(AppScreen.SERVICE_SELECTION)}
+                    onClick={() => navigateTo(AppScreen.SUB_CATEGORY)}
                     className="flex flex-col items-center p-3 rounded-xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform"
                 >
                     <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-2 ${cat.color} bg-opacity-20`}>

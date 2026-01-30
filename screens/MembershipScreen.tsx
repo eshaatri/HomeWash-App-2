@@ -113,7 +113,7 @@ export const MembershipScreen: React.FC<NavigationProps> = ({ navigateTo, isPrem
       {/* Sticky Footer CTA */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto w-full p-4 pb-8 bg-[#201d12]/95 backdrop-blur-xl border-t border-white/10 z-50">
         <button 
-          onClick={() => navigateTo(AppScreen.BOOKING)}
+          onClick={() => navigateTo(AppScreen.HOME)}
           className="w-full relative group overflow-hidden bg-primary text-[#201d12] font-bold text-lg h-14 rounded-lg shadow-[0_0_25px_rgba(var(--primary-r),var(--primary-g),var(--primary-b),0.25)] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
         >
           <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[20deg] group-hover:animate-shimmer"></div>
