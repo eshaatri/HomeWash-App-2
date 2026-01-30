@@ -18,7 +18,7 @@ import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from './mockData';
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.LOGIN);
   const [isPremium, setIsPremium] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   
   // Data State

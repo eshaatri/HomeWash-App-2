@@ -37,9 +37,9 @@ export const AddressScreen: React.FC<NavigationProps> = ({ navigateTo, isPremium
         {/* Address List */}
         <div className="flex flex-col gap-4">
           {[
-            { icon: 'home', title: 'Primary Residence', address: '128 W 57th St, New York, NY' },
-            { icon: 'work', title: 'Office', address: '55 Hudson Yards, New York, NY' },
-            { icon: 'favorite', title: "Parents' Home", address: '900 Biscayne Blvd, Miami, FL' }
+            { icon: 'home', title: 'Primary Residence', address: 'Flat 402, Oberoi Springs, Mumbai' },
+            { icon: 'work', title: 'Office', address: 'WeWork Galaxy, Bangalore' },
+            { icon: 'favorite', title: "Parents' Home", address: 'Defense Colony, New Delhi' }
           ].map((item) => (
             <div key={item.title} className="group relative overflow-hidden bg-white dark:bg-[#2a261a] rounded-2xl border border-neutral-200 dark:border-white/5 p-5 shadow-sm hover:shadow-md dark:hover:border-primary/30 transition-all duration-300">
               <div className="flex items-start justify-between gap-4">
@@ -76,7 +76,7 @@ export const AddressScreen: React.FC<NavigationProps> = ({ navigateTo, isPremium
         {/* Footer Info */}
         <div className="mt-auto pt-6 text-center">
           <p className="text-xs text-neutral-400 dark:text-neutral-500">
-            Your {isPremium ? 'Gold' : 'Basic'} Plan is valid for properties in New York, Los Angeles, and Miami.
+            Your {isPremium ? 'Gold' : 'Basic'} Plan is valid for properties in Mumbai, Delhi, and Bangalore.
           </p>
         </div>
       </main>

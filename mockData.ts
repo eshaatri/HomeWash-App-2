@@ -2,30 +2,30 @@ import { Booking, BookingStatus, Service, ServiceCategory, User, UserRole } from
 
 export const MOCK_USER: User = {
   id: 'u1',
-  name: 'Alex Johnson',
-  phone: '+1 987 654 3210',
+  name: 'Arjun Mehta',
+  phone: '+91 98765 43210',
   role: UserRole.CUSTOMER,
-  walletBalance: 150.00
+  walletBalance: 2500.00
 };
 
 export const MOCK_PARTNER: User = {
   id: 'p1',
-  name: 'Sarah Connor',
-  phone: '+1 555 000 0000',
+  name: 'Rajesh Kumar',
+  phone: '+91 99887 76655',
   role: UserRole.PARTNER,
-  walletBalance: 450.50,
+  walletBalance: 4500.50,
   rating: 4.9,
   isVerified: true,
-  earningsToday: 124.50
+  earningsToday: 2124.50
 };
 
 export const CATEGORIES: ServiceCategory[] = [
-  { id: 'c1', name: 'Home Cleaning', icon: 'cleaning_services', color: 'bg-blue-100 text-blue-600' },
-  { id: 'c2', name: 'Bathroom Cleaning', icon: 'bathroom', color: 'bg-indigo-100 text-indigo-600' },
-  { id: 'c3', name: 'Kitchen Cleaning', icon: 'kitchen', color: 'bg-orange-100 text-orange-600' },
-  { id: 'c4', name: 'Water Tank Cleaning', icon: 'water_drop', color: 'bg-cyan-100 text-cyan-600' },
-  { id: 'c5', name: 'Sofa Cleaning', icon: 'chair', color: 'bg-amber-100 text-amber-600' },
-  { id: 'c6', name: 'Car Wash', icon: 'directions_car', color: 'bg-slate-100 text-slate-600' },
+  { id: 'c1', name: 'Home Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
+  { id: 'c2', name: 'Bathroom Cleaning', icon: 'bathroom', color: 'bg-purple-50 text-purple-600' },
+  { id: 'c3', name: 'Kitchen Cleaning', icon: 'kitchen', color: 'bg-orange-50 text-orange-600' },
+  { id: 'c4', name: 'Water Tank Cleaning', icon: 'water_drop', color: 'bg-cyan-50 text-cyan-600' },
+  { id: 'c5', name: 'Sofa Cleaning', icon: 'weekend', color: 'bg-amber-50 text-amber-600' },
+  { id: 'c6', name: 'Car Wash', icon: 'directions_car', color: 'bg-slate-50 text-slate-600' },
 ];
 
 export const SUB_CATEGORIES_DATA = {
@@ -55,8 +55,9 @@ export const SERVICES: Service[] = [
   { 
     id: 's1', 
     title: 'Deep Home Cleaning', 
-    price: 199, 
-    originalPrice: 249,
+    categoryId: 'c1',
+    price: 1499, 
+    originalPrice: 1999,
     duration: '4 Hrs', 
     description: 'Complete top-to-bottom restoration.',
     rating: 4.8,
@@ -67,7 +68,8 @@ export const SERVICES: Service[] = [
   { 
     id: 's2', 
     title: 'Kitchen Sanitization', 
-    price: 89, 
+    categoryId: 'c3',
+    price: 699, 
     duration: '2 Hrs', 
     description: 'Grease removal and appliance detailing.',
     rating: 4.7,
@@ -77,7 +79,8 @@ export const SERVICES: Service[] = [
   { 
     id: 's3', 
     title: 'Bathroom Sparkle', 
-    price: 69, 
+    categoryId: 'c2',
+    price: 499, 
     duration: '1.5 Hrs', 
     description: 'Tile scrubbing and fixture polishing.',
     rating: 4.9,
@@ -87,7 +90,8 @@ export const SERVICES: Service[] = [
   { 
     id: 's4', 
     title: 'Sofa & Carpet Grooming', 
-    price: 120, 
+    categoryId: 'c5',
+    price: 999, 
     duration: '3 Hrs', 
     description: 'Deep shampoo and fabric care.',
     rating: 4.8,
@@ -103,9 +107,9 @@ export const MOCK_BOOKINGS: Booking[] = [
     status: BookingStatus.PARTNER_EN_ROUTE,
     date: 'Today',
     time: '2:00 PM',
-    amount: 199.00,
-    partnerName: 'David Miller',
-    partnerImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD8Ef8ElZ7J83hubPUVTphlL6jRIDuWtp5EFsDw6rd_Icq1Yg2EQlc_I5qUWcgFpbBfNFA0m-LM4jEponYXscfjzKcyhtVnstRyC40_1JyrUVKNb4ZjZyDeHZ4D6vL8v36QtcGod1pP6AQ5eh1kVQaYGeITmlsGU7RyFTaYQhENZM-HQsJjXQhJ_37OsDcQmMXZuLR7fKun5432GAyyjSHO4ai2cYemjusup_DY_6ZQY7sLdmnu4Ag0bto7swuZk-tjKULVADDumYo',
+    amount: 1499.00,
+    partnerName: 'Rajesh Kumar',
+    partnerImage: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=200&h=200',
     otp: '4492'
   },
   {
@@ -114,8 +118,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     status: BookingStatus.COMPLETED,
     date: 'Aug 12',
     time: '11:00 AM',
-    amount: 29.00,
-    partnerName: 'Mike Ross'
+    amount: 299.00,
+    partnerName: 'Amit Singh'
   },
   {
     id: 'b3',
@@ -123,8 +127,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     status: BookingStatus.CANCELLED,
     date: 'July 28',
     time: '10:00 AM',
-    amount: 49.00,
-    partnerName: 'Sarah Connor'
+    amount: 499.00,
+    partnerName: 'Priya Patel'
   },
   {
     id: 'b4',
@@ -132,8 +136,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     status: BookingStatus.COMPLETED,
     date: 'June 15',
     time: '04:00 PM',
-    amount: 59.00,
-    partnerName: 'John Doe'
+    amount: 599.00,
+    partnerName: 'Vikram Malhotra'
   },
   {
     id: 'b5',
@@ -141,7 +145,7 @@ export const MOCK_BOOKINGS: Booking[] = [
     status: BookingStatus.CONFIRMED,
     date: 'Tomorrow',
     time: '09:00 AM',
-    amount: 35.00,
+    amount: 349.00,
     partnerName: 'Not Assigned'
   }
 ];

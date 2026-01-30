@@ -45,7 +45,7 @@ export const MembershipScreen: React.FC<NavigationProps> = ({ navigateTo, isPrem
             Laundry, <br/><span className="text-primary">Redefined.</span>
           </h1>
           <p className="text-gray-400 text-base font-normal leading-relaxed max-w-xs mx-auto">
-            Unlock premium privileges across 5 cities with the Gold Standard.
+            Unlock premium privileges across 6 major metros with the Gold Standard.
           </p>
         </div>
 
@@ -76,8 +76,8 @@ export const MembershipScreen: React.FC<NavigationProps> = ({ navigateTo, isPrem
           <div className="relative z-10">
             <p className="text-xs uppercase tracking-[0.2em] text-primary font-bold mb-3">All Inclusive</p>
             <div className="flex items-start justify-center gap-1 mb-2">
-              <span className="text-2xl font-medium text-white/60 mt-2">$</span>
-              <span className="text-5xl font-bold text-white tracking-tight">29.99</span>
+              <span className="text-2xl font-medium text-white/60 mt-2">₹</span>
+              <span className="text-5xl font-bold text-white tracking-tight">499</span>
             </div>
             <p className="text-gray-400 text-sm mb-6">per month, billed annually</p>
             <div className="inline-flex items-center gap-2 bg-[#201d12]/80 border border-white/10 px-3 py-1.5 rounded-lg">

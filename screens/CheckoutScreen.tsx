@@ -4,7 +4,7 @@ import { AppScreen, NavigationProps } from '../types';
 export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, isPremium, onPaymentComplete, serviceSlots }) => {
   const subTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const tax = subTotal * 0.05;
-  const discount = isPremium ? 25 : 0;
+  const discount = isPremium ? 250 : 0;
   const total = Math.max(0, subTotal + tax - discount);
 
   return (
@@ -23,7 +23,7 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, is
       <div className="flex flex-col items-center justify-center py-10">
         <span className="mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">Total Payment</span>
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl font-light tracking-tighter text-onyx dark:text-white">${total.toFixed(2)}</span>
+          <span className="text-5xl font-light tracking-tighter text-onyx dark:text-white">₹{total.toFixed(2)}</span>
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-full border border-gray-200 dark:border-white/5 bg-white dark:bg-white/5 px-3 py-1">
           <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
@@ -128,7 +128,7 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, is
           onClick={onPaymentComplete}
           className="group relative w-full overflow-hidden rounded-lg bg-onyx dark:bg-white py-4 shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-transform active:scale-[0.98]"
         >
-          <span className="relative z-10 text-base font-bold text-white dark:text-onyx">Pay ${total.toFixed(2)}</span>
+          <span className="relative z-10 text-base font-bold text-white dark:text-onyx">Pay ₹{total.toFixed(2)}</span>
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 dark:via-gray-200/50 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></div>
         </button>
         <div className="mt-6 flex justify-center gap-4 grayscale opacity-20">

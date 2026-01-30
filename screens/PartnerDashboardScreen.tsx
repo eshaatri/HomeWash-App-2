@@ -10,7 +10,7 @@ export const PartnerDashboardScreen: React.FC<NavigationProps> = ({ navigateTo, 
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8Ef8ElZ7J83hubPUVTphlL6jRIDuWtp5EFsDw6rd_Icq1Yg2EQlc_I5qUWcgFpbBfNFA0m-LM4jEponYXscfjzKcyhtVnstRyC40_1JyrUVKNb4ZjZyDeHZ4D6vL8v36QtcGod1pP6AQ5eh1kVQaYGeITmlsGU7RyFTaYQhENZM-HQsJjXQhJ_37OsDcQmMXZuLR7fKun5432GAyyjSHO4ai2cYemjusup_DY_6ZQY7sLdmnu4Ag0bto7swuZk-tjKULVADDumYo" alt="Partner" className="h-full w-full object-cover"/>
+                    <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=200&h=200" alt="Partner" className="h-full w-full object-cover"/>
                 </div>
                 <div>
                     <h2 className="font-bold text-sm">Hi, {MOCK_PARTNER.name}</h2>
@@ -33,7 +33,7 @@ export const PartnerDashboardScreen: React.FC<NavigationProps> = ({ navigateTo, 
       <div className="p-4 grid grid-cols-2 gap-3">
         <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl shadow-sm border border-gray-100 dark:border-white/5">
             <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Today's Earnings</p>
-            <p className="text-2xl font-bold mt-1">${MOCK_PARTNER.earningsToday}</p>
+            <p className="text-2xl font-bold mt-1">₹{MOCK_PARTNER.earningsToday}</p>
         </div>
         <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl shadow-sm border border-gray-100 dark:border-white/5">
             <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Jobs Done</p>
@@ -56,7 +56,7 @@ export const PartnerDashboardScreen: React.FC<NavigationProps> = ({ navigateTo, 
                         <p className="text-sm opacity-80">Booking #8292</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-xl font-bold">$149.00</p>
+                        <p className="text-xl font-bold">₹1499.00</p>
                         <p className="text-xs font-medium">Cash on Delivery</p>
                     </div>
                 </div>
@@ -65,8 +65,8 @@ export const PartnerDashboardScreen: React.FC<NavigationProps> = ({ navigateTo, 
                     <div className="flex items-start gap-3">
                         <span className="material-symbols-outlined">location_on</span>
                         <div>
-                            <p className="font-bold text-sm">128 W 57th St</p>
-                            <p className="text-xs opacity-80">New York, NY 10019</p>
+                            <p className="font-bold text-sm">Flat 402, Oberoi Springs</p>
+                            <p className="text-xs opacity-80">Bandra West, Mumbai</p>
                         </div>
                     </div>
                 </div>
@@ -97,7 +97,7 @@ export const PartnerDashboardScreen: React.FC<NavigationProps> = ({ navigateTo, 
                 <div key={i} className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-gray-100 dark:border-white/5">
                     <div className="flex justify-between items-start mb-2">
                         <h4 className="font-bold text-lg">Sofa Cleaning</h4>
-                        <span className="text-sm font-bold">$50.00</span>
+                        <span className="text-sm font-bold">₹499.00</span>
                     </div>
                     <p className="text-gray-500 text-sm mb-3">3.5 km away • 45 mins duration</p>
                     <div className="flex gap-2">

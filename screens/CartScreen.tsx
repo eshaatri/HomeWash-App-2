@@ -4,7 +4,7 @@ import { AppScreen, NavigationProps } from '../types';
 export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, removeFromCart, addToCart, decreaseQuantity, isPremium }) => {
   const subTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const tax = subTotal * 0.05;
-  const discount = isPremium ? 25 : 0;
+  const discount = isPremium ? 250 : 0;
   const total = Math.max(0, subTotal + tax - discount);
 
   return (
@@ -48,7 +48,7 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
                                 <p className="mt-1 text-xs font-medium text-gray-500 dark:text-white/40">{item.service.duration}</p>
                             </div>
                             <div className="text-right">
-                                <span className="text-lg font-semibold tracking-tight text-onyx dark:text-white">${item.service.price * item.quantity}</span>
+                                <span className="text-lg font-semibold tracking-tight text-onyx dark:text-white">₹{item.service.price * item.quantity}</span>
                             </div>
                         </div>
                         
@@ -97,7 +97,7 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
                         </div>
                         <div>
                             <p className="text-sm font-bold text-onyx dark:text-white">Use Gold Credit</p>
-                            <p className="text-xs text-primary/80">Balance: $450.00</p>
+                            <p className="text-xs text-primary/80">Balance: ₹2500.00</p>
                         </div>
                         </div>
                         <label className="relative inline-flex cursor-pointer items-center">
@@ -114,23 +114,23 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
                 <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-gray-600 dark:text-alabaster/70">
                     <span>Subtotal</span>
-                    <span className="font-medium text-onyx dark:text-alabaster">${subTotal.toFixed(2)}</span>
+                    <span className="font-medium text-onyx dark:text-alabaster">₹{subTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600 dark:text-alabaster/70">
                     <span>Taxes & Fees (5%)</span>
-                    <span className="font-medium text-onyx dark:text-alabaster">${tax.toFixed(2)}</span>
+                    <span className="font-medium text-onyx dark:text-alabaster">₹{tax.toFixed(2)}</span>
                 </div>
                 {isPremium && (
                     <div className="flex justify-between text-primary/80">
                         <span>Gold Member Savings</span>
-                        <span className="font-medium">-${discount.toFixed(2)}</span>
+                        <span className="font-medium">-₹{discount.toFixed(2)}</span>
                     </div>
                 )}
                 </div>
                 <div className="my-6 h-px w-full bg-gray-200 dark:bg-white/5"></div>
                 <div className="flex items-end justify-between">
                 <span className="mb-1 text-sm font-medium text-gray-500 dark:text-white/50">Total Amount</span>
-                <span className="text-4xl font-black tracking-tight text-onyx dark:text-white">${total.toFixed(2)}</span>
+                <span className="text-4xl font-black tracking-tight text-onyx dark:text-white">₹{total.toFixed(2)}</span>
                 </div>
             </section>
 

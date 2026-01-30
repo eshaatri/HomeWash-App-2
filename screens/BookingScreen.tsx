@@ -123,7 +123,7 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
                              )}
                          </div>
                          <div className="flex items-center gap-2">
-                             <span className="text-sm font-bold text-onyx dark:text-white">${booking.amount}</span>
+                             <span className="text-sm font-bold text-onyx dark:text-white">₹{booking.amount}</span>
                              {booking.status === BookingStatus.COMPLETED && (
                                 <button className="flex items-center gap-1 text-xs font-bold text-primary border border-primary/20 px-2 py-1 rounded hover:bg-primary/10 transition-colors">
                                     <span className="material-symbols-outlined text-[14px]">refresh</span>

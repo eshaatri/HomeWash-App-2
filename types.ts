@@ -1,3 +1,4 @@
+
 export enum AppScreen {
   LOGIN = 'LOGIN',
   HOME = 'HOME',
@@ -53,6 +54,7 @@ export interface Service {
   reviewCount: number;
   image: string;
   bestseller?: boolean;
+  categoryId?: string;
 }
 
 export interface ServiceCategory {

@@ -36,7 +36,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             <span className="text-[10px] font-bold tracking-widest uppercase">Current Location</span>
             <span className="material-symbols-outlined text-[14px]">expand_more</span>
           </div>
-          <p className="text-sm font-bold truncate max-w-[160px] text-onyx dark:text-white">New York, NY 10019</p>
+          <p className="text-sm font-bold truncate max-w-[160px] text-onyx dark:text-white">Bandra West, Mumbai 400050</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -75,19 +75,19 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
         </div>
       </div>
 
-      {/* Categories Grid */}
+      {/* Categories Grid - Matching Screenshot */}
       <section className="px-6 py-4">
         <div className="grid grid-cols-3 gap-3">
             {CATEGORIES.map(cat => (
                 <button 
                     key={cat.id} 
                     onClick={() => navigateTo(AppScreen.SUB_CATEGORY)}
-                    className="flex flex-col items-center p-3 rounded-xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform"
+                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform h-28"
                 >
-                    <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-2 ${cat.color} bg-opacity-20`}>
-                        <span className="material-symbols-outlined">{cat.icon}</span>
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center mb-2 ${cat.color}`}>
+                        <span className="material-symbols-outlined text-[22px]">{cat.icon}</span>
                     </div>
-                    <span className="text-[10px] font-bold text-center leading-tight dark:text-gray-300">{cat.name}</span>
+                    <span className="text-[10px] font-bold text-center leading-tight dark:text-gray-300 w-full px-1">{cat.name}</span>
                 </button>
             ))}
         </div>
@@ -204,34 +204,33 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
         </div>
       </section>
 
-      {/* Bestsellers Section */}
+      {/* Coming Soon Section - Compact Grid */}
       <section className="px-6 mt-6">
         <div className="flex items-center justify-between pb-4">
-          <h3 className="text-lg font-bold tracking-tight text-onyx dark:text-white">Bestsellers</h3>
+          <h3 className="text-lg font-bold tracking-tight text-onyx dark:text-white">Coming Soon</h3>
           <span 
-            className="text-xs font-medium text-gray-400 dark:text-white/40 cursor-pointer"
-            onClick={() => navigateTo(AppScreen.SERVICE_SELECTION)}
+            className="text-xs font-medium text-gray-400 dark:text-white/40 cursor-default"
           >
-            View All
+            Stay Tuned
           </span>
         </div>
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+        <div className="grid grid-cols-4 gap-2">
           {[
-            { icon: 'ac_unit', title: 'AC Service', price: 'From $15', color: 'bg-blue-50 text-blue-600' },
-            { icon: 'pest_control', title: 'Pest Control', price: 'From $30', color: 'bg-green-50 text-green-600' },
-            { icon: 'plumbing', title: 'Plumbing', price: 'From $10', color: 'bg-gray-50 text-gray-600' },
+            { icon: 'solar_power', title: 'Solar', sub: 'Panel', color: 'bg-yellow-50 text-yellow-600' },
+            { icon: 'pest_control', title: 'Pest', sub: 'Control', color: 'bg-green-50 text-green-600' },
+            { icon: 'ac_unit', title: 'AC', sub: 'Service', color: 'bg-blue-50 text-blue-600' },
+            { icon: 'local_laundry_service', title: 'Washing', sub: 'Machine', color: 'bg-purple-50 text-purple-600' },
           ].map((service) => (
             <div 
               key={service.title} 
-              onClick={() => navigateTo(AppScreen.SERVICE_SELECTION)}
-              className="min-w-[140px] flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-white/5 bg-white dark:bg-onyx-light p-4 shadow-sm"
+              className="flex flex-col items-center gap-2 rounded-xl border border-gray-200 dark:border-white/5 bg-white dark:bg-onyx-light p-2 py-3 shadow-sm opacity-60 grayscale-[0.5]"
             >
-              <div className={`h-10 w-10 items-center justify-center flex rounded-lg ${service.color} dark:bg-opacity-10`}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{service.icon}</span>
+              <div className={`h-8 w-8 items-center justify-center flex rounded-full ${service.color} dark:bg-opacity-10`}>
+                <span className="material-symbols-outlined text-[18px]">{service.icon}</span>
               </div>
-              <div>
-                <h4 className="text-sm font-bold leading-tight text-onyx dark:text-alabaster">{service.title}</h4>
-                <p className="mt-1 text-[10px] uppercase tracking-wider text-gray-400 dark:text-white/40">{service.price}</p>
+              <div className="text-center w-full leading-none">
+                <h4 className="text-[9px] font-bold text-onyx dark:text-alabaster">{service.title}</h4>
+                <h4 className="text-[9px] font-bold text-onyx dark:text-alabaster mt-0.5">{service.sub}</h4>
               </div>
             </div>
           ))}

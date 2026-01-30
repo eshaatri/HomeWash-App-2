@@ -129,7 +129,7 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
                     </p>
                 </div>
                 <h3 className="text-lg font-bold leading-tight line-clamp-1">{currentItem.service.title}</h3>
-                <p className="text-xs text-gray-400">{currentItem.service.duration} • <span className="font-medium text-onyx dark:text-white">${currentItem.service.price}</span></p>
+                <p className="text-xs text-gray-400">{currentItem.service.duration} • <span className="font-medium text-onyx dark:text-white">₹{currentItem.service.price}</span></p>
             </div>
         </div>
 
