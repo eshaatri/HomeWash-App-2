@@ -94,9 +94,10 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
   ];
 
   return (
-    <div className="bg-[#f8f7f6] dark:bg-[#171612] text-slate-900 dark:text-white font-display antialiased min-h-screen flex flex-col">
+    // FIX: Root container strict overflow protection to prevent horizontal scrolling
+    <div className="relative flex min-h-screen w-full max-w-[100vw] flex-col bg-[#f8f7f6] dark:bg-[#171612] text-slate-900 dark:text-white font-display antialiased overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between p-4 bg-[#f8f7f6]/95 dark:bg-[#171612]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
+      <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-[#f8f7f6]/95 dark:bg-[#171612]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5 w-full">
         <button 
           onClick={handleBack}
           className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-black dark:text-white"
@@ -115,7 +116,7 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
           <div className="h-full bg-primary transition-all duration-300 ease-out" style={{ width: `${progressPercent}%` }}></div>
       </div>
 
-      <main className="flex-1 flex flex-col pb-40 px-4">
+      <main className="flex-1 flex flex-col pb-40 px-4 w-full max-w-md mx-auto">
         
         {/* Service Context Card */}
         <div className="mt-6 bg-white dark:bg-[#1a1915] p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-4 transition-all">
@@ -134,8 +135,9 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
         </div>
 
         {/* Date Strip */}
-        <section className="pt-6">
+        <section className="pt-6 w-full">
           <h3 className="tracking-widest text-xs font-bold text-gray-400 dark:text-gray-500 mb-4 uppercase pl-2">Select Date</h3>
+          {/* Negative margins used for edge-to-edge scroll, safe due to parent overflow-x-hidden */}
           <div className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 no-scrollbar">
             {dates.map((d, index) => {
                 const isSelected = index === selectedDateIndex;
@@ -143,7 +145,7 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
                     <button 
                         key={index}
                         onClick={() => setSelectedDateIndex(index)}
-                        className={`flex flex-col items-center justify-center min-w-[64px] h-[84px] rounded-2xl border transition-all duration-200 ${
+                        className={`flex flex-col items-center justify-center min-w-[64px] h-[84px] rounded-2xl border transition-all duration-200 shrink-0 ${
                             isSelected 
                             ? 'bg-primary border-primary shadow-lg shadow-primary/20 scale-105' 
                             : 'bg-white dark:bg-[#1a1915] border-transparent hover:border-gray-200 dark:hover:border-white/10'
@@ -208,8 +210,8 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
         </section>
       </main>
 
-      {/* Sticky Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 max-w-md mx-auto w-full bg-white dark:bg-[#171612] border-t border-gray-200 dark:border-white/10 p-5 z-40 pb-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+      {/* Sticky Footer - Ensured containment */}
+      <footer className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto bg-white dark:bg-[#171612] border-t border-gray-200 dark:border-white/10 p-5 z-40 pb-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         <div className="flex items-end justify-between mb-5 px-1">
           <div className="flex flex-col gap-1">
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">

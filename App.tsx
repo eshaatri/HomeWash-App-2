@@ -12,7 +12,7 @@ import { CheckoutScreen } from './screens/CheckoutScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { PartnerDashboardScreen } from './screens/PartnerDashboardScreen';
 import { BookingDetailScreen } from './screens/BookingDetailScreen';
-import { DesktopSidebar } from './components/DesktopSidebar';
+// import { DesktopSidebar } from './components/DesktopSidebar'; // Hiding for mobile default view
 import { AppScreen, User, UserRole, Booking, Service, CartItem, BookingStatus } from './types';
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from './mockData';
 
@@ -21,6 +21,8 @@ export default function App() {
   const [isPremium, setIsPremium] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [currentLocation, setCurrentLocationState] = useState<string>('Detecting location...');
+  const [currentLocationLabel, setCurrentLocationLabel] = useState<string>('Current Location');
   
   // Data State
   const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
@@ -83,6 +85,11 @@ export default function App() {
   const logout = () => {
     setUser(null);
     setCurrentScreen(AppScreen.LOGIN);
+  };
+
+  const setCurrentLocation = (location: string, label: string = 'Current Location') => {
+    setCurrentLocationState(location);
+    setCurrentLocationLabel(label);
   };
 
   // --- Cart & Booking Logic ---
@@ -173,6 +180,9 @@ export default function App() {
     user,
     login,
     logout,
+    currentLocation,
+    currentLocationLabel,
+    setCurrentLocation,
     bookings,
     cart,
     serviceSlots,
@@ -222,22 +232,18 @@ export default function App() {
   const isLoggedIn = user !== null && currentScreen !== AppScreen.LOGIN;
 
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-black transition-colors duration-300">
+    <div className="flex min-h-screen bg-gray-200 dark:bg-[#050505] justify-center transition-colors duration-300">
       
-      {/* Desktop Sidebar */}
-      {isLoggedIn && (
-        <DesktopSidebar {...commonProps} />
-      )}
-
-      {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isLoggedIn ? 'md:pl-64' : ''}`}>
-        {/* We remove max-w-md constraint to allow full width on desktop */}
-        <div className="w-full h-full bg-white dark:bg-black shadow-none md:shadow-xl transition-colors duration-300">
-           {/* Center content on large screens for certain views if needed, or allow full width */}
-           <div className={`mx-auto w-full h-full ${currentScreen === AppScreen.LOGIN ? 'max-w-full' : 'max-w-7xl'}`}>
-              {renderScreen()}
-           </div>
-        </div>
+      {/* 
+         MOBILE DEFAULT VIEW: 
+         - Constrained width (max-w-md)
+         - Centered (mx-auto)
+         - Shadow to resemble a device
+         - Hidden sidebar
+      */}
+      
+      <div className="w-full max-w-md h-full min-h-screen bg-white dark:bg-black shadow-2xl overflow-hidden relative">
+         {renderScreen()}
       </div>
     </div>
   );

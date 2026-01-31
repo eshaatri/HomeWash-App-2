@@ -92,6 +92,11 @@ export interface NavigationProps {
   login: (phone: string, role: UserRole) => void;
   logout: () => void;
   
+  // Location State
+  currentLocation: string;
+  currentLocationLabel: string;
+  setCurrentLocation: (location: string, label?: string) => void;
+
   // Data State
   bookings: Booking[];
   cart: CartItem[];

@@ -1,10 +1,77 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppScreen, NavigationProps } from '../types';
 import { BottomNav } from '../components/BottomNav';
 import { CATEGORIES, MOCK_BOOKINGS } from '../mockData';
 
 export const HomeScreen: React.FC<NavigationProps> = (props) => {
-  const { navigateTo, isPremium, togglePremium, isDarkMode, toggleDarkMode, user } = props;
+  const { navigateTo, isPremium, togglePremium, isDarkMode, toggleDarkMode, user, currentLocation, currentLocationLabel, setCurrentLocation } = props;
+
+  const [isLocating, setIsLocating] = useState<boolean>(false);
+
+  // Detect Location on Mount if not already set or is default
+  useEffect(() => {
+    const detectLocation = () => {
+        if (currentLocation !== 'Detecting location...' && currentLocation !== 'Location unavailable') {
+            return; 
+        }
+
+        setIsLocating(true);
+
+        if (!navigator.geolocation) {
+            setCurrentLocation('Location unavailable', 'Current Location');
+            setIsLocating(false);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    // Using OpenStreetMap Nominatim for free reverse geocoding
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                    const data = await response.json();
+                    
+                    if (data && data.address) {
+                        // Prioritize specific address parts for a clean display
+                        const suburb = data.address.suburb || data.address.neighbourhood || data.address.residential;
+                        const city = data.address.city || data.address.town || data.address.state_district;
+                        const postcode = data.address.postcode;
+                        
+                        let formatted = 'Unknown Location';
+                        if (suburb && city) {
+                            formatted = `${suburb}, ${city}`;
+                        } else if (city) {
+                             formatted = city;
+                        } else if (data.display_name) {
+                            formatted = data.display_name.split(',').slice(0, 2).join(',');
+                        }
+                        
+                        if (postcode && formatted.length < 25) {
+                            formatted += ` ${postcode}`;
+                        }
+                        
+                        setCurrentLocation(formatted, 'Current Location');
+                    } else {
+                        setCurrentLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, 'Current Location');
+                    }
+                } catch (error) {
+                    // Fallback to coordinates if API fails (offline)
+                    setCurrentLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, 'Current Location');
+                } finally {
+                    setIsLocating(false);
+                }
+            },
+            (error) => {
+                console.error("Location access denied or error:", error);
+                setCurrentLocation('Mumbai, India', 'Current Location'); // Default fallback
+                setIsLocating(false);
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
+    };
+
+    detectLocation();
+  }, []); // Run once on mount
 
   // Premium Metallic Styles - Enhanced for "Shiny" Look
   const premiumStyles = {
@@ -32,11 +99,17 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       <header className="sticky top-0 z-30 flex items-center justify-between bg-white/90 dark:bg-onyx/90 px-6 py-4 backdrop-blur-md border-b border-gray-200 dark:border-white/5 transition-colors duration-300">
         <div className="flex flex-col cursor-pointer hover:opacity-80" onClick={() => navigateTo(AppScreen.ADDRESSES)}>
           <div className="flex items-center gap-1 text-primary">
-            <span className="material-symbols-outlined text-[18px]">near_me</span>
-            <span className="text-[10px] font-bold tracking-widest uppercase">Current Location</span>
+            <span className={`material-symbols-outlined text-[18px] ${isLocating ? 'animate-spin' : ''}`}>
+                {isLocating ? 'progress_activity' : 'near_me'}
+            </span>
+            <span className="text-[10px] font-bold tracking-widest uppercase">
+                {isLocating ? 'Locating...' : currentLocationLabel}
+            </span>
             <span className="material-symbols-outlined text-[14px]">expand_more</span>
           </div>
-          <p className="text-sm font-bold truncate max-w-[160px] text-onyx dark:text-white">Bandra West, Mumbai 400050</p>
+          <p className="text-sm font-bold truncate max-w-[200px] text-onyx dark:text-white transition-all duration-300">
+              {currentLocation}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button 

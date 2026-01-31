@@ -1,11 +1,88 @@
 import React, { useState, useRef } from 'react';
-import { AppScreen, NavigationProps } from '../types';
+import { AppScreen, NavigationProps, Service, CartItem } from '../types';
 import { SERVICES, CATEGORIES } from '../mockData';
 
+// --- SERVICE CARD COMPONENT ---
+// Mobile-optimized: Reduced height, fluid width, no fixed pixels
+const ServiceCard: React.FC<{
+  service: Service;
+  cart: CartItem[];
+  addToCart: (s: Service) => void;
+  decreaseQuantity: (s: Service) => void;
+}> = ({ service, cart, addToCart, decreaseQuantity }) => {
+  const cartItem = cart.find(item => item.service.id === service.id);
+  const quantity = cartItem ? cartItem.quantity : 0;
+
+  return (
+    <div className="flex flex-col w-full bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-white/5 transition-all group">
+      {/* Reduced Height Image - Fixes "Huge" size issue */}
+      <div className="relative w-full h-44 sm:h-52 bg-gray-50 dark:bg-white/5">
+        <img 
+          src={service.image} 
+          alt={service.title} 
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          loading="lazy"
+        />
+        {service.bestseller && (
+          <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-md text-black text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">
+            Bestseller
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-2">
+        <div>
+          <h3 className="text-sm sm:text-base font-bold text-onyx dark:text-white leading-tight">
+            {service.title}
+          </h3>
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-relaxed">
+            {service.description}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between mt-auto pt-2">
+          <div className="flex flex-col">
+            <span className="text-lg font-black text-onyx dark:text-white tracking-tight">₹{service.price}</span>
+            {service.originalPrice && (
+              <span className="text-[9px] text-gray-400 line-through">₹{service.originalPrice}</span>
+            )}
+          </div>
+
+          {quantity === 0 ? (
+            <button 
+              onClick={() => addToCart(service)}
+              className="h-8 min-w-[4.5rem] px-3 rounded-lg bg-onyx dark:bg-white text-white dark:text-black font-bold text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-sm"
+            >
+              Add
+            </button>
+          ) : (
+            <div className="flex items-center h-8 bg-primary/10 border border-primary/20 rounded-lg overflow-hidden shadow-sm">
+              <button 
+                onClick={() => decreaseQuantity(service)} 
+                className="w-8 h-full flex items-center justify-center text-primary active:bg-primary active:text-black transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">remove</span>
+              </button>
+              <span className="w-5 text-center font-bold text-primary text-[10px]">{quantity}</span>
+              <button 
+                onClick={() => addToCart(service)} 
+                className="w-8 h-full flex items-center justify-center text-primary active:bg-primary active:text-black transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">add</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN SCREEN COMPONENT ---
 export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, cart, addToCart, decreaseQuantity }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   
-  // Drag-to-Scroll Refs
+  // Drag scrolling ref
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDown = useRef(false);
   const startX = useRef(0);
@@ -15,7 +92,6 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
   const cartTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Combine Active Categories with "Coming Soon" ones
   const MENU_ITEMS = [
     { id: 'ALL', name: 'All Services', isComingSoon: false },
     ...CATEGORIES.map(c => ({ id: c.id, name: c.name, isComingSoon: false })),
@@ -33,14 +109,12 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
   const isSelectedComingSoon = MENU_ITEMS.find(i => i.id === selectedCategory)?.isComingSoon;
 
   const handleCategoryClick = (id: string) => {
-      // Prevent click if we were dragging (accidental click protection)
       if (isDragging.current) return;
-      
       setSelectedCategory(id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- Mouse Drag Handlers ---
+  // --- Header Drag-to-Scroll Handlers ---
   const onMouseDown = (e: React.MouseEvent) => {
     isDown.current = true;
     isDragging.current = false;
@@ -52,15 +126,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
     }
   };
 
-  const onMouseLeave = () => {
-    isDown.current = false;
-    if (scrollRef.current) {
-        scrollRef.current.classList.remove('cursor-grabbing');
-        scrollRef.current.classList.add('cursor-grab');
-    }
-  };
-
-  const onMouseUp = () => {
+  const stopDragging = () => {
     isDown.current = false;
     if (scrollRef.current) {
         scrollRef.current.classList.remove('cursor-grabbing');
@@ -69,176 +135,114 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
   };
 
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDown.current) return;
+    if (!isDown.current || !scrollRef.current) return;
     e.preventDefault();
-    if (scrollRef.current) {
-        const x = e.pageX - scrollRef.current.offsetLeft;
-        const walk = (x - startX.current) * 2; // Scroll speed multiplier
-        scrollRef.current.scrollLeft = scrollLeft.current - walk;
-        
-        // Detect drag intent (move > 5px) to prevent accidental clicks
-        if (Math.abs(x - startX.current) > 5) {
-            isDragging.current = true;
-        }
-    }
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 2;
+    scrollRef.current.scrollLeft = scrollLeft.current - walk;
+    if (Math.abs(x - startX.current) > 5) isDragging.current = true;
   };
 
   return (
-    <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-alabaster dark:bg-black font-display text-onyx dark:text-white antialiased transition-colors duration-300">
+    // Root container with strict overflow control to prevent horizontal scrolling
+    <div className="relative flex min-h-screen w-full max-w-[100vw] flex-col bg-white dark:bg-black font-display antialiased transition-colors duration-300 overflow-x-hidden">
       
-      {/* Header - Sticky with Horizontal Drag-Scroll Menu */}
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors shadow-sm">
-          <div className="flex items-center p-4 justify-between">
-            <div 
-              onClick={() => navigateTo(AppScreen.HOME)}
-              className="text-onyx dark:text-white flex size-12 shrink-0 items-center justify-start cursor-pointer hover:opacity-80"
-            >
-              <span className="material-symbols-outlined text-2xl">arrow_back</span>
-            </div>
-            <h2 className="text-onyx dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Select Service</h2>
-            <div className="flex w-12 items-center justify-end">
-              <button 
-                onClick={() => navigateTo(AppScreen.CART)}
-                className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-transparent text-onyx dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0 relative"
-              >
-                <span className="material-symbols-outlined text-2xl">shopping_bag</span>
-                {cartItemCount > 0 && (
-                    <span className="absolute top-2 right-2 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
-                    </span>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Horizontal Scrollable Menu with Drag Logic */}
-          <div 
-              ref={scrollRef}
-              onMouseDown={onMouseDown}
-              onMouseLeave={onMouseLeave}
-              onMouseUp={onMouseUp}
-              onMouseMove={onMouseMove}
-              className="flex w-full overflow-x-auto gap-2 px-4 pb-4 no-scrollbar cursor-grab active:cursor-grabbing select-none"
-          >
-              {MENU_ITEMS.map((item) => {
-                  const isActive = selectedCategory === item.id;
-                  return (
-                      <button
-                          key={item.id}
-                          onClick={() => handleCategoryClick(item.id)}
-                          className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border select-none whitespace-nowrap ${
-                              isActive 
-                              ? 'bg-primary border-primary text-onyx shadow-md shadow-primary/20' 
-                              : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
-                          }`}
-                      >
-                          {item.name}
-                          {item.isComingSoon && <span className="ml-1 opacity-60 font-medium">(SOON)</span>}
-                      </button>
-                  );
-              })}
-          </div>
-      </div>
-
-      <div className="w-full">
-        <h2 className="text-onyx dark:text-white tracking-tight text-[28px] font-extrabold leading-tight px-4 text-left pb-2 pt-6">
-            {selectedCategory === 'ALL' ? 'All Services' : currentCategoryName}
-        </h2>
-        <p className="px-4 text-gray-500 dark:text-gray-400 text-sm font-medium mb-4">
-            {isSelectedComingSoon ? 'We are working on this!' : 'Customize your home refresh.'}
-        </p>
-      </div>
-
-      {isSelectedComingSoon ? (
-          <div className="flex flex-col items-center justify-center py-12 px-6 opacity-60">
-              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">construction</span>
-              <p className="text-center text-gray-500 dark:text-gray-400 font-medium">
-                  {currentCategoryName} services will be available in your area shortly.
-              </p>
-          </div>
-      ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-3 pb-4">
-            {filteredServices.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 px-6 opacity-60 col-span-full">
-                    <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">search_off</span>
-                    <p className="text-center text-gray-500 dark:text-gray-400 font-medium">
-                        No active services found for this category.
-                    </p>
-                </div>
-            ) : (
-                filteredServices.map((service) => {
-                    const cartItem = cart.find(item => item.service.id === service.id);
-                    const quantity = cartItem ? cartItem.quantity : 0;
-                    
-                    return (
-                        <div key={service.id} className="w-full">
-                        <div className="flex flex-col h-full justify-between rounded-xl bg-white dark:bg-[#121212] shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 overflow-hidden transition-all hover:shadow-md hover:ring-primary/50">
-                            <div 
-                            className="w-full bg-center bg-no-repeat bg-cover h-32 md:h-40" 
-                            style={{ backgroundImage: `url("${service.image}")` }}
-                            ></div>
-                            <div className="flex w-full min-w-0 grow flex-col gap-1 p-3">
-                            <div className="flex justify-between items-start gap-1">
-                                <p className="text-onyx dark:text-white text-sm font-bold leading-tight tracking-[-0.015em] line-clamp-2">{service.title}</p>
-                            </div>
-                            <p className="text-gray-500 dark:text-gray-400 text-[11px] font-normal leading-tight mb-2 line-clamp-2">{service.description}</p>
-                            
-                            <div className="flex flex-col gap-2 mt-auto">
-                                <div className="flex items-center justify-between">
-                                    <p className="text-onyx dark:text-white text-sm font-bold leading-normal">₹{service.price}</p>
-                                    
-                                    {quantity === 0 ? (
-                                    <button 
-                                        onClick={() => addToCart(service)}
-                                        className="flex h-7 px-3 items-center justify-center rounded-md bg-white dark:bg-[#121212] border border-primary text-primary hover:bg-primary hover:text-black transition-colors text-xs font-bold active:scale-95"
-                                    >
-                                        Add
-                                    </button>
-                                    ) : (
-                                        <div className="flex items-center justify-between h-7 bg-primary/10 border border-primary rounded-md overflow-hidden">
-                                            <button 
-                                                onClick={() => decreaseQuantity(service)}
-                                                className="w-7 h-full flex items-center justify-center text-primary hover:bg-primary hover:text-black transition-colors active:bg-primary/80"
-                                            >
-                                                <span className="material-symbols-outlined text-sm">remove</span>
-                                            </button>
-                                            <span className="font-bold text-xs text-primary px-1 min-w-[1.5rem] text-center">{quantity}</span>
-                                            <button 
-                                                onClick={() => addToCart(service)}
-                                                className="w-7 h-full flex items-center justify-center text-primary hover:bg-primary hover:text-black transition-colors active:bg-primary/80"
-                                            >
-                                                <span className="material-symbols-outlined text-sm">add</span>
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-                    );
-                })
-            )}
-          </div>
-      )}
-
-      {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 md:left-64 max-w-md md:max-w-none mx-auto p-4 bg-white/95 dark:bg-black/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)] z-50 transition-colors">
-          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Total</span>
-              <span className="text-xl font-bold text-onyx dark:text-white">
-                ₹{cartTotal.toFixed(2)}
-              </span>
-            </div>
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-100 dark:border-white/5 w-full">
+          <div className="flex items-center px-4 py-3 justify-between w-full max-w-7xl mx-auto">
             <button 
-              onClick={() => navigateTo(AppScreen.CART)}
-              className="flex-1 bg-onyx dark:bg-white hover:opacity-90 text-white dark:text-black font-bold rounded-lg h-12 px-6 flex items-center justify-center shadow-lg shadow-black/10 dark:shadow-white/10 transition-all active:scale-95 max-w-xs"
+              onClick={() => navigateTo(AppScreen.HOME)}
+              className="flex size-9 items-center justify-start text-black dark:text-white hover:opacity-70 transition-opacity"
             >
-              Go to Cart ({cartItemCount})
+              <span className="material-symbols-outlined text-xl font-bold">arrow_back</span>
             </button>
+            <div className="flex-1 text-center">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Home Services</span>
+            </div>
+            <div className="w-9"></div>
           </div>
+
+          <div className="w-full overflow-hidden">
+            <div 
+                ref={scrollRef}
+                onMouseDown={onMouseDown}
+                onMouseLeave={stopDragging}
+                onMouseUp={stopDragging}
+                onMouseMove={onMouseMove}
+                className="flex w-full overflow-x-auto gap-2 px-4 pb-3 no-scrollbar cursor-grab active:cursor-grabbing select-none touch-pan-x"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+                {MENU_ITEMS.map((item) => {
+                    const isActive = selectedCategory === item.id;
+                    return (
+                        <button
+                            key={item.id}
+                            onClick={() => handleCategoryClick(item.id)}
+                            className={`flex-shrink-0 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border ${
+                                isActive 
+                                ? 'bg-primary border-primary text-black shadow-sm' 
+                                : 'bg-white dark:bg-[#111] border-gray-200 dark:border-white/10 text-gray-400'
+                            }`}
+                        >
+                            {item.name}
+                        </button>
+                    );
+                })}
+            </div>
+          </div>
+      </div>
+
+      {/* Main Content - Fluid width with strict containment */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 mb-32 overflow-x-hidden">
+        <div className="py-5 sm:py-8">
+            <h1 className="text-2xl sm:text-3xl font-black leading-tight tracking-tighter text-black dark:text-white mb-1">
+                {selectedCategory === 'ALL' ? 'All Services' : currentCategoryName}
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">
+                {isSelectedComingSoon ? 'Coming soon to your area.' : 'Customize your home refresh.'}
+            </p>
+        </div>
+
+        {isSelectedComingSoon ? (
+            <div className="flex flex-col items-center justify-center py-20 px-6 opacity-40">
+                <span className="material-symbols-outlined text-[48px] mb-3">construction</span>
+                <p className="text-sm font-bold text-center tracking-tight">Expansion in Progress</p>
+            </div>
+        ) : (
+            // GRID: STRICT 1-COLUMN MOBILE, 2-COLUMN TABLET
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-12 w-full">
+                {filteredServices.map((service) => (
+                    <ServiceCard 
+                        key={service.id} 
+                        service={service} 
+                        cart={cart}
+                        addToCart={addToCart}
+                        decreaseQuantity={decreaseQuantity}
+                    />
+                ))}
+            </div>
+        )}
+      </main>
+
+      {/* Floating Cart Indicator */}
+      {cartItemCount > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[92%] sm:max-w-[400px] z-[60]">
+          <button 
+            onClick={() => navigateTo(AppScreen.CART)}
+            className="w-full flex items-center bg-black dark:bg-white text-white dark:text-black rounded-2xl shadow-xl overflow-hidden transition-all active:scale-[0.97] h-[60px]"
+          >
+            <div className="flex-1 flex flex-col items-start justify-center pl-6 text-left h-full">
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-60 mb-0.5">Total Cart</span>
+              <span className="text-lg font-black tracking-tight leading-none">₹{cartTotal.toFixed(0)}</span>
+            </div>
+            
+            <div className="h-6 w-[1.5px] bg-white/10 dark:bg-black/10"></div>
+            
+            <div className="flex items-center gap-2 pr-6 pl-5 h-full">
+              <span className="text-[10px] font-black uppercase tracking-widest">View Cart</span>
+              <span className="material-symbols-outlined text-lg">arrow_forward</span>
+            </div>
+          </button>
         </div>
       )}
     </div>
