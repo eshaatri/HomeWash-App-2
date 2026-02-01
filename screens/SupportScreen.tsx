@@ -7,14 +7,8 @@ export const SupportScreen: React.FC<NavigationProps> = (props) => {
   
   return (
     <div className="bg-background-light dark:bg-[#0f0f0f] text-slate-900 dark:text-white font-display antialiased min-h-screen flex flex-col">
-      {/* Header */}
+      {/* Header - Back button removed for Tab View */}
       <header className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white/80 dark:bg-[#0f0f0f]/80 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
-        <button 
-          onClick={() => navigateTo(AppScreen.HOME)}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-colors text-slate-900 dark:text-white"
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>arrow_back</span>
-        </button>
         <h1 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">VIP Support Hub</h1>
         <div className="flex size-10 shrink-0 items-center justify-center">
           <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>crown</span>

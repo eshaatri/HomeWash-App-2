@@ -103,6 +103,10 @@ export interface NavigationProps {
   // Map serviceId -> { date, time }
   serviceSlots: Record<string, { date: string; time: string }>;
 
+  // Category Selection
+  selectedCategory: ServiceCategory | null;
+  setSelectedCategory: (category: ServiceCategory | null) => void;
+
   // Actions
   addToCart: (service: Service) => void;
   removeFromCart: (serviceId: string) => void;

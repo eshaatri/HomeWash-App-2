@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AppScreen, NavigationProps, Service } from '../types';
-
-interface SchedulableItem {
-    service: Service;
-    uniqueKey: string; // id_index
-    instanceIndex: number;
-    totalInstances: number;
-}
+import { AppScreen, NavigationProps } from '../types';
 
 export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isPremium, setServiceSlot, cart }) => {
-  const [queue, setQueue] = useState<SchedulableItem[]>([]);
+  // Now iterating directly over cart items (distinct services) rather than exploded quantity
   const [currentIndex, setCurrentIndex] = useState(0);
   
   // Selection State
@@ -17,23 +10,9 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
   const [dates, setDates] = useState<{ dayName: string; dayNumber: number; fullDate: string; isWeekend: boolean }[]>([]);
   const [selectedDateIndex, setSelectedDateIndex] = useState(0);
 
-  // Initialize Queue and Dates
+  // Initialize Dates
   useEffect(() => {
-    // 1. Build Scheduling Queue (Flatten cart)
-    const newQueue: SchedulableItem[] = [];
-    cart.forEach(item => {
-        for (let i = 0; i < item.quantity; i++) {
-            newQueue.push({
-                service: item.service,
-                uniqueKey: `${item.service.id}_${i}`,
-                instanceIndex: i + 1,
-                totalInstances: item.quantity
-            });
-        }
-    });
-    setQueue(newQueue);
-
-    // 2. Generate Next 14 Days
+    // Generate Next 14 Days
     const nextDays = [];
     const today = new Date();
     for (let i = 0; i < 14; i++) {
@@ -53,17 +32,17 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
     }
   }, [cart, navigateTo]);
 
-  const currentItem = queue[currentIndex];
+  const currentItem = cart[currentIndex];
 
   const handleNext = () => {
     if (!currentItem || !selectedSlot) return;
 
-    // Save selection
-    setServiceSlot(currentItem.uniqueKey, dates[selectedDateIndex].fullDate, selectedSlot);
+    // Save selection for the Service ID
+    setServiceSlot(currentItem.service.id, dates[selectedDateIndex].fullDate, selectedSlot);
 
-    if (currentIndex < queue.length - 1) {
+    if (currentIndex < cart.length - 1) {
         setCurrentIndex(prev => prev + 1);
-        // Reset defaults if needed, or keep previous selection for convenience
+        // Reset or keep previous slot? Keeping selection is often friendlier for bulk booking.
         // setSelectedSlot('10:00 AM'); 
     } else {
         navigateTo(AppScreen.CHECKOUT);
@@ -80,7 +59,7 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
 
   if (!currentItem || dates.length === 0) return null;
 
-  const progressPercent = ((currentIndex + 1) / queue.length) * 100;
+  const progressPercent = ((currentIndex + 1) / cart.length) * 100;
 
   const TIME_SLOTS = [
       { time: '08:00 AM', label: 'Early Bird', premium: true },
@@ -94,7 +73,7 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
   ];
 
   return (
-    // FIX: Root container strict overflow protection to prevent horizontal scrolling
+    // Root container with strict overflow protection
     <div className="relative flex min-h-screen w-full max-w-[100vw] flex-col bg-[#f8f7f6] dark:bg-[#171612] text-slate-900 dark:text-white font-display antialiased overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-[#f8f7f6]/95 dark:bg-[#171612]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5 w-full">
@@ -106,7 +85,7 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
         </button>
         <div className="flex flex-col items-center">
           <h2 className="text-lg font-bold leading-tight tracking-tight">Schedule Service</h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Step {currentIndex + 1} of {queue.length}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Service {currentIndex + 1} of {cart.length}</p>
         </div>
         <div className="size-10"></div>
       </header>
@@ -126,10 +105,13 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
             <div className="flex-1">
                 <div className="flex justify-between items-start">
                     <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-0.5">
-                        Booking {currentItem.instanceIndex} of {currentItem.totalInstances}
+                        Scheduling For
                     </p>
                 </div>
-                <h3 className="text-lg font-bold leading-tight line-clamp-1">{currentItem.service.title}</h3>
+                <h3 className="text-lg font-bold leading-tight line-clamp-1">
+                    {currentItem.service.title}
+                    {currentItem.quantity > 1 && <span className="ml-1 text-gray-400 text-sm font-medium">x{currentItem.quantity}</span>}
+                </h3>
                 <p className="text-xs text-gray-400">{currentItem.service.duration} • <span className="font-medium text-onyx dark:text-white">₹{currentItem.service.price}</span></p>
             </div>
         </div>
@@ -137,7 +119,6 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
         {/* Date Strip */}
         <section className="pt-6 w-full">
           <h3 className="tracking-widest text-xs font-bold text-gray-400 dark:text-gray-500 mb-4 uppercase pl-2">Select Date</h3>
-          {/* Negative margins used for edge-to-edge scroll, safe due to parent overflow-x-hidden */}
           <div className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 no-scrollbar">
             {dates.map((d, index) => {
                 const isSelected = index === selectedDateIndex;
@@ -210,12 +191,12 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
         </section>
       </main>
 
-      {/* Sticky Footer - Ensured containment */}
+      {/* Sticky Footer */}
       <footer className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto bg-white dark:bg-[#171612] border-t border-gray-200 dark:border-white/10 p-5 z-40 pb-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         <div className="flex items-end justify-between mb-5 px-1">
           <div className="flex flex-col gap-1">
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
-                {currentIndex < queue.length - 1 ? 'Next Step' : 'Final Step'}
+                {currentIndex < cart.length - 1 ? 'Next Step' : 'Final Step'}
             </p>
             <div className="flex items-baseline gap-3">
                <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight line-clamp-1">
@@ -229,7 +210,7 @@ export const SlotSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, isP
           onClick={handleNext}
           disabled={!selectedSlot}
           className="w-full bg-primary hover:brightness-110 text-[#171612] font-bold text-lg py-4 rounded-xl shadow-[0_4px_20px_rgba(var(--primary-r),var(--primary-g),var(--primary-b),0.3)] transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
-          <span>{currentIndex < queue.length - 1 ? 'Schedule Next Item' : 'Review & Checkout'}</span>
+          <span>{currentIndex < cart.length - 1 ? 'Schedule Next Service' : 'Review & Checkout'}</span>
           <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </button>
       </footer>

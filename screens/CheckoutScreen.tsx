@@ -40,29 +40,29 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, is
                 <button onClick={() => navigateTo(AppScreen.SLOT_SELECTION)} className="text-xs font-bold text-primary hover:underline">Edit All</button>
             </div>
             
-            {cart.map((item) => {
-                // Render a block for each instance of the service (e.g., Deep Cleaning 1, Deep Cleaning 2)
-                return Array.from({ length: item.quantity }).map((_, i) => {
-                    const uniqueKey = `${item.service.id}_${i}`;
-                    const slot = serviceSlots[uniqueKey] || { date: 'Not Set', time: 'Not Set' };
-                    
-                    return (
-                        <div key={uniqueKey} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-xs">
-                                    #{i + 1}
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-onyx dark:text-white">{item.service.title}</p>
-                                    <div className="flex items-center gap-1.5 mt-1">
-                                        <span className="material-symbols-outlined text-[14px] text-primary">event</span>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{slot.date} @ {slot.time}</p>
-                                    </div>
+            {cart.map((item, index) => {
+                const slot = serviceSlots[item.service.id] || { date: 'Not Set', time: 'Not Set' };
+                
+                return (
+                    <div key={item.service.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            {/* Number badge */}
+                            <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-xs">
+                                {index + 1}
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-onyx dark:text-white">
+                                    {item.service.title}
+                                    {item.quantity > 1 && <span className="ml-1 text-primary">x{item.quantity}</span>}
+                                </p>
+                                <div className="flex items-center gap-1.5 mt-1">
+                                    <span className="material-symbols-outlined text-[14px] text-primary">event</span>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{slot.date} @ {slot.time}</p>
                                 </div>
                             </div>
                         </div>
-                    );
-                });
+                    </div>
+                );
             })}
         </div>
 

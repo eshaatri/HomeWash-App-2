@@ -1,23 +1,19 @@
 import React from 'react';
 import { AppScreen, NavigationProps } from '../types';
+import { BottomNav } from '../components/BottomNav';
 
-export const MembershipScreen: React.FC<NavigationProps> = ({ navigateTo, isPremium }) => {
+export const MembershipScreen: React.FC<NavigationProps> = (props) => {
+  const { navigateTo, isPremium, togglePremium } = props;
+
   return (
     <div className="bg-alabaster dark:bg-[#201d12] font-display text-slate-900 dark:text-white antialiased overflow-x-hidden min-h-screen flex flex-col relative pb-32">
       
-      {/* Top Navigation */}
-      <nav className="sticky top-0 z-50 flex items-center bg-alabaster/90 dark:bg-[#201d12]/90 backdrop-blur-md px-4 py-3 justify-between border-b border-gray-200 dark:border-white/5">
-        <button 
-          onClick={() => navigateTo(AppScreen.HOME)}
-          className="text-white flex size-10 shrink-0 items-center justify-center rounded-full active:bg-white/10 transition-colors"
-        >
-          <span className="material-symbols-outlined text-2xl text-black dark:text-white">arrow_back</span>
-        </button>
+      {/* Top Navigation - Back button removed for Tab View */}
+      <nav className="sticky top-0 z-50 flex items-center bg-alabaster/90 dark:bg-[#201d12]/90 backdrop-blur-md px-4 py-3 justify-center border-b border-gray-200 dark:border-white/5">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
           <span className="text-sm font-bold tracking-widest uppercase text-black dark:text-white">Home Wash | Gold</span>
         </div>
-        <div className="size-10"></div> 
       </nav>
 
       {/* Hero Section */}
@@ -110,17 +106,19 @@ export const MembershipScreen: React.FC<NavigationProps> = ({ navigateTo, isPrem
         </div>
       </main>
 
-      {/* Sticky Footer CTA */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto w-full p-4 pb-8 bg-[#201d12]/95 backdrop-blur-xl border-t border-white/10 z-50">
+      {/* Floating CTA above BottomNav */}
+      <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto w-full px-4 z-40 pointer-events-none">
         <button 
-          onClick={() => navigateTo(AppScreen.HOME)}
-          className="w-full relative group overflow-hidden bg-primary text-[#201d12] font-bold text-lg h-14 rounded-lg shadow-[0_0_25px_rgba(var(--primary-r),var(--primary-g),var(--primary-b),0.25)] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+          onClick={togglePremium}
+          className="w-full relative group overflow-hidden bg-primary text-[#201d12] font-bold text-lg h-14 rounded-lg shadow-[0_4px_25px_rgba(var(--primary-r),var(--primary-g),var(--primary-b),0.3)] flex items-center justify-center gap-2 active:scale-[0.98] transition-all pointer-events-auto border border-white/10"
         >
           <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[20deg] group-hover:animate-shimmer"></div>
           <span className="relative z-10">{isPremium ? 'Extend Membership' : 'Upgrade to Gold'}</span>
           <span className="material-symbols-outlined relative z-10 transition-transform group-hover:translate-x-1">arrow_forward</span>
         </button>
       </div>
+
+      <BottomNav {...props} />
     </div>
   );
 };

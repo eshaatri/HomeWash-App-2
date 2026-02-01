@@ -28,27 +28,96 @@ export const CATEGORIES: ServiceCategory[] = [
   { id: 'c6', name: 'Car Wash', icon: 'directions_car', color: 'bg-slate-50 text-slate-600' },
 ];
 
-export const SUB_CATEGORIES_DATA = {
-  title: "Cleaning & Pest Control",
-  sections: [
-    {
-      title: "Cleaning",
-      items: [
-        { id: 'sc1', name: 'Bathroom Cleaning', icon: 'bathtub', color: 'bg-blue-50 text-blue-500' },
-        { id: 'sc2', name: 'Kitchen Cleaning', icon: 'skillet', color: 'bg-gray-100 text-gray-600' },
-        { id: 'sc3', name: 'Full Home Cleaning', icon: 'home', color: 'bg-amber-50 text-amber-600' },
-        { id: 'sc4', name: 'Sofa & Carpet', icon: 'weekend', color: 'bg-yellow-50 text-yellow-600' },
-      ]
-    },
-    {
-      title: "Pest Control",
-      items: [
-        { id: 'sc5', name: 'Cockroach & Ant', icon: 'pest_control', color: 'bg-red-50 text-red-500' },
-        { id: 'sc6', name: 'Termite Control', icon: 'bug_report', color: 'bg-orange-50 text-orange-600' },
-        { id: 'sc7', name: 'Bed Bugs Control', icon: 'bed', color: 'bg-rose-50 text-rose-500' },
-      ]
-    }
-  ]
+export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { title: string, items: any[] }[] }> = {
+  // Home Cleaning
+  'c1': {
+    title: "Home Cleaning",
+    sections: [
+      {
+        title: "Select Property Type",
+        items: [
+          { id: 'hc1', name: 'Apartment', icon: 'apartment', color: 'bg-blue-50 text-blue-600' },
+          { id: 'hc2', name: 'Bungalow / Duplex', icon: 'cottage', color: 'bg-orange-50 text-orange-600' },
+          { id: 'hc3', name: 'Book by room', icon: 'meeting_room', color: 'bg-purple-50 text-purple-600' },
+          { id: 'hc4', name: 'Mini Services', icon: 'cleaning_services', color: 'bg-green-50 text-green-600' },
+        ]
+      }
+    ]
+  },
+  // Bathroom Cleaning
+  'c2': {
+    title: "Bathroom Cleaning",
+    sections: [
+      {
+        title: "Select Service Type",
+        items: [
+          { id: 'bc1', name: 'Combos', icon: 'layers', color: 'bg-orange-50 text-orange-600' },
+          { id: 'bc2', name: 'Bathroom Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
+          { id: 'bc3', name: 'Maintenance Pack', icon: 'handyman', color: 'bg-purple-50 text-purple-600' },
+          { id: 'bc4', name: 'Mini Services', icon: 'water_drop', color: 'bg-cyan-50 text-cyan-600' },
+        ]
+      }
+    ]
+  },
+  // Kitchen Cleaning
+  'c3': {
+    title: "Kitchen Cleaning",
+    sections: [
+      {
+        title: "Select Service Type",
+        items: [
+          { id: 'kc1', name: 'Discounted Pack', icon: 'local_offer', color: 'bg-green-50 text-green-600' },
+          { id: 'kc2', name: 'Chimney Cleaning', icon: 'mode_fan', color: 'bg-orange-50 text-orange-600' },
+          { id: 'kc3', name: 'Complete Kitchen Cleaning', icon: 'countertops', color: 'bg-blue-50 text-blue-600' },
+          { id: 'kc4', name: 'Appliance Cleaning', icon: 'microwave', color: 'bg-purple-50 text-purple-600' },
+          { id: 'kc5', name: 'Cabinet and Tiles', icon: 'shelves', color: 'bg-amber-50 text-amber-600' },
+          { id: 'kc6', name: 'Mini Services', icon: 'cleaning_services', color: 'bg-cyan-50 text-cyan-600' },
+        ]
+      }
+    ]
+  },
+  // Water Tank Cleaning
+  'c4': {
+    title: "Water Tank Cleaning",
+    sections: [
+      {
+        title: "Select Tank Type",
+        items: [
+          { id: 'wt1', name: 'Plastic Tank', icon: 'water_bottle', color: 'bg-blue-50 text-blue-600' },
+          { id: 'wt2', name: 'Cemented/Underground', icon: 'warehouse', color: 'bg-gray-50 text-gray-600' },
+        ]
+      }
+    ]
+  },
+  // Sofa Cleaning
+  'c5': {
+    title: "Sofa & Carpet Cleaning",
+    sections: [
+      {
+        title: "Select Item",
+        items: [
+          { id: 'sc1', name: 'Sofa', icon: 'weekend', color: 'bg-amber-50 text-amber-600' },
+          { id: 'sc2', name: 'Carpet', icon: 'texture', color: 'bg-orange-50 text-orange-600' },
+          { id: 'sc3', name: 'Mattress', icon: 'bed', color: 'bg-blue-50 text-blue-600' },
+          { id: 'sc4', name: 'Curtain', icon: 'curtains', color: 'bg-purple-50 text-purple-600' },
+          { id: 'sc5', name: 'Dining Table', icon: 'table_restaurant', color: 'bg-green-50 text-green-600' },
+        ]
+      }
+    ]
+  },
+  // Car Wash
+  'c6': {
+    title: "Car Wash",
+    sections: [
+      {
+        title: "Select Wash Type",
+        items: [
+          { id: 'cw1', name: 'Interior', icon: 'airline_seat_recline_extra', color: 'bg-indigo-50 text-indigo-600' },
+          { id: 'cw2', name: 'Exterior', icon: 'local_car_wash', color: 'bg-cyan-50 text-cyan-600' },
+        ]
+      }
+    ]
+  }
 };
 
 export const SERVICES: Service[] = [

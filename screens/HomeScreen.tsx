@@ -4,7 +4,7 @@ import { BottomNav } from '../components/BottomNav';
 import { CATEGORIES, MOCK_BOOKINGS } from '../mockData';
 
 export const HomeScreen: React.FC<NavigationProps> = (props) => {
-  const { navigateTo, isPremium, togglePremium, isDarkMode, toggleDarkMode, user, currentLocation, currentLocationLabel, setCurrentLocation } = props;
+  const { navigateTo, isPremium, togglePremium, isDarkMode, toggleDarkMode, user, currentLocation, currentLocationLabel, setCurrentLocation, setSelectedCategory } = props;
 
   const [isLocating, setIsLocating] = useState<boolean>(false);
 
@@ -154,7 +154,10 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             {CATEGORIES.map(cat => (
                 <button 
                     key={cat.id} 
-                    onClick={() => navigateTo(AppScreen.SUB_CATEGORY)}
+                    onClick={() => {
+                        setSelectedCategory(cat);
+                        navigateTo(AppScreen.SUB_CATEGORY);
+                    }}
                     className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform h-28 hover:shadow-md hover:border-gray-200 dark:hover:border-white/10"
                 >
                     <div className={`h-10 w-10 rounded-full flex items-center justify-center mb-2 ${cat.color}`}>

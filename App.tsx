@@ -13,7 +13,7 @@ import { LoginScreen } from './screens/LoginScreen';
 import { PartnerDashboardScreen } from './screens/PartnerDashboardScreen';
 import { BookingDetailScreen } from './screens/BookingDetailScreen';
 // import { DesktopSidebar } from './components/DesktopSidebar'; // Hiding for mobile default view
-import { AppScreen, User, UserRole, Booking, Service, CartItem, BookingStatus } from './types';
+import { AppScreen, User, UserRole, Booking, Service, CartItem, BookingStatus, ServiceCategory } from './types';
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from './mockData';
 
 export default function App() {
@@ -27,8 +27,12 @@ export default function App() {
   // Data State
   const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
   const [cart, setCart] = useState<CartItem[]>([]);
-  // Changed from single bookingSlot to a map of uniqueId -> Slot
-  // Key format: `${serviceId}_${index}` (e.g. s1_0, s1_1)
+  
+  // Category State
+  const [selectedCategory, setSelectedCategoryState] = useState<ServiceCategory | null>(null);
+  
+  // Map serviceId -> { date, time }
+  // Key is simply service.id now, shared across all quantities of that service
   const [serviceSlots, setServiceSlots] = useState<Record<string, { date: string; time: string }>>({});
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
@@ -70,6 +74,10 @@ export default function App() {
   const navigateTo = (screen: AppScreen) => {
     window.scrollTo(0, 0);
     setCurrentScreen(screen);
+  };
+
+  const setSelectedCategory = (category: ServiceCategory | null) => {
+    setSelectedCategoryState(category);
   };
 
   const login = (phone: string, role: UserRole) => {
@@ -124,41 +132,36 @@ export default function App() {
 
   const removeFromCart = (serviceId: string) => {
     setCart((prev) => prev.filter((item) => item.service.id !== serviceId));
-    // Also remove from slots if it exists (cleanup all potential indices)
+    // Remove slot for this service ID
     setServiceSlots(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-            if (key.startsWith(serviceId + '_')) {
-                delete newState[key];
-            }
-        });
+        delete newState[serviceId];
         return newState;
     });
   };
 
-  const setServiceSlot = (uniqueKey: string, date: string, time: string) => {
+  const setServiceSlot = (serviceId: string, date: string, time: string) => {
     setServiceSlots(prev => ({
         ...prev,
-        [uniqueKey]: { date, time }
+        [serviceId]: { date, time }
     }));
   };
 
   const onPaymentComplete = () => {
     const newBookings: Booking[] = [];
     
-    // Explode cart items based on quantity
+    // Create bookings. If quantity > 1, create multiple bookings sharing the same slot.
     cart.forEach(item => {
+        const slot = serviceSlots[item.service.id] || { date: 'Pending', time: 'Pending' };
+        
         for (let i = 0; i < item.quantity; i++) {
-            const uniqueKey = `${item.service.id}_${i}`;
-            const slot = serviceSlots[uniqueKey] || { date: 'Pending', time: 'Pending' };
-            
             newBookings.push({
                 id: 'bk' + Math.random().toString(36).substr(2, 6),
                 serviceName: item.service.title,
                 status: BookingStatus.PENDING,
                 date: slot.date,
                 time: slot.time,
-                amount: item.service.price, // Individual price
+                amount: item.service.price, // Individual price per unit
                 partnerName: 'Looking for partner...',
             });
         }
@@ -186,6 +189,8 @@ export default function App() {
     bookings,
     cart,
     serviceSlots,
+    selectedCategory,
+    setSelectedCategory,
     addToCart,
     removeFromCart,
     decreaseQuantity,
@@ -233,15 +238,6 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-gray-200 dark:bg-[#050505] justify-center transition-colors duration-300">
-      
-      {/* 
-         MOBILE DEFAULT VIEW: 
-         - Constrained width (max-w-md)
-         - Centered (mx-auto)
-         - Shadow to resemble a device
-         - Hidden sidebar
-      */}
-      
       <div className="w-full max-w-md h-full min-h-screen bg-white dark:bg-black shadow-2xl overflow-hidden relative">
          {renderScreen()}
       </div>
