@@ -50,6 +50,48 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       }
     ]
   },
+  'c2': {
+    title: "Bathroom Cleaning",
+    sections: [
+      {
+        title: "Select Service Type",
+        items: [
+          { id: 'combos', name: 'Combos', icon: 'layers', color: 'bg-orange-50 text-orange-600' },
+          { id: 'bathroom_clean', name: 'Bathroom Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
+          { id: 'maintenance', name: 'Maintenance Pack', icon: 'handyman', color: 'bg-purple-50 text-purple-600' },
+          { id: 'mini', name: 'Mini Services', icon: 'water_drop', color: 'bg-cyan-50 text-cyan-600' },
+        ]
+      }
+    ]
+  },
+  'c3': {
+    title: "Kitchen Cleaning",
+    sections: [
+      {
+        title: "Select Service Type",
+        items: [
+          { id: 'discounted', name: 'Discounted Pack', icon: 'local_offer', color: 'bg-green-50 text-green-600' },
+          { id: 'chimney', name: 'Chimney Cleaning', icon: 'mode_fan', color: 'bg-orange-50 text-orange-600' },
+          { id: 'complete', name: 'Complete Kitchen Cleaning', icon: 'countertops', color: 'bg-blue-50 text-blue-600' },
+          { id: 'appliance', name: 'Appliance Cleaning', icon: 'microwave', color: 'bg-purple-50 text-purple-600' },
+          { id: 'cabinet', name: 'Cabinet and Tiles', icon: 'shelves', color: 'bg-amber-50 text-amber-600' },
+          { id: 'mini', name: 'Mini Services', icon: 'cleaning_services', color: 'bg-cyan-50 text-cyan-600' },
+        ]
+      }
+    ]
+  },
+  'c4': {
+    title: "Water Tank Cleaning",
+    sections: [
+      {
+        title: "Select Tank Type",
+        items: [
+          { id: 'plastic_tank', name: 'Plastic Tank', icon: 'water_bottle', color: 'bg-cyan-50 text-cyan-600' },
+          { id: 'cemented_tank', name: 'Cemented/Underground', icon: 'architecture', color: 'bg-gray-50 text-gray-600' },
+        ]
+      }
+    ]
+  },
   'c5': {
     title: "Sofa Cleaning",
     sections: [
