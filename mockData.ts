@@ -50,6 +50,21 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       }
     ]
   },
+  'c5': {
+    title: "Sofa Cleaning",
+    sections: [
+      {
+        title: "Select Item",
+        items: [
+          { id: 'sofa', name: 'Sofa', icon: 'weekend', color: 'bg-amber-50 text-amber-600' },
+          { id: 'carpet', name: 'Carpet', icon: 'texture', color: 'bg-orange-50 text-orange-600' },
+          { id: 'mattress', name: 'Mattress', icon: 'bed', color: 'bg-blue-50 text-blue-600' },
+          { id: 'curtain', name: 'Curtain', icon: 'curtains', color: 'bg-purple-50 text-purple-600' },
+          { id: 'dining', name: 'Dining Table', icon: 'table_restaurant', color: 'bg-green-50 text-green-600' },
+        ]
+      }
+    ]
+  },
   'c6': {
     title: "Car Wash",
     sections: [
