@@ -1,3 +1,4 @@
+
 import { Booking, BookingStatus, Service, ServiceCategory, User, UserRole } from "./types";
 
 export const MOCK_USER: User = {
@@ -28,193 +29,107 @@ export const CATEGORIES: ServiceCategory[] = [
   { id: 'c6', name: 'Car Wash', icon: 'directions_car', color: 'bg-slate-50 text-slate-600' },
 ];
 
+export interface ExtendedService extends Service {
+  inclusions?: string[];
+  reviews?: string;
+  subCategoryId?: string;
+}
+
 export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { title: string, items: any[] }[] }> = {
-  // Home Cleaning
   'c1': {
     title: "Home Cleaning",
     sections: [
       {
         title: "Select Property Type",
         items: [
-          { id: 'hc1', name: 'Apartment', icon: 'apartment', color: 'bg-blue-50 text-blue-600' },
-          { id: 'hc2', name: 'Bungalow / Duplex', icon: 'cottage', color: 'bg-orange-50 text-orange-600' },
-          { id: 'hc3', name: 'Book by room', icon: 'meeting_room', color: 'bg-purple-50 text-purple-600' },
-          { id: 'hc4', name: 'Mini Services', icon: 'cleaning_services', color: 'bg-green-50 text-green-600' },
+          { id: 'apartment', name: 'Apartment', icon: 'apartment', color: 'bg-blue-50 text-blue-600' },
+          { id: 'bungalow', name: 'Bungalow / Duplex', icon: 'cottage', color: 'bg-orange-50 text-orange-600' },
+          { id: 'room', name: 'Book by room', icon: 'meeting_room', color: 'bg-purple-50 text-purple-600' },
+          { id: 'mini', name: 'Mini Services', icon: 'cleaning_services', color: 'bg-green-50 text-green-600' },
         ]
       }
     ]
   },
-  // Bathroom Cleaning
-  'c2': {
-    title: "Bathroom Cleaning",
-    sections: [
-      {
-        title: "Select Service Type",
-        items: [
-          { id: 'bc1', name: 'Combos', icon: 'layers', color: 'bg-orange-50 text-orange-600' },
-          { id: 'bc2', name: 'Bathroom Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
-          { id: 'bc3', name: 'Maintenance Pack', icon: 'handyman', color: 'bg-purple-50 text-purple-600' },
-          { id: 'bc4', name: 'Mini Services', icon: 'water_drop', color: 'bg-cyan-50 text-cyan-600' },
-        ]
-      }
-    ]
-  },
-  // Kitchen Cleaning
-  'c3': {
-    title: "Kitchen Cleaning",
-    sections: [
-      {
-        title: "Select Service Type",
-        items: [
-          { id: 'kc1', name: 'Discounted Pack', icon: 'local_offer', color: 'bg-green-50 text-green-600' },
-          { id: 'kc2', name: 'Chimney Cleaning', icon: 'mode_fan', color: 'bg-orange-50 text-orange-600' },
-          { id: 'kc3', name: 'Complete Kitchen Cleaning', icon: 'countertops', color: 'bg-blue-50 text-blue-600' },
-          { id: 'kc4', name: 'Appliance Cleaning', icon: 'microwave', color: 'bg-purple-50 text-purple-600' },
-          { id: 'kc5', name: 'Cabinet and Tiles', icon: 'shelves', color: 'bg-amber-50 text-amber-600' },
-          { id: 'kc6', name: 'Mini Services', icon: 'cleaning_services', color: 'bg-cyan-50 text-cyan-600' },
-        ]
-      }
-    ]
-  },
-  // Water Tank Cleaning
-  'c4': {
-    title: "Water Tank Cleaning",
-    sections: [
-      {
-        title: "Select Tank Type",
-        items: [
-          { id: 'wt1', name: 'Plastic Tank', icon: 'water_bottle', color: 'bg-blue-50 text-blue-600' },
-          { id: 'wt2', name: 'Cemented/Underground', icon: 'warehouse', color: 'bg-gray-50 text-gray-600' },
-        ]
-      }
-    ]
-  },
-  // Sofa Cleaning
-  'c5': {
-    title: "Sofa & Carpet Cleaning",
-    sections: [
-      {
-        title: "Select Item",
-        items: [
-          { id: 'sc1', name: 'Sofa', icon: 'weekend', color: 'bg-amber-50 text-amber-600' },
-          { id: 'sc2', name: 'Carpet', icon: 'texture', color: 'bg-orange-50 text-orange-600' },
-          { id: 'sc3', name: 'Mattress', icon: 'bed', color: 'bg-blue-50 text-blue-600' },
-          { id: 'sc4', name: 'Curtain', icon: 'curtains', color: 'bg-purple-50 text-purple-600' },
-          { id: 'sc5', name: 'Dining Table', icon: 'table_restaurant', color: 'bg-green-50 text-green-600' },
-        ]
-      }
-    ]
-  },
-  // Car Wash
   'c6': {
     title: "Car Wash",
     sections: [
       {
         title: "Select Wash Type",
         items: [
-          { id: 'cw1', name: 'Interior', icon: 'airline_seat_recline_extra', color: 'bg-indigo-50 text-indigo-600' },
-          { id: 'cw2', name: 'Exterior', icon: 'local_car_wash', color: 'bg-cyan-50 text-cyan-600' },
+          { id: 'interior', name: 'Interior', icon: 'airline_seat_recline_extra', color: 'bg-indigo-50 text-indigo-600' },
+          { id: 'exterior', name: 'Exterior', icon: 'local_car_wash', color: 'bg-cyan-50 text-cyan-600' },
         ]
       }
     ]
   }
 };
 
-export const SERVICES: Service[] = [
+export const SERVICES: ExtendedService[] = [
   { 
     id: 's1', 
-    title: 'Deep Home Cleaning', 
+    title: 'Furnished Apartment', 
     categoryId: 'c1',
-    price: 1499, 
-    originalPrice: 1999,
-    duration: '4 Hrs', 
-    description: 'Complete top-to-bottom restoration.',
-    rating: 4.8,
-    reviewCount: 1240,
+    subCategoryId: 'apartment',
+    price: 3499, 
+    originalPrice: 3999,
+    duration: '3 hrs 45 mins', 
+    description: 'Complete top-to-bottom restoration for your furnished space.',
+    rating: 4.82,
+    reviews: '380K reviews',
+    reviewCount: 380000,
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD5c6hvQ269iGoWpfvLQDj7bmbtgQqliAJq7BfBgfU8BHSZcE672IWwFIUyJwLcXTmRxl-d_6CJGFY8mrBW_yYweVNb0Z8pwQMyLnSDTo0OkDBx3H2C6kv7t6i8CmM--y6OgboO4_hRAVdAPLhRcmW5Iwf_tTuBbeplYcIo5l2upmHCwrLpjiX4GjFVevtkalgAkoM7Zmx65Lz5m_wtRsf-iJCLDXu9twEi1DRlqL1TtgrE-tHdbGkjNlYM0C2O5h4WFVNfyD4uPNY',
-    bestseller: true
+    bestseller: true,
+    inclusions: [
+      'Cleaning & stain removal from rooms, kitchen, bathroom & balcony',
+      'Machine floor scrubbing & dusting of walls & ceilings'
+    ]
   },
   { 
-    id: 's2', 
-    title: 'Kitchen Sanitization', 
-    categoryId: 'c3',
-    price: 699, 
-    duration: '2 Hrs', 
-    description: 'Grease removal and appliance detailing.',
-    rating: 4.7,
-    reviewCount: 450,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQyKII_vIaYbueglrCgh8F-6OF2PmOkj_bk4X1NuaRUaG6y4NFTB8zkvoUBZifEDIflhH_vZTPVTbUi9ppddj_PADLZ0Il4Vsmr9H9nVcoY0k-neYBhDNDzKMHL24IdQyDdjbg9z_AA9ueRIAis-0JpNbTycooHUHFjvfvfW12Ph2DWiEhKPP_W2nkZpSEYQ4K-opYDnVrif3S7JtLwW5khRfD5qc-wFSUznoff5_xsW1tqqLI73qRV4Sx0ZH-fvpasYD6YzS7f20'
+    id: 's1_un', 
+    title: 'Unfurnished Apartment', 
+    categoryId: 'c1',
+    subCategoryId: 'apartment',
+    price: 3199, 
+    duration: '3 hrs', 
+    description: 'Empty space cleaning focusing on deep floors and wall dusting.',
+    rating: 4.82,
+    reviews: '176K reviews',
+    reviewCount: 176000,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDhMOlSsEXRDt3sDDyty-vRXWr9jTMfio4HeOZi-wMf023A4X41bpDbxNoMTChDF3Q7UsnfNjf4uO9K3KvdwtLVUq9OsiWgG827dJOoZ8asEZ3pr14pe72BEq5VkZ82epmnm4AUhIuDiL6TM_ev5YD5WhGGC2EWBxbosU6TMvisuWQs2qtTKt-f2FcexXRiQUbbC0IAy9oUDhO3H4gH-aDNn_C25obcofREoGJcAnmog7P2vfTgtxgrAvoJ1XCfM1K14feVlYB71eo',
+    inclusions: [
+      'Cleaning & stain removal from floors and skirting',
+      'Dry vacuuming of walls and ceiling'
+    ]
   },
   { 
-    id: 's3', 
-    title: 'Bathroom Sparkle', 
-    categoryId: 'c2',
-    price: 499, 
-    duration: '1.5 Hrs', 
-    description: 'Tile scrubbing and fixture polishing.',
+    id: 's2_bun', 
+    title: 'Bungalow Deep Clean', 
+    categoryId: 'c1',
+    subCategoryId: 'bungalow',
+    price: 5499, 
+    duration: '6 hrs', 
+    description: 'Specialized cleaning for large multi-story homes.',
     rating: 4.9,
-    reviewCount: 2100,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDhMOlSsEXRDt3sDDyty-vRXWr9jTMfio4HeOZi-wMf023A4X41bpDbxNoMTChDF3Q7UsnfNjf4uO9K3KvdwtLVUq9OsiWgG827dJOoZ8asEZ3pr14pe72BEq5VkZ82epmnm4AUhIuDiL6TM_ev5YD5WhGGC2EWBxbosU6TMvisuWQs2qtTKt-f2FcexXRiQUbbC0IAy9oUDhO3H4gH-aDNn_C25obcofREoGJcAnmog7P2vfTgtxgrAvoJ1XCfM1K14feVlYB71eo'
-  },
-  { 
-    id: 's4', 
-    title: 'Sofa & Carpet Grooming', 
-    categoryId: 'c5',
-    price: 999, 
-    duration: '3 Hrs', 
-    description: 'Deep shampoo and fabric care.',
-    rating: 4.8,
-    reviewCount: 320,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCxfgxTKVL3pzVbOj0bxIsLzORLmiwHUocaoDIr3VK0eMNh2-xL8OaiKej1o7duNf9CGGFUEH_DYX84BsAUIJjJClBT5WFsDHKfqOuXr0PnxAc4M25nFQuJuRNGHPM9npjmlRHgbm1LC2lCt6LaxRo7HDUNkJ5cB3r7YXArocq0d1-K9aXTgu7pw0zBhLG-nqz3qyz6QgUVewEQIi8XaSV5G3poBZnOfDI7Da3k6YhgWEhGJs9FAjjobjyCarCekl_fszz01AYxhiM'
+    reviews: '12K reviews',
+    reviewCount: 12000,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQyKII_vIaYbueglrCgh8F-6OF2PmOkj_bk4X1NuaRUaG6y4NFTB8zkvoUBZifEDIflhH_vZTPVTbUi9ppddj_PADLZ0Il4Vsmr9H9nVcoY0k-neYBhDNDzKMHL24IdQyDdjbg9z_AA9ueRIAis-0JpNbTycooHUHFjvfvfW12Ph2DWiEhKPP_W2nkZpSEYQ4K-opYDnVrif3S7JtLwW5khRfD5qc-wFSUznoff5_xsW1tqqLI73qRV4Sx0ZH-fvpasYD6YzS7f20',
+    inclusions: [
+      'Staircase and railing cleaning',
+      'Extensive glass window cleaning'
+    ]
   }
 ];
 
 export const MOCK_BOOKINGS: Booking[] = [
   {
     id: 'b1',
-    serviceName: 'Deep Home Cleaning',
+    serviceName: 'Furnished Apartment Cleaning',
     status: BookingStatus.PARTNER_EN_ROUTE,
     date: 'Today',
     time: '2:00 PM',
-    amount: 1499.00,
+    amount: 3499.00,
     partnerName: 'Rajesh Kumar',
     partnerImage: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=200&h=200',
     otp: '4492'
-  },
-  {
-    id: 'b2',
-    serviceName: 'Car Wash Exterior',
-    status: BookingStatus.COMPLETED,
-    date: 'Aug 12',
-    time: '11:00 AM',
-    amount: 299.00,
-    partnerName: 'Amit Singh'
-  },
-  {
-    id: 'b3',
-    serviceName: 'Sofa Cleaning',
-    status: BookingStatus.CANCELLED,
-    date: 'July 28',
-    time: '10:00 AM',
-    amount: 499.00,
-    partnerName: 'Priya Patel'
-  },
-  {
-    id: 'b4',
-    serviceName: 'AC Service',
-    status: BookingStatus.COMPLETED,
-    date: 'June 15',
-    time: '04:00 PM',
-    amount: 599.00,
-    partnerName: 'Vikram Malhotra'
-  },
-  {
-    id: 'b5',
-    serviceName: 'Plumbing Repair',
-    status: BookingStatus.CONFIRMED,
-    date: 'Tomorrow',
-    time: '09:00 AM',
-    amount: 349.00,
-    partnerName: 'Not Assigned'
   }
 ];

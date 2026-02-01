@@ -1,227 +1,202 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState } from 'react';
 import { AppScreen, NavigationProps, Service, CartItem } from '../types';
-import { SERVICES, CATEGORIES } from '../mockData';
+import { SERVICES, SUB_CATEGORIES_DB, ExtendedService } from '../mockData';
 
-// --- SERVICE CARD COMPONENT ---
-// Mobile-optimized: Reduced height, fluid width, no fixed pixels
-const ServiceCard: React.FC<{
-  service: Service;
-  cart: CartItem[];
-  addToCart: (s: Service) => void;
-  decreaseQuantity: (s: Service) => void;
-}> = ({ service, cart, addToCart, decreaseQuantity }) => {
-  const cartItem = cart.find(item => item.service.id === service.id);
-  const quantity = cartItem ? cartItem.quantity : 0;
-
-  return (
-    <div className="flex flex-col w-full bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-white/5 transition-all group">
-      {/* Reduced Height Image - Fixes "Huge" size issue */}
-      <div className="relative w-full h-44 sm:h-52 bg-gray-50 dark:bg-white/5">
-        <img 
-          src={service.image} 
-          alt={service.title} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
-        />
-        {service.bestseller && (
-          <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-md text-black text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">
-            Bestseller
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-2">
-        <div>
-          <h3 className="text-sm sm:text-base font-bold text-onyx dark:text-white leading-tight">
-            {service.title}
-          </h3>
-          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-relaxed">
-            {service.description}
-          </p>
-        </div>
-
-        <div className="flex items-center justify-between mt-auto pt-2">
-          <div className="flex flex-col">
-            <span className="text-lg font-black text-onyx dark:text-white tracking-tight">₹{service.price}</span>
-            {service.originalPrice && (
-              <span className="text-[9px] text-gray-400 line-through">₹{service.originalPrice}</span>
-            )}
-          </div>
-
-          {quantity === 0 ? (
-            <button 
-              onClick={() => addToCart(service)}
-              className="h-8 min-w-[4.5rem] px-3 rounded-lg bg-onyx dark:bg-white text-white dark:text-black font-bold text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-sm"
-            >
-              Add
-            </button>
-          ) : (
-            <div className="flex items-center h-8 bg-primary/10 border border-primary/20 rounded-lg overflow-hidden shadow-sm">
-              <button 
-                onClick={() => decreaseQuantity(service)} 
-                className="w-8 h-full flex items-center justify-center text-primary active:bg-primary active:text-black transition-colors"
-              >
-                <span className="material-symbols-outlined text-sm">remove</span>
-              </button>
-              <span className="w-5 text-center font-bold text-primary text-[10px]">{quantity}</span>
-              <button 
-                onClick={() => addToCart(service)} 
-                className="w-8 h-full flex items-center justify-center text-primary active:bg-primary active:text-black transition-colors"
-              >
-                <span className="material-symbols-outlined text-sm">add</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// --- MAIN SCREEN COMPONENT ---
-export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, cart, addToCart, decreaseQuantity }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, selectedCategory, cart, addToCart, decreaseQuantity }) => {
+  // Use the context of the category from which the user arrived
+  const catId = selectedCategory?.id || 'c1';
+  const categoryMeta = SUB_CATEGORIES_DB[catId] || SUB_CATEGORIES_DB['c1'];
   
-  // Drag scrolling ref
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isDown = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
-  const isDragging = useRef(false);
+  // State for sub-category selection
+  const [activeSubId, setActiveSubId] = useState<string>(categoryMeta.sections[0].items[0].id);
+
+  // Filter services based on category and sub-category
+  const filteredServices = SERVICES.filter(s => s.categoryId === catId && s.subCategoryId === activeSubId);
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const MENU_ITEMS = [
-    { id: 'ALL', name: 'All Services', isComingSoon: false },
-    ...CATEGORIES.map(c => ({ id: c.id, name: c.name, isComingSoon: false })),
-    { id: 'cs1', name: 'Solar Panel', isComingSoon: true },
-    { id: 'cs2', name: 'Pest Control', isComingSoon: true },
-    { id: 'cs3', name: 'AC Service', isComingSoon: true },
-    { id: 'cs4', name: 'Washing Machine', isComingSoon: true },
-  ];
-
-  const filteredServices = selectedCategory === 'ALL' 
-    ? SERVICES 
-    : SERVICES.filter(s => s.categoryId === selectedCategory);
-
-  const currentCategoryName = MENU_ITEMS.find(i => i.id === selectedCategory)?.name || 'All Services';
-  const isSelectedComingSoon = MENU_ITEMS.find(i => i.id === selectedCategory)?.isComingSoon;
-
-  const handleCategoryClick = (id: string) => {
-      if (isDragging.current) return;
-      setSelectedCategory(id);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // --- Header Drag-to-Scroll Handlers ---
-  const onMouseDown = (e: React.MouseEvent) => {
-    isDown.current = true;
-    isDragging.current = false;
-    if (scrollRef.current) {
-        scrollRef.current.classList.add('cursor-grabbing');
-        scrollRef.current.classList.remove('cursor-grab');
-        startX.current = e.pageX - scrollRef.current.offsetLeft;
-        scrollLeft.current = scrollRef.current.scrollLeft;
-    }
-  };
-
-  const stopDragging = () => {
-    isDown.current = false;
-    if (scrollRef.current) {
-        scrollRef.current.classList.remove('cursor-grabbing');
-        scrollRef.current.classList.add('cursor-grab');
-    }
-  };
-
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDown.current || !scrollRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX.current) * 2;
-    scrollRef.current.scrollLeft = scrollLeft.current - walk;
-    if (Math.abs(x - startX.current) > 5) isDragging.current = true;
-  };
-
   return (
-    // Root container with strict overflow control to prevent horizontal scrolling
-    <div className="relative flex min-h-screen w-full max-w-[100vw] flex-col bg-white dark:bg-black font-display antialiased transition-colors duration-300 overflow-x-hidden">
+    <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-[#050505] font-display text-onyx dark:text-white antialiased transition-colors duration-300">
       
       {/* Sticky Header */}
-      <div className="sticky top-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-100 dark:border-white/5 w-full">
-          <div className="flex items-center px-4 py-3 justify-between w-full max-w-7xl mx-auto">
-            <button 
-              onClick={() => navigateTo(AppScreen.HOME)}
-              className="flex size-9 items-center justify-start text-black dark:text-white hover:opacity-70 transition-opacity"
-            >
-              <span className="material-symbols-outlined text-xl font-bold">arrow_back</span>
-            </button>
-            <div className="flex-1 text-center">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Home Services</span>
-            </div>
-            <div className="w-9"></div>
+      <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#050505]/95 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
+        <div className="flex items-center p-4 gap-4">
+          <button 
+            onClick={() => navigateTo(AppScreen.HOME)}
+            className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
+          >
+            <span className="material-symbols-outlined text-2xl">arrow_back</span>
+          </button>
+          <div className="relative flex-1">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+            <input 
+              type="text" 
+              placeholder={`Search in ${categoryMeta.title}`}
+              className="w-full h-11 bg-gray-50 dark:bg-white/5 rounded-lg pl-10 pr-4 text-sm font-medium border-none focus:ring-1 focus:ring-primary"
+            />
           </div>
-
-          <div className="w-full overflow-hidden">
-            <div 
-                ref={scrollRef}
-                onMouseDown={onMouseDown}
-                onMouseLeave={stopDragging}
-                onMouseUp={stopDragging}
-                onMouseMove={onMouseMove}
-                className="flex w-full overflow-x-auto gap-2 px-4 pb-3 no-scrollbar cursor-grab active:cursor-grabbing select-none touch-pan-x"
-                style={{ WebkitOverflowScrolling: 'touch' }}
-            >
-                {MENU_ITEMS.map((item) => {
-                    const isActive = selectedCategory === item.id;
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => handleCategoryClick(item.id)}
-                            className={`flex-shrink-0 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border ${
-                                isActive 
-                                ? 'bg-primary border-primary text-black shadow-sm' 
-                                : 'bg-white dark:bg-[#111] border-gray-200 dark:border-white/10 text-gray-400'
-                            }`}
-                        >
-                            {item.name}
-                        </button>
-                    );
-                })}
-            </div>
-          </div>
+        </div>
       </div>
 
-      {/* Main Content - Fluid width with strict containment */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 mb-32 overflow-x-hidden">
-        <div className="py-5 sm:py-8">
-            <h1 className="text-2xl sm:text-3xl font-black leading-tight tracking-tighter text-black dark:text-white mb-1">
-                {selectedCategory === 'ALL' ? 'All Services' : currentCategoryName}
-            </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">
-                {isSelectedComingSoon ? 'Coming soon to your area.' : 'Customize your home refresh.'}
-            </p>
+      <main className="flex-1 pb-32">
+        {/* Category Header */}
+        <div className="px-5 py-6 border-b border-gray-100 dark:border-white/5">
+          <h1 className="text-3xl font-black tracking-tight mb-2">in {categoryMeta.title}</h1>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center h-5 w-5 rounded-full bg-primary text-black">
+              <span className="material-symbols-outlined text-[12px] font-bold fill-1">star</span>
+            </div>
+            <p className="text-sm font-bold">4.82 <span className="text-gray-400 font-medium">(1.5 M bookings)</span></p>
+          </div>
         </div>
 
-        {isSelectedComingSoon ? (
-            <div className="flex flex-col items-center justify-center py-20 px-6 opacity-40">
-                <span className="material-symbols-outlined text-[48px] mb-3">construction</span>
-                <p className="text-sm font-bold text-center tracking-tight">Expansion in Progress</p>
+        {/* Sub-Category Selector (Horizontal Icons) */}
+        <div className="px-5 py-6 bg-gray-50/50 dark:bg-white/[0.02]">
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-5">Select a service</p>
+          <div className="grid grid-cols-4 gap-3">
+            {categoryMeta.sections[0].items.map((item) => {
+              const isActive = activeSubId === item.id;
+              return (
+                <button 
+                  key={item.id}
+                  onClick={() => setActiveSubId(item.id)}
+                  className="flex flex-col items-center gap-2 group"
+                >
+                  <div className={`relative h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-300 overflow-hidden ${
+                    isActive 
+                      ? 'bg-white dark:bg-[#1a1a1a] shadow-md ring-2 ring-primary' 
+                      : 'bg-white dark:bg-[#111] border border-gray-200 dark:border-white/5 grayscale-[0.5]'
+                  }`}>
+                    <img src={item.image || `https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=200&h=200`} className="absolute inset-0 w-full h-full object-cover opacity-20" alt="" />
+                    <span className={`material-symbols-outlined text-[24px] relative z-10 ${isActive ? 'text-primary' : 'text-gray-400'}`}>
+                      {item.icon}
+                    </span>
+                  </div>
+                  <span className={`text-[10px] font-bold text-center leading-tight transition-colors ${isActive ? 'text-onyx dark:text-white' : 'text-gray-400'}`}>
+                    {item.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Service Section Heading */}
+        <div className="px-5 py-6">
+          <h2 className="text-2xl font-black tracking-tight">{categoryMeta.sections[0].items.find(i => i.id === activeSubId)?.name}</h2>
+        </div>
+
+        {/* Detailed Service Cards */}
+        <div className="space-y-4 px-5">
+          {filteredServices.length > 0 ? (
+            filteredServices.map((service: ExtendedService) => {
+              const cartItem = cart.find(ci => ci.service.id === service.id);
+              const qty = cartItem ? cartItem.quantity : 0;
+              
+              return (
+                <div key={service.id} className="relative bg-white dark:bg-[#111] rounded-2xl p-5 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md transition-all">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-black leading-tight mb-1">{service.title}</h3>
+                      
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <div className="flex items-center gap-0.5 text-[10px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                          <span className="material-symbols-outlined text-[12px] fill-1">star</span>
+                          {service.rating}
+                        </div>
+                        <span className="text-[11px] text-gray-400 font-medium">({service.reviews})</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-base font-black">Starts at ₹{service.price}</span>
+                        <span className="h-1 w-1 rounded-full bg-gray-300"></span>
+                        <span className="text-xs text-gray-400 font-medium">{service.duration}</span>
+                      </div>
+
+                      {/* Inclusions */}
+                      <ul className="space-y-2 mb-4">
+                        {service.inclusions?.map((inc, i) => (
+                          <li key={i} className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            <span className="h-1 w-1 rounded-full bg-gray-400 mt-1.5 shrink-0"></span>
+                            {inc}
+                          </li>
+                        ))}
+                      </ul>
+
+                      <button className="text-xs font-bold text-primary hover:underline">View details</button>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-28 w-28 rounded-xl overflow-hidden shadow-inner border border-gray-100 dark:border-white/10">
+                        <img src={service.image} className="h-full w-full object-cover" alt={service.title} />
+                      </div>
+                      
+                      {qty === 0 ? (
+                        <button 
+                          onClick={() => addToCart(service)}
+                          className="w-full h-10 bg-white dark:bg-[#1a1a1a] text-primary border border-primary/40 rounded-lg font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all"
+                        >
+                          Add
+                        </button>
+                      ) : (
+                        <div className="flex items-center w-full h-10 bg-primary rounded-lg overflow-hidden shadow-lg shadow-primary/20">
+                          <button onClick={() => decreaseQuantity(service)} className="flex-1 h-full flex items-center justify-center text-black active:bg-black/10">
+                            <span className="material-symbols-outlined text-sm font-bold">remove</span>
+                          </button>
+                          <span className="px-1 text-black font-black text-xs">{qty}</span>
+                          <button onClick={() => addToCart(service)} className="flex-1 h-full flex items-center justify-center text-black active:bg-black/10">
+                            <span className="material-symbols-outlined text-sm font-bold">add</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 opacity-30">
+              <span className="material-symbols-outlined text-[64px]">explore_off</span>
+              <p className="font-bold mt-4">No packages found for this sub-category</p>
             </div>
-        ) : (
-            // GRID: STRICT 1-COLUMN MOBILE, 2-COLUMN TABLET
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-12 w-full">
-                {filteredServices.map((service) => (
-                    <ServiceCard 
-                        key={service.id} 
-                        service={service} 
-                        cart={cart}
-                        addToCart={addToCart}
-                        decreaseQuantity={decreaseQuantity}
-                    />
-                ))}
+          )}
+        </div>
+
+        {/* UC Promise Section */}
+        <div className="mt-12 mx-5 p-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
+          <h3 className="text-lg font-black mb-6">Home Wash Promise</h3>
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-full bg-white dark:bg-[#1a1a1a] flex items-center justify-center shadow-sm">
+                <span className="material-symbols-outlined text-green-500">verified</span>
+              </div>
+              <div>
+                <p className="font-bold text-sm">Verified Professionals</p>
+                <p className="text-xs text-gray-400 mt-1">Background checked and trained experts only.</p>
+              </div>
             </div>
-        )}
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-full bg-white dark:bg-[#1a1a1a] flex items-center justify-center shadow-sm">
+                <span className="material-symbols-outlined text-blue-500">sanitizer</span>
+              </div>
+              <div>
+                <p className="font-bold text-sm">Safe Chemicals</p>
+                <p className="text-xs text-gray-400 mt-1">Eco-friendly and non-toxic cleaning agents.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-full bg-white dark:bg-[#1a1a1a] flex items-center justify-center shadow-sm">
+                <span className="material-symbols-outlined text-orange-500">cleaning_services</span>
+              </div>
+              <div>
+                <p className="font-bold text-sm">Superior Stain Removal</p>
+                <p className="text-xs text-gray-400 mt-1">Advanced machine-driven scrubbing technology.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* Floating Cart Indicator */}
@@ -229,18 +204,18 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[92%] sm:max-w-[400px] z-[60]">
           <button 
             onClick={() => navigateTo(AppScreen.CART)}
-            className="w-full flex items-center bg-black dark:bg-white text-white dark:text-black rounded-2xl shadow-xl overflow-hidden transition-all active:scale-[0.97] h-[60px]"
+            className="w-full flex items-center bg-black dark:bg-white text-white dark:text-black rounded-2xl shadow-2xl overflow-hidden transition-all active:scale-[0.97] h-[64px] border border-white/10"
           >
-            <div className="flex-1 flex flex-col items-start justify-center pl-6 text-left h-full">
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-60 mb-0.5">Total Cart</span>
-              <span className="text-lg font-black tracking-tight leading-none">₹{cartTotal.toFixed(0)}</span>
+            <div className="flex-1 flex flex-col items-start justify-center pl-6 text-left">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mb-0.5">Cart Subtotal</span>
+              <span className="text-xl font-black tracking-tight leading-none">₹{cartTotal.toFixed(0)}</span>
             </div>
             
-            <div className="h-6 w-[1.5px] bg-white/10 dark:bg-black/10"></div>
+            <div className="h-8 w-[1.5px] bg-white/10 dark:bg-black/10"></div>
             
             <div className="flex items-center gap-2 pr-6 pl-5 h-full">
-              <span className="text-[10px] font-black uppercase tracking-widest">View Cart</span>
-              <span className="material-symbols-outlined text-lg">arrow_forward</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Review Order</span>
+              <span className="material-symbols-outlined text-lg">shopping_bag</span>
             </div>
           </button>
         </div>
