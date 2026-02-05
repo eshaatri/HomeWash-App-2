@@ -36,7 +36,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({ navigateTo, sel
     ];
 
     const INCLUDED_ITEMS = [
-        { label: 'Room floor scrubbing', image: '/assets/floor-scrubbing.png' },
+        { label: 'Room floor scrubbing', image: 'https://images.unsplash.com/photo-1581578731117-104f2a412c54?auto=format&fit=crop&q=80&w=300' },
         { label: 'Cabinets & furniture exterior wiping', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=80&w=300' },
         { label: 'Ceiling & fan dusting', image: 'https://images.unsplash.com/photo-1632984589945-883a45c61335?auto=format&fit=crop&q=80&w=300' },
         { label: 'Sofa* & mattress*', image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=300' },
@@ -63,11 +63,11 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({ navigateTo, sel
     ];
 
     const EQUIPMENTS = [
-        { label: 'Floor scrubbing machine', image: '/assets/floor-scrubbing.png' },
-        { label: 'Dry & wet vacuum cleaner', image: 'https://images.unsplash.com/photo-1563131928-3c94d4203248?auto=format&fit=crop&q=80&w=200' },
-        { label: 'Hand scrubber', image: 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=200' },
-        { label: 'Different type of attachments', image: 'https://images.unsplash.com/photo-1581578731522-a027bc438914?auto=format&fit=crop&q=80&w=200' },
-        { label: 'Microfibre cloths', image: 'https://images.unsplash.com/photo-1596516109370-29001ec8eb36?auto=format&fit=crop&q=80&w=200' },
+        { label: 'Floor scrubbing machine', image: 'https://images.unsplash.com/photo-1581578731117-104f2a412c54?auto=format&fit=crop&q=80&w=200' },
+        { label: 'Dry & wet vacuum cleaner', image: 'https://images.unsplash.com/photo-1558317374-a354d5f6d4da?auto=format&fit=crop&q=80&w=200' },
+        { label: 'Hand scrubber', image: 'https://images.unsplash.com/photo-1585664811087-47f65f68c34b?auto=format&fit=crop&q=80&w=200' },
+        { label: 'Different type of attachments', image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=200' },
+        { label: 'Microfibre cloths', image: 'https://images.unsplash.com/photo-1516766453986-e8d19760775d?auto=format&fit=crop&q=80&w=200' },
         { label: 'Sponge', image: 'https://images.unsplash.com/photo-1533561052604-c3be19d755f7?auto=format&fit=crop&q=80&w=200' },
         { label: 'Cleaning solutions', image: 'https://images.unsplash.com/photo-1628191010210-a59de33e5941?auto=format&fit=crop&q=80&w=200' },
         { label: 'Grout brushes', image: 'https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=200' },

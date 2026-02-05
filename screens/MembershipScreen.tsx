@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AppScreen, NavigationProps } from '../types';
 import { BottomNav } from '../components/BottomNav';
@@ -6,116 +7,126 @@ export const MembershipScreen: React.FC<NavigationProps> = (props) => {
   const { navigateTo, isPremium, togglePremium } = props;
 
   return (
-    <div className="bg-alabaster dark:bg-[#201d12] font-display text-slate-900 dark:text-white antialiased overflow-x-hidden min-h-screen flex flex-col relative pb-32">
+    <div className="bg-alabaster dark:bg-[#121212] font-display text-slate-900 dark:text-white antialiased overflow-x-hidden min-h-screen flex flex-col relative pb-48 transition-colors duration-300">
       
-      {/* Top Navigation - Back button removed for Tab View */}
-      <nav className="sticky top-0 z-50 flex items-center bg-alabaster/90 dark:bg-[#201d12]/90 backdrop-blur-md px-4 py-3 justify-center border-b border-gray-200 dark:border-white/5">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>diamond</span>
-          <span className="text-sm font-bold tracking-widest uppercase text-black dark:text-white">Home Wash | Gold</span>
-        </div>
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
+         <button onClick={() => navigateTo(AppScreen.HOME)} className="material-symbols-outlined">arrow_back</button>
+         <span className="text-sm font-bold tracking-widest uppercase">HomeWash Gold</span>
+         <div className="w-6"></div>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative w-full h-[320px] overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-t from-[#201d12] via-[#201d12]/50 to-transparent z-10 pointer-events-none"></div>
-        <div 
-          className="w-full h-full bg-center bg-cover bg-no-repeat transform scale-105 group-hover:scale-100 transition-transform duration-700 ease-out" 
-          style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBzAsocfs1AlEM7Y5Wk1Mp-lLpJof03tyV2Z4uTWZA7lPbKIE6FzeFGJzt3BSbLg9S7OnltFtxPYTjd6Y4r65DSCX2aZK2v6ue29JrYowb4Aync6wrX-ZElIUNDJBHp3vwphOyVc39Tr3g2UY-brOyJmsxr4D6CuIrMnRgswSNXCoPsCmZD8Wi-kLG6BpUQPW1Fa3SvBZOMl_nvMpDGWgujBhRfg0tgkSlGzoR6MpvURgeonSUNL0Q_5pEzaAXA1L9BBWSOU95PHTY")' }}
-        ></div>
-        {/* Floating Badge */}
-        <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center">
-          <div className="bg-black/60 backdrop-blur-sm border border-primary/30 px-5 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(var(--primary-r),var(--primary-g),var(--primary-b),0.2)]">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/90">Premium Tier</span>
-          </div>
+      <div className="relative px-6 pt-8 pb-12 overflow-hidden">
+        {/* Abstract Background Blurs */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
+
+        <div className="relative z-10 text-center space-y-4">
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-2">
+               <span className="material-symbols-outlined text-[14px]">stars</span>
+               Premium Membership
+           </div>
+           <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-[1.1]">
+              Upgrade your <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffd633] to-[#b39624]">Lifestyle.</span>
+           </h1>
+           <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">
+             Join the exclusive club of homeowners who enjoy priority service and unmatched savings.
+           </p>
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="px-4 -mt-4 relative z-20 space-y-8">
-        
-        {/* Headlines */}
-        <div className="text-center space-y-3">
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow-sm">
-            Laundry, <br/><span className="text-primary">Redefined.</span>
-          </h1>
-          <p className="text-gray-400 text-base font-normal leading-relaxed max-w-xs mx-auto">
-            Unlock premium privileges across 6 major metros with the Gold Standard.
-          </p>
-        </div>
+      {/* Main Card */}
+      <div className="px-6 mb-8">
+         <div className="relative w-full aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border border-white/20 group">
+             {/* Background Image */}
+             <div className="absolute inset-0 bg-black">
+                 <img 
+                    src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=600&auto=format&fit=crop" 
+                    className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                    alt="Luxury Interior"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+             </div>
+             
+             {/* Card Content */}
+             <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                 <div className="flex justify-between items-start">
+                     <span className="text-white/80 font-mono text-xs tracking-widest">MEMBER CARD</span>
+                     <span className="material-symbols-outlined text-primary text-3xl">workspace_premium</span>
+                 </div>
+                 
+                 <div>
+                     <p className="text-primary font-bold text-sm uppercase tracking-widest mb-1">Gold Tier</p>
+                     <h2 className="text-white text-3xl font-black tracking-tight mb-4">Unlocks Everything.</h2>
+                     <div className="flex items-baseline gap-2 text-white">
+                         <span className="text-4xl font-black">₹499</span>
+                         <span className="text-white/60 text-sm">/ month</span>
+                     </div>
+                 </div>
+             </div>
+         </div>
+      </div>
 
-        {/* Benefits List */}
-        <div className="space-y-4">
-          {[
-            { icon: 'bolt', title: 'Zero Waiting', desc: 'Skip the queue, every time.' },
-            { icon: 'local_shipping', title: 'Priority Pickup', desc: '60-minute turnaround windows.' },
-            { icon: 'savings', title: 'Rollover Credits', desc: 'Unused washes stay with you.' },
-            { icon: 'checkroom', title: 'Premium Packaging', desc: 'Your clothes, delivered in style.' }
-          ].map((benefit) => (
-            <div key={benefit.title} className="group flex items-center gap-4 bg-white/[0.03] border border-white/5 p-4 rounded-xl hover:bg-white/[0.06] transition-colors">
-              <div className="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-12 group-hover:bg-primary/20 transition-colors">
-                <span className="material-symbols-outlined">{benefit.icon}</span>
+      {/* Benefits List */}
+      <div className="px-6 space-y-6">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">Gold Privileges</h3>
+          
+          {/* Benefit 1: 10% Discount */}
+          <div className="flex items-start gap-5">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dim flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                  <span className="material-symbols-outlined text-black text-2xl">percent</span>
               </div>
-              <div className="flex flex-col justify-center">
-                <p className="text-white text-base font-semibold leading-normal">{benefit.title}</p>
-                <p className="text-[#b6b1a0] text-sm font-normal leading-normal">{benefit.desc}</p>
+              <div className="flex-1">
+                  <h4 className="text-lg font-bold text-onyx dark:text-white">Flat 10% Off</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mt-1">
+                      Save instantly on every service, cleaning agent, and add-on. No minimum order value.
+                  </p>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Pricing Card */}
-        <div className="relative overflow-hidden rounded-xl border border-primary/40 bg-gradient-to-b from-primary/10 to-[#201d12] p-8 text-center shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
-          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 blur-[60px] rounded-full pointer-events-none"></div>
-          <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-primary/5 blur-[60px] rounded-full pointer-events-none"></div>
-          <div className="relative z-10">
-            <p className="text-xs uppercase tracking-[0.2em] text-primary font-bold mb-3">All Inclusive</p>
-            <div className="flex items-start justify-center gap-1 mb-2">
-              <span className="text-2xl font-medium text-white/60 mt-2">₹</span>
-              <span className="text-5xl font-bold text-white tracking-tight">499</span>
-            </div>
-            <p className="text-gray-400 text-sm mb-6">per month, billed annually</p>
-            <div className="inline-flex items-center gap-2 bg-[#201d12]/80 border border-white/10 px-3 py-1.5 rounded-lg">
-              <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
-              <span className="text-xs text-white/80">Cancel anytime. No hidden fees.</span>
-            </div>
           </div>
-        </div>
 
-        {/* Testimonial Section */}
-        <div className="text-center py-6 border-t border-white/5">
-          <div className="flex justify-center gap-1 mb-4 text-primary">
-            {[1,2,3,4,5].map(i => (
-              <span key={i} className="material-symbols-outlined fill-1 text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-            ))}
+           {/* Benefit 2: Priority Timings */}
+           <div className="flex items-start gap-5">
+              <div className="h-12 w-12 rounded-2xl bg-gray-900 dark:bg-white/10 flex items-center justify-center shrink-0 border border-gray-200 dark:border-white/10">
+                  <span className="material-symbols-outlined text-white text-2xl">schedule</span>
+              </div>
+              <div className="flex-1">
+                  <h4 className="text-lg font-bold text-onyx dark:text-white">Priority Slots</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mt-1">
+                      Get exclusive access to high-demand morning and weekend slots reserved just for you.
+                  </p>
+              </div>
           </div>
-          <p className="text-white/90 italic text-lg leading-relaxed mb-6 px-2 font-light">
-            "The zero waiting feature is a game changer for my busy schedule. Absolute luxury service."
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <div 
-              className="size-10 rounded-full border border-white/10 bg-gray-600 bg-cover bg-center" 
-              style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD8Ef8ElZ7J83hubPUVTphlL6jRIDuWtp5EFsDw6rd_Icq1Yg2EQlc_I5qUWcgFpbBfNFA0m-LM4jEponYXscfjzKcyhtVnstRyC40_1JyrUVKNb4ZjZyDeHZ4D6vL8v36QtcGod1pP6AQ5eh1kVQaYGeITmlsGU7RyFTaYQhENZM-HQsJjXQhJ_37OsDcQmMXZuLR7fKun5432GAyyjSHO4ai2cYemjusup_DY_6ZQY7sLdmnu4Ag0bto7swuZk-tjKULVADDumYo")' }}
-            ></div>
-            <div className="text-left">
-              <p className="text-sm font-semibold text-white">Sarah Jenkins</p>
-              <p className="text-xs text-primary/80 uppercase tracking-wider">Gold Member</p>
-            </div>
-          </div>
-        </div>
-      </main>
 
-      {/* Floating CTA above BottomNav */}
-      <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto w-full px-4 z-40 pointer-events-none">
-        <button 
-          onClick={togglePremium}
-          className="w-full relative group overflow-hidden bg-primary text-[#201d12] font-bold text-lg h-14 rounded-lg shadow-[0_4px_25px_rgba(var(--primary-r),var(--primary-g),var(--primary-b),0.3)] flex items-center justify-center gap-2 active:scale-[0.98] transition-all pointer-events-auto border border-white/10"
-        >
-          <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[20deg] group-hover:animate-shimmer"></div>
-          <span className="relative z-10">{isPremium ? 'Extend Membership' : 'Upgrade to Gold'}</span>
-          <span className="material-symbols-outlined relative z-10 transition-transform group-hover:translate-x-1">arrow_forward</span>
-        </button>
+          {/* Benefit 3: Top Partners */}
+          <div className="flex items-start gap-5">
+              <div className="h-12 w-12 rounded-2xl bg-gray-900 dark:bg-white/10 flex items-center justify-center shrink-0 border border-gray-200 dark:border-white/10">
+                  <span className="material-symbols-outlined text-white text-2xl">badge</span>
+              </div>
+              <div className="flex-1">
+                  <h4 className="text-lg font-bold text-onyx dark:text-white">Top-Rated Partners</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mt-1">
+                      Auto-assigned 4.9+ rated professionals for all your bookings.
+                  </p>
+              </div>
+          </div>
+      </div>
+
+      {/* CTA - Fixed above Bottom Nav for Mobile */}
+      <div className="fixed bottom-[84px] md:bottom-8 left-0 right-0 px-6 z-40 max-w-md mx-auto pointer-events-none">
+          <button 
+            onClick={togglePremium}
+            className="pointer-events-auto relative w-full h-14 bg-onyx dark:bg-white rounded-xl overflow-hidden group shadow-[0_8px_30px_rgb(0,0,0,0.12)] active:scale-[0.98] transition-all border border-white/10"
+          >
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-dim opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10 flex items-center justify-center gap-3 h-full">
+                  <span className={`text-lg font-bold ${isPremium ? 'text-white' : 'text-white dark:text-black group-hover:text-black'}`}>
+                      {isPremium ? 'Manage Membership' : 'Unlock Gold @ ₹499'}
+                  </span>
+                  {!isPremium && <span className="material-symbols-outlined text-white dark:text-black group-hover:text-black">arrow_forward</span>}
+              </div>
+          </button>
       </div>
 
       <BottomNav {...props} />

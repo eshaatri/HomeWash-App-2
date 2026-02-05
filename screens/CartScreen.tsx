@@ -1,10 +1,12 @@
+
 import React from 'react';
 import { AppScreen, NavigationProps } from '../types';
 
 export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, removeFromCart, addToCart, decreaseQuantity, isPremium }) => {
   const subTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const tax = subTotal * 0.05;
-  const discount = isPremium ? 250 : 0;
+  // Updated Discount Logic: 10% off for Premium
+  const discount = isPremium ? (subTotal * 0.10) : 0;
   const total = Math.max(0, subTotal + tax - discount);
 
   return (
@@ -96,14 +98,13 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
                             <span className="material-symbols-outlined fill-current">stars</span>
                         </div>
                         <div>
-                            <p className="text-sm font-bold text-onyx dark:text-white">Use Gold Credit</p>
-                            <p className="text-xs text-primary/80">Balance: ₹2500.00</p>
+                            <p className="text-sm font-bold text-onyx dark:text-white">Gold Discount Applied</p>
+                            <p className="text-xs text-primary/80">You saved ₹{discount.toFixed(2)}!</p>
                         </div>
                         </div>
-                        <label className="relative inline-flex cursor-pointer items-center">
-                        <input className="peer sr-only" type="checkbox" defaultChecked />
-                        <div className="peer h-6 w-11 rounded-full bg-gray-200 dark:bg-white/10 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                        </label>
+                        <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                            <span className="material-symbols-outlined text-black text-[14px] font-bold">check</span>
+                        </div>
                     </div>
                     </div>
                 </section>
@@ -122,7 +123,7 @@ export const CartScreen: React.FC<NavigationProps> = ({ navigateTo, cart, remove
                 </div>
                 {isPremium && (
                     <div className="flex justify-between text-primary/80">
-                        <span>Gold Member Savings</span>
+                        <span>Gold Member (10% Off)</span>
                         <span className="font-medium">-₹{discount.toFixed(2)}</span>
                     </div>
                 )}

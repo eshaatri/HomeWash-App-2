@@ -1,15 +1,17 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppScreen, NavigationProps, Service, CartItem } from '../types';
 import { SERVICES, SUB_CATEGORIES_DB, ExtendedService } from '../mockData';
 
-export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, selectedCategory, cart, addToCart, decreaseQuantity, setSelectedService }) => {
+export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, selectedCategory, selectedSubCategoryId, cart, addToCart, decreaseQuantity, setSelectedService }) => {
   // Use the context of the category from which the user arrived
   const catId = selectedCategory?.id || 'c1';
   const categoryMeta = SUB_CATEGORIES_DB[catId] || SUB_CATEGORIES_DB['c1'];
   
-  // State for sub-category selection
-  const [activeSubId, setActiveSubId] = useState<string>(categoryMeta.sections[0].items[0].id);
+  // Initialize state with global selected sub-category if available, otherwise default to first item
+  const [activeSubId, setActiveSubId] = useState<string>(
+    selectedSubCategoryId || categoryMeta.sections[0].items[0].id
+  );
 
   // Filter services based on category and sub-category
   const filteredServices = SERVICES.filter(s => s.categoryId === catId && s.subCategoryId === activeSubId);
@@ -35,7 +37,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
       <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#050505]/95 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
         <div className="flex items-center p-4 gap-4">
           <button 
-            onClick={() => navigateTo(AppScreen.HOME)}
+            onClick={() => navigateTo(AppScreen.SUB_CATEGORY)}
             className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
           >
             <span className="material-symbols-outlined text-2xl">arrow_back</span>

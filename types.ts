@@ -109,6 +109,10 @@ export interface NavigationProps {
   selectedCategory: ServiceCategory | null;
   setSelectedCategory: (category: ServiceCategory | null) => void;
   
+  // Sub Category Selection
+  selectedSubCategoryId: string | null;
+  setSelectedSubCategoryId: (id: string | null) => void;
+
   // Service Selection for Config
   selectedService: Service | null;
   setSelectedService: (service: Service | null) => void;

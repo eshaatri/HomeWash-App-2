@@ -33,6 +33,7 @@ export default function App() {
   
   // Category State
   const [selectedCategory, setSelectedCategoryState] = useState<ServiceCategory | null>(null);
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   
   // Map serviceId -> { date, time }
@@ -82,6 +83,8 @@ export default function App() {
 
   const setSelectedCategory = (category: ServiceCategory | null) => {
     setSelectedCategoryState(category);
+    // Reset sub-category when main category changes to ensure fresh start
+    setSelectedSubCategoryId(null);
   };
 
   const login = (phone: string, role: UserRole) => {
@@ -198,6 +201,8 @@ export default function App() {
     serviceSlots,
     selectedCategory,
     setSelectedCategory,
+    selectedSubCategoryId,
+    setSelectedSubCategoryId,
     selectedService,
     setSelectedService,
     addToCart,
@@ -208,46 +213,58 @@ export default function App() {
   };
 
   const renderScreen = () => {
-    switch (currentScreen) {
-      case AppScreen.LOGIN:
-        return <LoginScreen {...commonProps} />;
-      case AppScreen.PARTNER_DASHBOARD:
-        return <PartnerDashboardScreen {...commonProps} />;
-      case AppScreen.HOME:
-        return <HomeScreen {...commonProps} />;
-      case AppScreen.PROFILE:
-        return <ProfileScreen {...commonProps} />;
-      case AppScreen.MEMBERSHIP:
-        return <MembershipScreen {...commonProps} />;
-      case AppScreen.ADDRESSES:
-        return <AddressScreen {...commonProps} />;
-      case AppScreen.BOOKING:
-        return <BookingScreen {...commonProps} onSelectBooking={(b) => {
-          setSelectedBooking(b);
-          navigateTo(AppScreen.BOOKING_DETAIL);
-        }} />;
-      case AppScreen.SLOT_SELECTION:
-        return <SlotSelectionScreen {...commonProps} />;
-      case AppScreen.BOOKING_DETAIL:
-        return <BookingDetailScreen {...commonProps} booking={selectedBooking || bookings[0] || MOCK_BOOKINGS[0]} />;
-      case AppScreen.SUPPORT:
-        return <SupportScreen {...commonProps} />;
-      case AppScreen.SUB_CATEGORY:
-        return <SubCategoryScreen {...commonProps} />;
-      case AppScreen.SERVICE_SELECTION:
-        return <ServiceSelectionScreen {...commonProps} />;
-      case AppScreen.SERVICE_DETAIL:
-        return <ServiceDetailScreen {...commonProps} />;
-      case AppScreen.CART:
-        return <CartScreen {...commonProps} />;
-      case AppScreen.CHECKOUT:
-        return <CheckoutScreen {...commonProps} />;
-      default:
-        return <HomeScreen {...commonProps} />;
-    }
-  };
+    // If we are on SUB_CATEGORY, we render HomeScreen behind it
+    const activeScreen = currentScreen === AppScreen.SUB_CATEGORY ? AppScreen.HOME : currentScreen;
 
-  const isLoggedIn = user !== null && currentScreen !== AppScreen.LOGIN;
+    const screenContent = (() => {
+      switch (activeScreen) {
+        case AppScreen.LOGIN:
+          return <LoginScreen {...commonProps} />;
+        case AppScreen.PARTNER_DASHBOARD:
+          return <PartnerDashboardScreen {...commonProps} />;
+        case AppScreen.HOME:
+          return <HomeScreen {...commonProps} />;
+        case AppScreen.PROFILE:
+          return <ProfileScreen {...commonProps} />;
+        case AppScreen.MEMBERSHIP:
+          return <MembershipScreen {...commonProps} />;
+        case AppScreen.ADDRESSES:
+          return <AddressScreen {...commonProps} />;
+        case AppScreen.BOOKING:
+          return <BookingScreen {...commonProps} onSelectBooking={(b) => {
+            setSelectedBooking(b);
+            navigateTo(AppScreen.BOOKING_DETAIL);
+          }} />;
+        case AppScreen.SLOT_SELECTION:
+          return <SlotSelectionScreen {...commonProps} />;
+        case AppScreen.BOOKING_DETAIL:
+          return <BookingDetailScreen {...commonProps} booking={selectedBooking || bookings[0] || MOCK_BOOKINGS[0]} />;
+        case AppScreen.SUPPORT:
+          return <SupportScreen {...commonProps} />;
+        case AppScreen.SERVICE_SELECTION:
+          return <ServiceSelectionScreen {...commonProps} />;
+        case AppScreen.SERVICE_DETAIL:
+          return <ServiceDetailScreen {...commonProps} />;
+        case AppScreen.CART:
+          return <CartScreen {...commonProps} />;
+        case AppScreen.CHECKOUT:
+          return <CheckoutScreen {...commonProps} />;
+        default:
+          return <HomeScreen {...commonProps} />;
+      }
+    })();
+
+    return (
+      <>
+        {screenContent}
+        {currentScreen === AppScreen.SUB_CATEGORY && (
+          <div className="absolute inset-0 z-[60]">
+             <SubCategoryScreen {...commonProps} />
+          </div>
+        )}
+      </>
+    );
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-200 dark:bg-[#050505] justify-center transition-colors duration-300">
