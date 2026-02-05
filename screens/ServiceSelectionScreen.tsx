@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { AppScreen, NavigationProps, Service, CartItem } from '../types';
 import { SERVICES, SUB_CATEGORIES_DB, ExtendedService } from '../mockData';
 
-export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, selectedCategory, cart, addToCart, decreaseQuantity }) => {
+export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, selectedCategory, cart, addToCart, decreaseQuantity, setSelectedService }) => {
   // Use the context of the category from which the user arrived
   const catId = selectedCategory?.id || 'c1';
   const categoryMeta = SUB_CATEGORIES_DB[catId] || SUB_CATEGORIES_DB['c1'];
@@ -16,6 +16,17 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleServiceClick = (service: ExtendedService) => {
+    // Check if it's one of the configurable apartment services
+    if (service.id === 's1' || service.id === 's1_un') {
+        setSelectedService(service);
+        navigateTo(AppScreen.SERVICE_DETAIL);
+    } else {
+        // Default behavior (optional: could also go to detail, but for now we keep add logic for others or just expand)
+        // For consistency, let's just use the existing add/remove logic for non-complex items
+    }
+  };
 
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-[#050505] font-display text-onyx dark:text-white antialiased transition-colors duration-300">
@@ -94,12 +105,18 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
             filteredServices.map((service: ExtendedService) => {
               const cartItem = cart.find(ci => ci.service.id === service.id);
               const qty = cartItem ? cartItem.quantity : 0;
+              const isConfigurable = service.id === 's1' || service.id === 's1_un';
               
               return (
                 <div key={service.id} className="relative bg-white dark:bg-[#111] rounded-2xl p-5 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md transition-all">
                   <div className="flex gap-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-black leading-tight mb-1">{service.title}</h3>
+                      <h3 
+                        className="text-lg font-black leading-tight mb-1 cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => isConfigurable && handleServiceClick(service)}
+                      >
+                        {service.title}
+                      </h3>
                       
                       <div className="flex items-center gap-1.5 mb-2">
                         <div className="flex items-center gap-0.5 text-[10px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded">
@@ -125,7 +142,12 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
                         ))}
                       </ul>
 
-                      <button className="text-xs font-bold text-primary hover:underline">View details</button>
+                      <button 
+                        onClick={() => isConfigurable ? handleServiceClick(service) : null}
+                        className="text-xs font-bold text-primary hover:underline"
+                      >
+                        View details
+                      </button>
                     </div>
 
                     <div className="flex flex-col items-center gap-3">
@@ -133,23 +155,32 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({ navigateTo, 
                         <img src={service.image} className="h-full w-full object-cover" alt={service.title} />
                       </div>
                       
-                      {qty === 0 ? (
+                      {isConfigurable ? (
                         <button 
-                          onClick={() => addToCart(service)}
-                          className="w-full h-10 bg-white dark:bg-[#1a1a1a] text-primary border border-primary/40 rounded-lg font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all"
+                            onClick={() => handleServiceClick(service)}
+                            className="w-full h-10 bg-white dark:bg-[#1a1a1a] text-primary border border-primary/40 rounded-lg font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all"
                         >
-                          Add
+                            Select
                         </button>
                       ) : (
-                        <div className="flex items-center w-full h-10 bg-primary rounded-lg overflow-hidden shadow-lg shadow-primary/20">
-                          <button onClick={() => decreaseQuantity(service)} className="flex-1 h-full flex items-center justify-center text-black active:bg-black/10">
-                            <span className="material-symbols-outlined text-sm font-bold">remove</span>
-                          </button>
-                          <span className="px-1 text-black font-black text-xs">{qty}</span>
-                          <button onClick={() => addToCart(service)} className="flex-1 h-full flex items-center justify-center text-black active:bg-black/10">
-                            <span className="material-symbols-outlined text-sm font-bold">add</span>
-                          </button>
-                        </div>
+                        qty === 0 ? (
+                            <button 
+                            onClick={() => addToCart(service)}
+                            className="w-full h-10 bg-white dark:bg-[#1a1a1a] text-primary border border-primary/40 rounded-lg font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all"
+                            >
+                            Add
+                            </button>
+                        ) : (
+                            <div className="flex items-center w-full h-10 bg-primary rounded-lg overflow-hidden shadow-lg shadow-primary/20">
+                            <button onClick={() => decreaseQuantity(service)} className="flex-1 h-full flex items-center justify-center text-black active:bg-black/10">
+                                <span className="material-symbols-outlined text-sm font-bold">remove</span>
+                            </button>
+                            <span className="px-1 text-black font-black text-xs">{qty}</span>
+                            <button onClick={() => addToCart(service)} className="flex-1 h-full flex items-center justify-center text-black active:bg-black/10">
+                                <span className="material-symbols-outlined text-sm font-bold">add</span>
+                            </button>
+                            </div>
+                        )
                       )}
                     </div>
                   </div>

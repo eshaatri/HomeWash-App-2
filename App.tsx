@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { HomeScreen } from './screens/HomeScreen';
 import { MembershipScreen } from './screens/MembershipScreen';
@@ -6,12 +7,14 @@ import { BookingScreen } from './screens/BookingScreen';
 import { SlotSelectionScreen } from './screens/SlotSelectionScreen';
 import { SupportScreen } from './screens/SupportScreen';
 import { ServiceSelectionScreen } from './screens/ServiceSelectionScreen';
+import { ServiceDetailScreen } from './screens/ServiceDetailScreen';
 import { SubCategoryScreen } from './screens/SubCategoryScreen';
 import { CartScreen } from './screens/CartScreen';
 import { CheckoutScreen } from './screens/CheckoutScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { PartnerDashboardScreen } from './screens/PartnerDashboardScreen';
 import { BookingDetailScreen } from './screens/BookingDetailScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
 // import { DesktopSidebar } from './components/DesktopSidebar'; // Hiding for mobile default view
 import { AppScreen, User, UserRole, Booking, Service, CartItem, BookingStatus, ServiceCategory } from './types';
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from './mockData';
@@ -30,6 +33,7 @@ export default function App() {
   
   // Category State
   const [selectedCategory, setSelectedCategoryState] = useState<ServiceCategory | null>(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   
   // Map serviceId -> { date, time }
   // Key is simply service.id now, shared across all quantities of that service
@@ -104,6 +108,9 @@ export default function App() {
 
   const addToCart = (service: Service) => {
     setCart((prev) => {
+      // Check if exact same service ID exists (usually simple items)
+      // For configured items, we might generate unique IDs in ServiceDetailScreen, 
+      // but for simplicity here we rely on ID.
       const existing = prev.find(item => item.service.id === service.id);
       if (existing) {
         return prev.map(item => 
@@ -191,6 +198,8 @@ export default function App() {
     serviceSlots,
     selectedCategory,
     setSelectedCategory,
+    selectedService,
+    setSelectedService,
     addToCart,
     removeFromCart,
     decreaseQuantity,
@@ -206,6 +215,8 @@ export default function App() {
         return <PartnerDashboardScreen {...commonProps} />;
       case AppScreen.HOME:
         return <HomeScreen {...commonProps} />;
+      case AppScreen.PROFILE:
+        return <ProfileScreen {...commonProps} />;
       case AppScreen.MEMBERSHIP:
         return <MembershipScreen {...commonProps} />;
       case AppScreen.ADDRESSES:
@@ -225,6 +236,8 @@ export default function App() {
         return <SubCategoryScreen {...commonProps} />;
       case AppScreen.SERVICE_SELECTION:
         return <ServiceSelectionScreen {...commonProps} />;
+      case AppScreen.SERVICE_DETAIL:
+        return <ServiceDetailScreen {...commonProps} />;
       case AppScreen.CART:
         return <CartScreen {...commonProps} />;
       case AppScreen.CHECKOUT:

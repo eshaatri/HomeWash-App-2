@@ -2,6 +2,7 @@
 export enum AppScreen {
   LOGIN = 'LOGIN',
   HOME = 'HOME',
+  PROFILE = 'PROFILE',
   CITY_SELECT = 'CITY_SELECT',
   MEMBERSHIP = 'MEMBERSHIP',
   ADDRESSES = 'ADDRESSES',
@@ -11,6 +12,7 @@ export enum AppScreen {
   SUPPORT = 'SUPPORT',
   SUB_CATEGORY = 'SUB_CATEGORY',
   SERVICE_SELECTION = 'SERVICE_SELECTION',
+  SERVICE_DETAIL = 'SERVICE_DETAIL', // New Config Screen
   CART = 'CART',
   CHECKOUT = 'CHECKOUT',
   PARTNER_DASHBOARD = 'PARTNER_DASHBOARD',
@@ -106,6 +108,10 @@ export interface NavigationProps {
   // Category Selection
   selectedCategory: ServiceCategory | null;
   setSelectedCategory: (category: ServiceCategory | null) => void;
+  
+  // Service Selection for Config
+  selectedService: Service | null;
+  setSelectedService: (service: Service | null) => void;
 
   // Actions
   addToCart: (service: Service) => void;

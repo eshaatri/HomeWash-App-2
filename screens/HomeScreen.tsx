@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppScreen, NavigationProps } from '../types';
 import { BottomNav } from '../components/BottomNav';
@@ -7,6 +8,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
   const { navigateTo, isPremium, togglePremium, isDarkMode, toggleDarkMode, user, currentLocation, currentLocationLabel, setCurrentLocation, setSelectedCategory } = props;
 
   const [isLocating, setIsLocating] = useState<boolean>(false);
+  const [buttonStyle, setButtonStyle] = useState<'3D' | 'GLASS' | 'NEU'>('3D');
 
   // Detect Location on Mount if not already set or is default
   useEffect(() => {
@@ -27,12 +29,10 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    // Using OpenStreetMap Nominatim for free reverse geocoding
                     const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
                     const data = await response.json();
                     
                     if (data && data.address) {
-                        // Prioritize specific address parts for a clean display
                         const suburb = data.address.suburb || data.address.neighbourhood || data.address.residential;
                         const city = data.address.city || data.address.town || data.address.state_district;
                         const postcode = data.address.postcode;
@@ -55,7 +55,6 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                         setCurrentLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, 'Current Location');
                     }
                 } catch (error) {
-                    // Fallback to coordinates if API fails (offline)
                     setCurrentLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, 'Current Location');
                 } finally {
                     setIsLocating(false);
@@ -63,7 +62,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             },
             (error) => {
                 console.error("Location access denied or error:", error);
-                setCurrentLocation('Mumbai, India', 'Current Location'); // Default fallback
+                setCurrentLocation('Mumbai, India', 'Current Location'); 
                 setIsLocating(false);
             },
             { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
@@ -71,22 +70,57 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
     };
 
     detectLocation();
-  }, []); // Run once on mount
+  }, []);
 
-  // Premium Metallic Styles - Enhanced for "Shiny" Look
+  // --- Design System Variants ---
+
+  // Variant 1: 3D "Pillowy" Pop (Requested Style)
+  const get3DStyle = (id: string) => {
+    // Base styles with specialized shadows for "Squishy" look
+    const base = "relative overflow-hidden transition-transform active:scale-95 duration-200 border-b-4 border-r-4 rounded-[24px]";
+    
+    switch(id) {
+      case 'c1': // Home Cleaning - Blue
+        return `${base} bg-[#4facfe] border-[#0072ff]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(79,172,254,0.3)]`;
+      case 'c2': // Bathroom - Purple
+        return `${base} bg-[#a18cd1] border-[#fbc2eb]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(161,140,209,0.3)]`;
+      case 'c3': // Kitchen - Orange
+        return `${base} bg-[#ff9a9e] border-[#fecfef]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(255,154,158,0.3)]`;
+      case 'c4': // Water - Cyan
+        return `${base} bg-[#00c6fb] border-[#005bea]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(0,198,251,0.3)]`;
+      case 'c5': // Sofa - Yellow/Amber
+        return `${base} bg-[#f6d365] border-[#fda085]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.6),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(246,211,101,0.3)]`;
+      case 'c6': // Car - Grey/White
+        return `${base} bg-[#e0c3fc] border-[#8ec5fc]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(224,195,252,0.3)]`;
+      default:
+        return `${base} bg-white`;
+    }
+  };
+
+  // Variant 2: Modern Glassmorphism
+  const getGlassStyle = (id: string) => {
+    return `relative bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-[20px] shadow-sm active:scale-95 transition-all`;
+  };
+
+  // Variant 3: Soft Neumorphism
+  const getNeuStyle = (id: string) => {
+    return `relative bg-[#f8f7f6] dark:bg-[#1a1a1a] rounded-[24px] shadow-[6px_6px_12px_#d1d1cf,-6px_-6px_12px_#ffffff] dark:shadow-[5px_5px_10px_#0b0b0b,-5px_-5px_10px_#292929] active:shadow-[inset_6px_6px_12px_#d1d1cf,inset_-6px_-6px_12px_#ffffff] dark:active:shadow-[inset_5px_5px_10px_#0b0b0b,inset_-5px_-5px_10px_#292929] border border-white/20 dark:border-white/5 transition-all`;
+  };
+
+  const getButtonStyle = (id: string) => {
+    if (buttonStyle === '3D') return get3DStyle(id);
+    if (buttonStyle === 'GLASS') return getGlassStyle(id);
+    return getNeuStyle(id);
+  };
+
   const premiumStyles = {
     background: 'linear-gradient(135deg, #8A6E2F 0%, #D4AF37 20%, #FFF9E3 50%, #D4AF37 80%, #8A6E2F 100%)',
-    boxShadow: `
-      0 20px 40px -12px rgba(0, 0, 0, 0.5),
-      inset 0 1.5px 0.5px rgba(255, 255, 255, 0.8),
-      inset 0 -1.5px 1px rgba(0, 0, 0, 0.3)
-    `,
+    boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1.5px 0.5px rgba(255, 255, 255, 0.8), inset 0 -1.5px 1px rgba(0, 0, 0, 0.3)',
     borderColor: '#C5A059'
   };
 
-  // Freemium Flat Styles
   const freemiumStyles = {
-    background: '#FFD633', // Flat yellow as requested
+    background: '#FFD633',
     boxShadow: '0 8px 15px -3px rgba(0, 0, 0, 0.1)',
     borderColor: 'transparent'
   };
@@ -121,8 +155,8 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             </span>
           </button>
           <button 
-            onClick={togglePremium}
-            className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-onyx-light transition-transform active:scale-95 ${!isPremium ? 'grayscale' : ''}`}
+            onClick={() => navigateTo(AppScreen.PROFILE)}
+            className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-onyx-light transition-transform active:scale-95`}
           >
             <img 
               alt="Profile" 
@@ -135,7 +169,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
 
       {/* Hero / Search */}
       <div className="px-6 pt-6 pb-2 md:pt-10">
-        <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-onyx dark:text-alabaster mb-4">
+        <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-onyx dark:text-white mb-4">
           Hello, <span className="text-primary">{user?.name.split(' ')[0]}</span>
         </h1>
         <div className="relative max-w-2xl">
@@ -148,9 +182,26 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
         </div>
       </div>
 
-      {/* Categories Grid - Responsive */}
-      <section className="px-6 py-4">
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+      {/* Style Playground Control (Hidden in Prod) */}
+      <div className="px-6 mt-4 flex gap-2 overflow-x-auto no-scrollbar">
+          {['3D', 'GLASS', 'NEU'].map((style) => (
+             <button
+                key={style}
+                onClick={() => setButtonStyle(style as any)}
+                className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border transition-all ${
+                    buttonStyle === style 
+                    ? 'bg-onyx text-white dark:bg-white dark:text-onyx border-onyx dark:border-white' 
+                    : 'bg-transparent text-gray-400 border-gray-200 dark:border-white/10'
+                }`}
+             >
+                {style === '3D' ? '3D Pop' : style === 'GLASS' ? 'Glass' : 'Neumorph'}
+             </button>
+          ))}
+      </div>
+
+      {/* 3D Categories Grid */}
+      <section className="px-6 py-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-6">
             {CATEGORIES.map(cat => (
                 <button 
                     key={cat.id} 
@@ -158,12 +209,37 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                         setSelectedCategory(cat);
                         navigateTo(AppScreen.SUB_CATEGORY);
                     }}
-                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform h-28 hover:shadow-md hover:border-gray-200 dark:hover:border-white/10"
+                    className="flex flex-col items-center group"
                 >
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center mb-2 ${cat.color}`}>
-                        <span className="material-symbols-outlined text-[22px]">{cat.icon}</span>
+                    {/* The Button Container */}
+                    <div className={`w-full aspect-square flex items-center justify-center mb-3 ${getButtonStyle(cat.id)}`}>
+                        {/* Icon Styling based on mode */}
+                        <div className={`
+                            relative z-10 flex items-center justify-center transition-transform group-hover:scale-110 duration-300
+                            ${buttonStyle === '3D' ? 'drop-shadow-[0_4px_4px_rgba(0,0,0,0.15)]' : ''}
+                        `}>
+                             {/* Icon Circle (Optional based on style) */}
+                             {buttonStyle === 'GLASS' ? (
+                                 <div className={`h-12 w-12 rounded-full flex items-center justify-center bg-white text-black shadow-lg`}>
+                                     <span className="material-symbols-outlined text-[24px]">{cat.icon}</span>
+                                 </div>
+                             ) : (
+                                <span className={`material-symbols-outlined text-[42px] ${buttonStyle === '3D' ? 'text-white' : 'text-primary'}`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                                    {cat.icon}
+                                </span>
+                             )}
+                             
+                             {/* Gloss Reflection for 3D Mode */}
+                             {buttonStyle === '3D' && (
+                                <div className="absolute -top-6 -right-6 w-12 h-12 bg-white/20 rounded-full blur-md"></div>
+                             )}
+                        </div>
                     </div>
-                    <span className="text-[10px] font-bold text-center leading-tight dark:text-gray-300 w-full px-1">{cat.name}</span>
+                    
+                    {/* Label */}
+                    <span className="text-[12px] font-bold text-center leading-tight text-onyx dark:text-gray-300 w-full px-1 tracking-tight group-hover:text-primary transition-colors">
+                      {cat.name}
+                    </span>
                 </button>
             ))}
         </div>
@@ -176,34 +252,15 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             className={`group relative rounded-xl p-5 overflow-hidden cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] border max-w-2xl ${isPremium ? 'border-[#c5a059]/50' : 'border-transparent'}`}
             style={cardStyle}
           >
-              {/* Premium Specific Effects */}
               {isPremium && (
                 <>
-                  {/* Brushed Metal Texture Layer */}
                   <div 
                     className="absolute inset-0 opacity-[0.15] pointer-events-none mix-blend-overlay"
-                    style={{ 
-                      backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 1px, #000 1px, #000 2px)',
-                      backgroundSize: '2px 100%'
-                    }}
+                    style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 1px, #000 1px, #000 2px)', backgroundSize: '2px 100%' }}
                   ></div>
-
-                  {/* High Intensity Shimmer Swipe */}
                   <div 
                     className="absolute inset-0 opacity-40 pointer-events-none"
-                    style={{ 
-                      background: 'linear-gradient(115deg, transparent 40%, #ffffff 48%, #ffffff 52%, transparent 60%)',
-                      backgroundSize: '200% 200%',
-                      animation: 'shimmer 3s infinite ease-out'
-                    }}
-                  ></div>
-
-                  {/* Soft Ambient Glow Layer */}
-                  <div 
-                    className="absolute inset-0 opacity-20 pointer-events-none animate-pulse-slow"
-                    style={{ 
-                      background: 'radial-gradient(circle at 50% -20%, #ffffff 0%, transparent 70%)'
-                    }}
+                    style={{ background: 'linear-gradient(115deg, transparent 40%, #ffffff 48%, #ffffff 52%, transparent 60%)', backgroundSize: '200% 200%', animation: 'shimmer 3s infinite ease-out' }}
                   ></div>
                 </>
               )}
@@ -217,7 +274,6 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                       Track <span className="material-symbols-outlined text-sm">arrow_forward</span>
                     </span>
                 </div>
-                
                 <h3 className={`text-2xl font-black tracking-tighter transition-colors ${isPremium ? 'text-black drop-shadow-[0_1px_0.5px_rgba(255,255,255,0.5)]' : 'text-black/90'}`}>
                   Deep Home Cleaning
                 </h3>
@@ -236,19 +292,13 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                           </div>
                       </div>
                   </div>
-                  
-                  {/* Contact Button */}
                   <div className={`flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition-all ${isPremium ? 'bg-black/10 border-black/10 text-black/80 group-hover:bg-black group-hover:text-white' : 'bg-white/40 border-black/5 text-black/60 group-hover:bg-white group-hover:text-black'}`}>
                     <span className="material-symbols-outlined text-lg">call</span>
                   </div>
                 </div>
               </div>
 
-              {/* Etched Icon Decoration */}
-              <span 
-                className={`material-symbols-outlined absolute -right-6 -bottom-6 text-[140px] pointer-events-none select-none transition-opacity ${isPremium ? 'text-black/15' : 'text-black/5'}`}
-                style={{ transform: 'rotate(-15deg)' }}
-              >
+              <span className={`material-symbols-outlined absolute -right-6 -bottom-6 text-[140px] pointer-events-none select-none transition-opacity ${isPremium ? 'text-black/15' : 'text-black/5'}`} style={{ transform: 'rotate(-15deg)' }}>
                 cleaning_services
               </span>
           </div>
@@ -276,40 +326,6 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
               </span>
             </div>
           </div>
-          <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-primary/10 blur-3xl"></div>
-        </div>
-      </section>
-
-      {/* Coming Soon Section - Responsive Grid */}
-      <section className="px-6 mt-6">
-        <div className="flex items-center justify-between pb-4">
-          <h3 className="text-lg font-bold tracking-tight text-onyx dark:text-white">Coming Soon</h3>
-          <span 
-            className="text-xs font-medium text-gray-400 dark:text-white/40 cursor-default"
-          >
-            Stay Tuned
-          </span>
-        </div>
-        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-          {[
-            { icon: 'solar_power', title: 'Solar', sub: 'Panel', color: 'bg-yellow-50 text-yellow-600' },
-            { icon: 'pest_control', title: 'Pest', sub: 'Control', color: 'bg-green-50 text-green-600' },
-            { icon: 'ac_unit', title: 'AC', sub: 'Service', color: 'bg-blue-50 text-blue-600' },
-            { icon: 'local_laundry_service', title: 'Washing', sub: 'Machine', color: 'bg-purple-50 text-purple-600' },
-          ].map((service) => (
-            <div 
-              key={service.title} 
-              className="flex flex-col items-center gap-2 rounded-xl border border-gray-200 dark:border-white/5 bg-white dark:bg-onyx-light p-2 py-3 shadow-sm opacity-60 grayscale-[0.5]"
-            >
-              <div className={`h-8 w-8 items-center justify-center flex rounded-full ${service.color} dark:bg-opacity-10`}>
-                <span className="material-symbols-outlined text-[18px]">{service.icon}</span>
-              </div>
-              <div className="text-center w-full leading-none">
-                <h4 className="text-[9px] font-bold text-onyx dark:text-alabaster">{service.title}</h4>
-                <h4 className="text-[9px] font-bold text-onyx dark:text-alabaster mt-0.5">{service.sub}</h4>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
       

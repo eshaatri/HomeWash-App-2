@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AppScreen, NavigationProps } from '../types';
 import { SUB_CATEGORIES_DB } from '../mockData';
@@ -32,12 +33,16 @@ export const SubCategoryScreen: React.FC<NavigationProps> = ({ navigateTo, selec
                   onClick={() => navigateTo(AppScreen.SERVICE_SELECTION)}
                   className="flex flex-col items-center gap-2 group w-full"
                 >
-                  <div className={`h-16 w-16 rounded-2xl flex items-center justify-center shadow-sm transition-transform active:scale-95 group-hover:shadow-md ${item.color.split(' ')[0] || 'bg-gray-50'}`}>
-                    <span className={`material-symbols-outlined text-[28px] ${item.color.split(' ')[1] || 'text-gray-600'}`}>
-                      {item.icon}
-                    </span>
+                  <div className={`h-16 w-16 rounded-2xl flex items-center justify-center shadow-sm transition-transform active:scale-95 group-hover:shadow-md overflow-hidden ${item.image ? 'bg-white border border-gray-100 dark:border-white/10' : (item.color.split(' ')[0] || 'bg-gray-50')}`}>
+                    {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                        <span className={`material-symbols-outlined text-[28px] ${item.color.split(' ')[1] || 'text-gray-600'}`}>
+                          {item.icon}
+                        </span>
+                    )}
                   </div>
-                  <span className="text-[11px] font-medium text-center leading-tight text-gray-700 dark:text-gray-300 w-full break-words">
+                  <span className="text-[11px] font-bold text-center leading-tight text-onyx dark:text-white w-full break-words">
                     {item.name}
                   </span>
                 </button>
