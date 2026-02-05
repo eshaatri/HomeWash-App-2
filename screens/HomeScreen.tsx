@@ -8,7 +8,6 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
   const { navigateTo, isPremium, togglePremium, isDarkMode, toggleDarkMode, user, currentLocation, currentLocationLabel, setCurrentLocation, setSelectedCategory } = props;
 
   const [isLocating, setIsLocating] = useState<boolean>(false);
-  const [buttonStyle, setButtonStyle] = useState<'3D' | 'GLASS' | 'NEU'>('3D');
 
   // Detect Location on Mount if not already set or is default
   useEffect(() => {
@@ -74,14 +73,14 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
 
   // --- Design System Variants ---
 
-  // Variant 1: 3D "Pillowy" Pop (Requested Style)
+  // Variant: 3D "Pillowy" Pop (Hardcoded Style)
   const get3DStyle = (id: string) => {
     // Base styles with specialized shadows for "Squishy" look
-    const base = "relative overflow-hidden transition-transform active:scale-95 duration-200 border-b-4 border-r-4 rounded-[24px]";
+    const base = "relative overflow-hidden transition-transform active:scale-95 duration-200 border-b-4 border-r-4 rounded-[20px]";
     
     switch(id) {
-      case 'c1': // Home Cleaning - Blue
-        return `${base} bg-[#4facfe] border-[#0072ff]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(79,172,254,0.3)]`;
+      case 'c1':// Home Cleaning - Now using your custom image
+        return `${base} bg-[url('/assets/floor-scrubbing.png')] bg-cover bg-center border-[#0072ff]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(79,172,254,0.3)]`;
       case 'c2': // Bathroom - Purple
         return `${base} bg-[#a18cd1] border-[#fbc2eb]/20 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-4px_-4px_8px_rgba(0,0,0,0.1),0_8px_20px_rgba(161,140,209,0.3)]`;
       case 'c3': // Kitchen - Orange
@@ -95,22 +94,6 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       default:
         return `${base} bg-white`;
     }
-  };
-
-  // Variant 2: Modern Glassmorphism
-  const getGlassStyle = (id: string) => {
-    return `relative bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-[20px] shadow-sm active:scale-95 transition-all`;
-  };
-
-  // Variant 3: Soft Neumorphism
-  const getNeuStyle = (id: string) => {
-    return `relative bg-[#f8f7f6] dark:bg-[#1a1a1a] rounded-[24px] shadow-[6px_6px_12px_#d1d1cf,-6px_-6px_12px_#ffffff] dark:shadow-[5px_5px_10px_#0b0b0b,-5px_-5px_10px_#292929] active:shadow-[inset_6px_6px_12px_#d1d1cf,inset_-6px_-6px_12px_#ffffff] dark:active:shadow-[inset_5px_5px_10px_#0b0b0b,inset_-5px_-5px_10px_#292929] border border-white/20 dark:border-white/5 transition-all`;
-  };
-
-  const getButtonStyle = (id: string) => {
-    if (buttonStyle === '3D') return get3DStyle(id);
-    if (buttonStyle === 'GLASS') return getGlassStyle(id);
-    return getNeuStyle(id);
   };
 
   return (
@@ -168,26 +151,9 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
         </div>
       </div>
 
-      {/* Style Playground Control (Hidden in Prod) */}
-      <div className="px-6 mt-4 flex gap-2 overflow-x-auto no-scrollbar">
-          {['3D', 'GLASS', 'NEU'].map((style) => (
-             <button
-                key={style}
-                onClick={() => setButtonStyle(style as any)}
-                className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border transition-all ${
-                    buttonStyle === style 
-                    ? 'bg-onyx text-white dark:bg-white dark:text-onyx border-onyx dark:border-white' 
-                    : 'bg-transparent text-gray-400 border-gray-200 dark:border-white/10'
-                }`}
-             >
-                {style === '3D' ? '3D Pop' : style === 'GLASS' ? 'Glass' : 'Neumorph'}
-             </button>
-          ))}
-      </div>
-
-      {/* 3D Categories Grid */}
+      {/* 3-Column Categories Grid */}
       <section className="px-6 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-6">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-7">
             {CATEGORIES.map(cat => (
                 <button 
                     key={cat.id} 
@@ -197,33 +163,21 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     }}
                     className="flex flex-col items-center group"
                 >
-                    {/* The Button Container */}
-                    <div className={`w-full aspect-square flex items-center justify-center mb-3 ${getButtonStyle(cat.id)}`}>
-                        {/* Icon Styling based on mode */}
-                        <div className={`
-                            relative z-10 flex items-center justify-center transition-transform group-hover:scale-110 duration-300
-                            ${buttonStyle === '3D' ? 'drop-shadow-[0_4px_4px_rgba(0,0,0,0.15)]' : ''}
-                        `}>
-                             {/* Icon Circle (Optional based on style) */}
-                             {buttonStyle === 'GLASS' ? (
-                                 <div className={`h-12 w-12 rounded-full flex items-center justify-center bg-white text-black shadow-lg`}>
-                                     <span className="material-symbols-outlined text-[24px]">{cat.icon}</span>
-                                 </div>
-                             ) : (
-                                <span className={`material-symbols-outlined text-[42px] ${buttonStyle === '3D' ? 'text-white' : 'text-primary'}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                                    {cat.icon}
-                                </span>
-                             )}
+                    {/* The Button Container - Fixed to 3D Style */}
+                    <div className={`w-full aspect-square flex items-center justify-center mb-2.5 ${get3DStyle(cat.id)}`}>
+                        {/* Icon Styling */}
+                        <div className="relative z-10 flex items-center justify-center transition-transform group-hover:scale-110 duration-300 drop-shadow-[0_3px_3px_rgba(0,0,0,0.12)]">
+                            <span className="material-symbols-outlined text-[32px] text-white" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                {cat.icon}
+                            </span>
                              
                              {/* Gloss Reflection for 3D Mode */}
-                             {buttonStyle === '3D' && (
-                                <div className="absolute -top-6 -right-6 w-12 h-12 bg-white/20 rounded-full blur-md"></div>
-                             )}
+                             <div className="absolute -top-4 -right-4 w-10 h-10 bg-white/20 rounded-full blur-md"></div>
                         </div>
                     </div>
                     
                     {/* Label */}
-                    <span className="text-[12px] font-bold text-center leading-tight text-onyx dark:text-gray-300 w-full px-1 tracking-tight group-hover:text-primary transition-colors">
+                    <span className="text-[11px] font-bold text-center leading-[1.2] text-onyx dark:text-gray-300 w-full px-0.5 tracking-tight group-hover:text-primary transition-colors line-clamp-2">
                       {cat.name}
                     </span>
                 </button>
