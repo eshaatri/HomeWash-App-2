@@ -307,7 +307,7 @@ export const SERVICES: ExtendedService[] = [
     image: 'https://plus.unsplash.com/premium_photo-1678733357597-29314417d45e?auto=format&fit=crop&q=80&w=300',
     inclusions: ['Blade wiping', 'Motor cleaning']
   },
-  // Water Tank Services (New)
+  // Water Tank Services
   {
     id: 'tank_plastic',
     title: 'Plastic Tank Cleaning',
@@ -321,6 +321,20 @@ export const SERVICES: ExtendedService[] = [
     reviewCount: 12000,
     image: 'https://plus.unsplash.com/premium_photo-1663089895885-c20e104f7556?auto=format&fit=crop&q=80&w=300',
     inclusions: ['Dewatering', 'Sludge removal', 'High pressure cleaning', 'Vacuuming']
+  },
+  {
+    id: 'tank_cemented',
+    title: 'Cemented Tank Cleaning',
+    categoryId: 'c4',
+    subCategoryId: 'cemented_tank',
+    price: 699,
+    duration: '1 hr',
+    description: 'Professional cleaning for underground or overhead cemented tanks.',
+    rating: 4.75,
+    reviews: '8K reviews',
+    reviewCount: 8000,
+    image: 'https://plus.unsplash.com/premium_photo-1664300900349-afd61c20f8b8?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dewatering', 'Sludge removal', 'High pressure cleaning', 'Vacuuming', 'Anti-bacterial spray']
   },
   // Book by Room Services
   {
