@@ -130,8 +130,8 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       {
         title: "Select Wash Type",
         items: [
-          { id: 'interior', name: 'Interior', icon: 'airline_seat_recline_extra', color: 'bg-indigo-50 text-indigo-600' },
-          { id: 'exterior', name: 'Exterior', icon: 'local_car_wash', color: 'bg-cyan-50 text-cyan-600' },
+          { id: 'interior', name: 'Interior deep clean', icon: 'airline_seat_recline_extra', color: 'bg-indigo-50 text-indigo-600' },
+          { id: 'exterior', name: 'Complete car wash', icon: 'local_car_wash', color: 'bg-cyan-50 text-cyan-600' },
         ]
       }
     ]
