@@ -79,34 +79,12 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       {
         title: "Select Service Type",
         items: [
-          { id: 'discounted', name: 'Discounted Pack', icon: 'local_offer', color: 'bg-green-50 text-green-600' },
-          { 
-            id: 'chimney', 
-            name: 'Chimney Cleaning', 
-            icon: 'mode_fan', 
-            color: 'bg-orange-50 text-orange-600',
-            image: 'https://images.unsplash.com/photo-1621252179027-94459d27d3ee?auto=format&fit=crop&q=80&w=300'
-          },
           { 
             id: 'complete', 
             name: 'Complete Kitchen Cleaning', 
             icon: 'countertops', 
             color: 'bg-blue-50 text-blue-600',
             image: 'https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=300'
-          },
-          { 
-            id: 'appliance', 
-            name: 'Appliance Cleaning', 
-            icon: 'microwave', 
-            color: 'bg-purple-50 text-purple-600',
-            image: 'https://images.unsplash.com/photo-1585938389612-a552a28d6914?auto=format&fit=crop&q=80&w=300'
-          },
-          { 
-            id: 'cabinet', 
-            name: 'Cabinet and Tiles', 
-            icon: 'shelves', 
-            color: 'bg-amber-50 text-amber-600',
-            image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=80&w=300'
           },
           { 
             id: 'mini', 
@@ -137,11 +115,12 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       {
         title: "Select Item",
         items: [
-          { id: 'sofa', name: 'Sofa', icon: 'weekend', color: 'bg-amber-50 text-amber-600' },
+          { id: 'sofa', name: 'Sofa', icon: 'weekend', color: 'from-amber-300 to-amber-500' },
           { id: 'carpet', name: 'Carpet', icon: 'texture', color: 'bg-orange-50 text-orange-600' },
           { id: 'mattress', name: 'Mattress', icon: 'bed', color: 'bg-blue-50 text-blue-600' },
-          { id: 'curtain', name: 'Curtain', icon: 'curtains', color: 'bg-purple-50 text-purple-600' },
-          { id: 'dining', name: 'Dining Table', icon: 'table_restaurant', color: 'bg-green-50 text-green-600' },
+          { id: 'blinds', name: 'Blinds', icon: 'blinds', color: 'bg-purple-50 text-purple-600' },
+          { id: 'chair', name: 'Chair', icon: 'chair', color: 'bg-green-50 text-green-600' },
+          { id: 'mini', name: 'Mini Services', icon: 'cleaning_services', color: 'bg-teal-50 text-teal-600' },
         ]
       }
     ]
