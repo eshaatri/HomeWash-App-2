@@ -1,88 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home Wash Luxury</title>
-    
+
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
-        :root {
-            /* Default Premium (Gold) - Updated to #ffd633 */
-            --primary-r: 255;
-            --primary-g: 214;
-            --primary-b: 51;
-            --primary-dim: #b39624;
-            --gradient-start: #ffd633;
-            --gradient-end: #e6c229;
-        }
+      :root {
+        /* Default Premium (Gold) - Updated to #ffd633 */
+        --primary-r: 255;
+        --primary-g: 214;
+        --primary-b: 51;
+        --primary-dim: #b39624;
+        --gradient-start: #ffd633;
+        --gradient-end: #e6c229;
+      }
     </style>
     <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "rgb(var(--primary-r) var(--primary-g) var(--primary-b) / <alpha-value>)",
-                        "primary-dim": "var(--primary-dim)",
-                        "onyx": "#09090b",    // Deep Black/Grey
-                        "onyx-light": "#18181b", // Slightly lighter for cards
-                        "alabaster": "#f8f7f6", // Off-white
-                        "background-dark": "#0f0f0f",
-                        "surface-dark": "#1a1a1a",
-                        "card-dark": "#121212",
-                    },
-                    fontFamily: {
-                        "sans": ["Inter", "sans-serif"],
-                        "display": ["Inter", "sans-serif"],
-                    },
-                    backgroundImage: {
-                        'gold-gradient': 'linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%)',
-                        'onyx-gradient': 'linear-gradient(135deg, #18181b 0%, #09090b 100%)',
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'shimmer': 'shimmer 2s infinite',
-                    },
-                    keyframes: {
-                        shimmer: {
-                            '0%': { transform: 'translateX(-150%) skewX(-20deg)' },
-                            '100%': { transform: 'translateX(150%) skewX(-20deg)' },
-                        }
-                    }
-                },
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary:
+                "rgb(var(--primary-r) var(--primary-g) var(--primary-b) / <alpha-value>)",
+              "primary-dim": "var(--primary-dim)",
+              onyx: "#09090b", // Deep Black/Grey
+              "onyx-light": "#18181b", // Slightly lighter for cards
+              alabaster: "#f8f7f6", // Off-white
+              "background-dark": "#0f0f0f",
+              "surface-dark": "#1a1a1a",
+              "card-dark": "#121212",
             },
-        }
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              display: ["Inter", "sans-serif"],
+            },
+            backgroundImage: {
+              "gold-gradient":
+                "linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%)",
+              "onyx-gradient":
+                "linear-gradient(135deg, #18181b 0%, #09090b 100%)",
+            },
+            animation: {
+              "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              shimmer: "shimmer 2s infinite",
+            },
+            keyframes: {
+              shimmer: {
+                "0%": { transform: "translateX(-150%) skewX(-20deg)" },
+                "100%": { transform: "translateX(150%) skewX(-20deg)" },
+              },
+            },
+          },
+        },
+      };
     </script>
     <style>
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      /* Hide scrollbar for IE, Edge and Firefox */
+      .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
-  }
-}
-</script>
-</head>
-<body class="bg-alabaster dark:bg-black text-onyx dark:text-alabaster font-display antialiased selection:bg-primary selection:text-onyx h-full transition-colors duration-300">
+    <script type="importmap">
+      {
+        "imports": {
+          "react/": "https://esm.sh/react@^19.2.4/",
+          "react": "https://esm.sh/react@^19.2.4",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+        }
+      }
+    </script>
+  </head>
+  <body
+    class="bg-alabaster dark:bg-black text-onyx dark:text-alabaster font-display antialiased selection:bg-primary selection:text-onyx h-full transition-colors duration-300"
+  >
     <div id="root"></div>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>
