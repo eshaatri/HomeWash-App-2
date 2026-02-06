@@ -1,17 +1,11 @@
-
 import React from 'react';
 import { AppScreen, NavigationProps } from '../types';
 
 export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, isPremium, onPaymentComplete, serviceSlots }) => {
   const subTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const tax = subTotal * 0.05;
-  // Match 10% discount logic from CartScreen
-  const discount = isPremium ? (subTotal * 0.10) : 0;
+  const discount = isPremium ? 250 : 0;
   const total = Math.max(0, subTotal + tax - discount);
-  
-  // 30% Advance Logic
-  const advancePayable = Math.ceil(total * 0.30);
-  const balancePayable = total - advancePayable;
 
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-8 bg-alabaster dark:bg-onyx text-onyx dark:text-alabaster font-display antialiased transition-colors duration-300">
@@ -26,17 +20,14 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, is
         <div className="h-10 w-10"></div> 
       </header>
 
-      <div className="flex flex-col items-center justify-center py-8">
-        <span className="mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">Advance Payable (30%)</span>
+      <div className="flex flex-col items-center justify-center py-10">
+        <span className="mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">Total Payment</span>
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl font-light tracking-tighter text-onyx dark:text-white">₹{advancePayable.toFixed(0)}</span>
+          <span className="text-5xl font-light tracking-tighter text-onyx dark:text-white">₹{total.toFixed(2)}</span>
         </div>
-        <p className="mt-2 text-xs text-gray-400 font-medium">
-            Total Order Value: <span className="text-onyx dark:text-white font-bold">₹{total.toFixed(0)}</span>
-        </p>
         <div className="mt-4 flex items-center gap-2 rounded-full border border-gray-200 dark:border-white/5 bg-white dark:bg-white/5 px-3 py-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse"></span>
-          <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-white/60">Balance ₹{balancePayable.toFixed(0)} due on service</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+          <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-white/60">Service Bundle ({cart.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
         </div>
       </div>
 
@@ -137,7 +128,7 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, is
           onClick={onPaymentComplete}
           className="group relative w-full overflow-hidden rounded-lg bg-onyx dark:bg-white py-4 shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-transform active:scale-[0.98]"
         >
-          <span className="relative z-10 text-base font-bold text-white dark:text-onyx">Pay Advance ₹{advancePayable.toFixed(0)}</span>
+          <span className="relative z-10 text-base font-bold text-white dark:text-onyx">Pay ₹{total.toFixed(2)}</span>
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 dark:via-gray-200/50 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></div>
         </button>
         <div className="mt-6 flex justify-center gap-4 grayscale opacity-20">

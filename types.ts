@@ -57,6 +57,7 @@ export interface Service {
   image: string;
   bestseller?: boolean;
   categoryId?: string;
+  offerTag?: string;
 }
 
 export interface ServiceCategory {

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AppScreen, NavigationProps } from '../types';
 import { BottomNav } from '../components/BottomNav';
@@ -81,7 +80,7 @@ export const SupportScreen: React.FC<NavigationProps> = (props) => {
           <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500 mb-3 px-1">Common Questions</h3>
           <div className="space-y-3">
             {[
-              { q: 'Rescheduling Policy', a: 'Rescheduling is applicable for all users up to 24 hours before the scheduled time.' },
+              { q: 'Rescheduling Policy', a: 'As a VIP member, you can reschedule any service up to 1 hour before the scheduled time without any penalty fees.' },
               { q: 'Premium Insurance Coverage', a: 'Your Gold subscription includes comprehensive insurance coverage up to $5,000 for any potential damages during service.' },
               { q: 'Add-on Services', a: 'You can add extra services like upholstery cleaning or window treatments directly through your concierge or during booking.' }
             ].map((faq, idx) => (
