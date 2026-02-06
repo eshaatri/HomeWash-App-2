@@ -212,6 +212,44 @@ export const SERVICES: ExtendedService[] = [
           'Recommended for deep-cleaning and tough stains'
       ]
   },
+  // Kitchen Services - Added Occupied/Unoccupied
+  {
+    id: 'kitchen_occupied',
+    title: 'Occupied kitchen cleaning',
+    categoryId: 'c3',
+    subCategoryId: 'complete',
+    price: 1999,
+    duration: '2.5 hrs',
+    description: 'Deep cleaning of kitchen while in use. Includes appliance cleaning.',
+    rating: 4.82,
+    reviews: '1.5M bookings',
+    reviewCount: 1500000,
+    bestseller: true,
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=300',
+    inclusions: [
+        'Removal of oil & grease stains from walls, slabs, cabinets & stove',
+        'Cleaning of cabinets inside & out',
+        'Cleaning of appliances: Fridge, Microwave, Chimney'
+    ]
+  },
+  {
+    id: 'kitchen_unoccupied',
+    title: 'Unoccupied kitchen cleaning',
+    categoryId: 'c3',
+    subCategoryId: 'complete',
+    price: 1499,
+    duration: '2 hrs',
+    description: 'Deep cleaning of empty kitchen (move-in/move-out).',
+    rating: 4.75,
+    reviews: '800K bookings',
+    reviewCount: 800000,
+    image: 'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?auto=format&fit=crop&q=80&w=300',
+    inclusions: [
+        'Deep cleaning of empty cabinets & shelves',
+        'Floor scrubbing and wall stain removal',
+        'Does not include appliance cleaning inside'
+    ]
+  },
   // Book by Room Services
   {
     id: 'room_bedroom',
