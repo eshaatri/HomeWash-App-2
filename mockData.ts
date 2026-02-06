@@ -250,6 +250,63 @@ export const SERVICES: ExtendedService[] = [
         'Does not include appliance cleaning inside'
     ]
   },
+  // Kitchen Mini Services (Added per request)
+  {
+    id: 'kitchen_mini_cabinet',
+    title: 'Cabinet Cleaning',
+    categoryId: 'c3',
+    subCategoryId: 'mini',
+    price: 249,
+    duration: '45 mins',
+    description: 'Deep cleaning of kitchen cabinets (interior & exterior).',
+    rating: 4.7,
+    reviews: '500 reviews',
+    reviewCount: 500,
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dusting', 'Wet wiping', 'Organization', 'Oil removal']
+  },
+  {
+    id: 'kitchen_mini_furniture',
+    title: 'Furniture Wet Wipe',
+    categoryId: 'c3',
+    subCategoryId: 'mini',
+    price: 149,
+    duration: '20 mins',
+    description: 'Wet wiping of kitchen tables and chairs.',
+    rating: 4.6,
+    reviews: '300 reviews',
+    reviewCount: 300,
+    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Table cleaning', 'Chair cleaning', 'Stain removal']
+  },
+  {
+    id: 'kitchen_mini_ceiling',
+    title: 'Ceiling Dusting',
+    categoryId: 'c3',
+    subCategoryId: 'mini',
+    price: 149,
+    duration: '20 mins',
+    description: 'Removal of cobwebs and dust from kitchen ceiling.',
+    rating: 4.8,
+    reviews: '400 reviews',
+    reviewCount: 400,
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Cobweb removal', 'Corner dusting', 'Exhaust fan exterior']
+  },
+  {
+    id: 'kitchen_mini_fan',
+    title: 'Ceiling Fan Cleaning',
+    categoryId: 'c3',
+    subCategoryId: 'mini',
+    price: 99,
+    duration: '15 mins',
+    description: 'Cleaning of kitchen ceiling fans.',
+    rating: 4.7,
+    reviews: '600 reviews',
+    reviewCount: 600,
+    image: 'https://plus.unsplash.com/premium_photo-1678733357597-29314417d45e?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Blade wiping', 'Motor cleaning']
+  },
   // Book by Room Services
   {
     id: 'room_bedroom',
