@@ -62,9 +62,7 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       {
         title: "Select Service Type",
         items: [
-          { id: 'combos', name: 'Combos', icon: 'layers', color: 'bg-orange-50 text-orange-600' },
-          { id: 'bathroom_clean', name: 'Bathroom Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
-          { id: 'mini', name: 'Mini Services', icon: 'water_drop', color: 'bg-cyan-50 text-cyan-600' },
+          { id: 'bathroom_clean', name: 'Intense Bathroom Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
         ]
       }
     ]
@@ -75,34 +73,12 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       {
         title: "Select Service Type",
         items: [
-          { id: 'discounted', name: 'Discounted Pack', icon: 'local_offer', color: 'bg-green-50 text-green-600' },
-          { 
-            id: 'chimney', 
-            name: 'Chimney Cleaning', 
-            icon: 'mode_fan', 
-            color: 'bg-orange-50 text-orange-600',
-            image: 'https://images.unsplash.com/photo-1621252179027-94459d27d3ee?auto=format&fit=crop&q=80&w=300'
-          },
           { 
             id: 'complete', 
             name: 'Complete Kitchen Cleaning', 
             icon: 'countertops', 
             color: 'bg-blue-50 text-blue-600',
             image: 'https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=300'
-          },
-          { 
-            id: 'appliance', 
-            name: 'Appliance Cleaning', 
-            icon: 'microwave', 
-            color: 'bg-purple-50 text-purple-600',
-            image: 'https://images.unsplash.com/photo-1585938389612-a552a28d6914?auto=format&fit=crop&q=80&w=300'
-          },
-          { 
-            id: 'cabinet', 
-            name: 'Cabinet and Tiles', 
-            icon: 'shelves', 
-            color: 'bg-amber-50 text-amber-600',
-            image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=80&w=300'
           },
           { 
             id: 'mini', 
@@ -136,8 +112,8 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
           { id: 'sofa', name: 'Sofa', icon: 'weekend', color: 'bg-amber-50 text-amber-600' },
           { id: 'carpet', name: 'Carpet', icon: 'texture', color: 'bg-orange-50 text-orange-600' },
           { id: 'mattress', name: 'Mattress', icon: 'bed', color: 'bg-blue-50 text-blue-600' },
-          { id: 'curtain', name: 'Curtain', icon: 'curtains', color: 'bg-purple-50 text-purple-600' },
-          { id: 'dining', name: 'Dining Table', icon: 'table_restaurant', color: 'bg-green-50 text-green-600' },
+          { id: 'blinds', name: 'Blinds Cleaning', icon: 'blinds', color: 'bg-purple-50 text-purple-600' },
+          { id: 'chair', name: 'Chair Cleaning', icon: 'chair', color: 'bg-green-50 text-green-600' },
         ]
       }
     ]
@@ -148,8 +124,8 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       {
         title: "Select Wash Type",
         items: [
-          { id: 'interior', name: 'Interior', icon: 'airline_seat_recline_extra', color: 'bg-indigo-50 text-indigo-600' },
-          { id: 'exterior', name: 'Exterior', icon: 'local_car_wash', color: 'bg-cyan-50 text-cyan-600' },
+          { id: 'interior', name: 'Interior deep clean', icon: 'airline_seat_recline_extra', color: 'bg-indigo-50 text-indigo-600' },
+          { id: 'exterior', name: 'Complete car wash', icon: 'local_car_wash', color: 'bg-cyan-50 text-cyan-600' },
         ]
       }
     ]
@@ -351,7 +327,22 @@ export const SERVICES: ExtendedService[] = [
     reviewCount: 10000,
     image: 'https://plus.unsplash.com/premium_photo-1678733357597-29314417d45e?auto=format&fit=crop&q=80&w=300',
     inclusions: ['Blade wiping', 'Motor cleaning', 'Ladder provided']
-  }
+  },
+  // Added Intense Bathroom Service
+  {
+    id: 's_intense_bath',
+    title: 'Intense Bathroom Cleaning',
+    categoryId: 'c2',
+    subCategoryId: 'bathroom_clean',
+    price: 499,
+    duration: '45 mins',
+    description: 'Deep cleaning with machine scrubbing for floors and walls.',
+    rating: 4.85,
+    reviews: '12K reviews',
+    reviewCount: 12000,
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Machine scrubbing of floors', 'Descaling of taps & fixtures', 'Toilet pot stain removal']
+  },
 ];
 
 export const MOCK_BOOKINGS: Booking[] = [
