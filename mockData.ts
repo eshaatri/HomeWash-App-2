@@ -21,12 +21,12 @@ export const MOCK_PARTNER: User = {
 };
 
 export const CATEGORIES: ServiceCategory[] = [
-  { id: 'c1', name: 'Home Cleaning', icon: 'cleaning_services', color: 'from-blue-400 to-blue-500' },
-  { id: 'c2', name: 'Bathroom Cleaning', icon: 'bathroom', color: 'from-violet-400 to-violet-500' },
-  { id: 'c3', name: 'Kitchen Cleaning', icon: 'kitchen', color: 'from-rose-400 to-rose-500' },
-  { id: 'c4', name: 'Water Tank Cleaning', icon: 'water_drop', color: 'from-cyan-400 to-cyan-500' },
-  { id: 'c5', name: 'Sofa Cleaning', icon: 'weekend', color: 'from-amber-300 to-amber-500' },
-  { id: 'c6', name: 'Car Wash', icon: 'local_car_wash', color: 'from-indigo-300 to-indigo-500' },
+  { id: 'c1', name: 'Home Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
+  { id: 'c2', name: 'Bathroom Cleaning', icon: 'bathroom', color: 'bg-purple-50 text-purple-600' },
+  { id: 'c3', name: 'Kitchen Cleaning', icon: 'kitchen', color: 'bg-orange-50 text-orange-600' },
+  { id: 'c4', name: 'Water Tank Cleaning', icon: 'water_drop', color: 'bg-cyan-50 text-cyan-600' },
+  { id: 'c5', name: 'Sofa Cleaning', icon: 'weekend', color: 'bg-amber-50 text-amber-600' },
+  { id: 'c6', name: 'Car Wash', icon: 'directions_car', color: 'bg-slate-50 text-slate-600' },
 ];
 
 export interface ExtendedService extends Service {
@@ -64,7 +64,6 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
         items: [
           { id: 'combos', name: 'Combos', icon: 'layers', color: 'bg-orange-50 text-orange-600' },
           { id: 'bathroom_clean', name: 'Bathroom Cleaning', icon: 'cleaning_services', color: 'bg-blue-50 text-blue-600' },
-          { id: 'maintenance', name: 'Maintenance Pack', icon: 'handyman', color: 'bg-purple-50 text-purple-600' },
           { id: 'mini', name: 'Mini Services', icon: 'water_drop', color: 'bg-cyan-50 text-cyan-600' },
         ]
       }
