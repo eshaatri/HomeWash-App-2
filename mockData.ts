@@ -62,7 +62,6 @@ export const SUB_CATEGORIES_DB: Record<string, { title: string, sections: { titl
       {
         title: "Select Service Type",
         items: [
-          // Updated to single item as requested
           { 
               id: 'intense', 
               name: 'Intense Cleaning', 
@@ -340,6 +339,138 @@ export const SERVICES: ExtendedService[] = [
     reviewCount: 10000,
     image: 'https://plus.unsplash.com/premium_photo-1678733357597-29314417d45e?auto=format&fit=crop&q=80&w=300',
     inclusions: ['Blade wiping', 'Motor cleaning', 'Ladder provided']
+  },
+  // Sofa Mini Services
+  {
+    id: 'sofa_mini_cushions',
+    title: 'Cushions Cleaning',
+    categoryId: 'c5',
+    subCategoryId: 'mini',
+    price: 149,
+    duration: '30 mins',
+    description: 'Deep cleaning and shampooing of sofa cushions.',
+    rating: 4.6,
+    reviews: '500 reviews',
+    reviewCount: 500,
+    image: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Vacuuming', 'Shampooing', 'Drying']
+  },
+  {
+    id: 'sofa_mini_table',
+    title: 'Centre Table Cleaning',
+    categoryId: 'c5',
+    subCategoryId: 'mini',
+    price: 199,
+    duration: '20 mins',
+    description: 'Deep cleaning and polishing of centre table.',
+    rating: 4.8,
+    reviews: '1K reviews',
+    reviewCount: 1000,
+    image: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dusting', 'Wet wiping', 'Glass cleaning', 'Polishing']
+  },
+  // Sofa Cleaning Service
+  {
+    id: 'sofa_shampoo',
+    title: 'Sofa Cleaning',
+    categoryId: 'c5',
+    subCategoryId: 'sofa',
+    price: 349,
+    duration: '45 mins',
+    description: 'Deep cleaning and shampooing of sofa seats.',
+    rating: 4.85,
+    reviews: '10K reviews',
+    reviewCount: 10000,
+    image: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dry vacuuming', 'Shampooing', 'Wet vacuuming', 'Stain removal']
+  },
+  {
+    id: 'carpet_shampoo',
+    title: 'Carpet Cleaning',
+    categoryId: 'c5',
+    subCategoryId: 'carpet',
+    price: 399,
+    duration: '1 hr',
+    description: 'Deep cleaning and shampooing of carpets.',
+    rating: 4.8,
+    reviews: '5K reviews',
+    reviewCount: 5000,
+    image: 'https://images.unsplash.com/photo-1558317374-a354d5f6d4da?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dry vacuuming', 'Shampooing', 'Wet vacuuming', 'Stain removal']
+  },
+  // Mattress Cleaning Service
+  {
+    id: 'mattress_shampoo',
+    title: 'Mattress Cleaning',
+    categoryId: 'c5',
+    subCategoryId: 'mattress',
+    price: 499,
+    duration: '1 hr',
+    description: 'Deep cleaning and sanitization of mattress.',
+    rating: 4.75,
+    reviews: '4K reviews',
+    reviewCount: 4000,
+    image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dry vacuuming', 'Shampooing', 'Wet vacuuming', 'Stain removal']
+  },
+  // Blinds Cleaning Service
+  {
+    id: 'blinds_cleaning',
+    title: 'Blinds',
+    categoryId: 'c5',
+    subCategoryId: 'blinds',
+    price: 299,
+    duration: '45 mins',
+    description: 'Deep cleaning of window blinds.',
+    rating: 4.7,
+    reviews: '1.2K reviews',
+    reviewCount: 1200,
+    image: 'https://images.unsplash.com/photo-1505691938895-1cd1027d1a58?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dusting', 'Wet wiping', 'Stain removal']
+  },
+  // Chair Cleaning Service
+  {
+    id: 'chair_shampoo',
+    title: 'Chair',
+    categoryId: 'c5',
+    subCategoryId: 'chair',
+    price: 199,
+    duration: '30 mins',
+    description: 'Deep cleaning and shampooing of dining/office chairs.',
+    rating: 4.7,
+    reviews: '3K reviews',
+    reviewCount: 3000,
+    image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Vacuuming', 'Shampooing', 'Stain removal']
+  },
+  // Car Wash Services
+  {
+    id: 'car_interior',
+    title: 'Interior deep clean',
+    categoryId: 'c6',
+    subCategoryId: 'interior',
+    price: 1299,
+    duration: '2 hrs',
+    description: 'Complete interior detailing with vacuuming and shampooing.',
+    rating: 4.82,
+    reviews: '1.5K reviews',
+    reviewCount: 1500,
+    image: 'https://images.unsplash.com/photo-1552930294-6b595f4c2974?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Deep vacuuming', 'Upholstery shampooing', 'Dashboard polishing', 'Roof & floor cleaning']
+  },
+  {
+    id: 'car_complete',
+    title: 'Complete car wash',
+    categoryId: 'c6',
+    subCategoryId: 'exterior',
+    price: 799,
+    duration: '1 hr',
+    description: 'Comprehensive exterior wash and basic interior cleaning.',
+    rating: 4.75,
+    reviews: '3K reviews',
+    reviewCount: 3000,
+    image: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Exterior foam wash', 'Interior vacuuming', 'Tyre polishing', 'Mat cleaning']
   }
 ];
 
