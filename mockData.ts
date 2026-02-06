@@ -250,7 +250,7 @@ export const SERVICES: ExtendedService[] = [
         'Does not include appliance cleaning inside'
     ]
   },
-  // Kitchen Mini Services (Added per request)
+  // Kitchen Mini Services
   {
     id: 'kitchen_mini_cabinet',
     title: 'Cabinet Cleaning',
@@ -306,6 +306,21 @@ export const SERVICES: ExtendedService[] = [
     reviewCount: 600,
     image: 'https://plus.unsplash.com/premium_photo-1678733357597-29314417d45e?auto=format&fit=crop&q=80&w=300',
     inclusions: ['Blade wiping', 'Motor cleaning']
+  },
+  // Water Tank Services (New)
+  {
+    id: 'tank_plastic',
+    title: 'Plastic Tank Cleaning',
+    categoryId: 'c4',
+    subCategoryId: 'plastic_tank',
+    price: 399,
+    duration: '45 mins',
+    description: 'Mechanized cleaning, dewatering & sludge removal.',
+    rating: 4.8,
+    reviews: '12K reviews',
+    reviewCount: 12000,
+    image: 'https://plus.unsplash.com/premium_photo-1663089895885-c20e104f7556?auto=format&fit=crop&q=80&w=300',
+    inclusions: ['Dewatering', 'Sludge removal', 'High pressure cleaning', 'Vacuuming']
   },
   // Book by Room Services
   {
