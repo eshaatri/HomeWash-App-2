@@ -26,16 +26,16 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [currentLocation, setCurrentLocationState] = useState<string>('Detecting location...');
   const [currentLocationLabel, setCurrentLocationLabel] = useState<string>('Current Location');
-  
+
   // Data State
   const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
   const [cart, setCart] = useState<CartItem[]>([]);
-  
+
   // Category State
   const [selectedCategory, setSelectedCategoryState] = useState<ServiceCategory | null>(null);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
-  
+
   // Map serviceId -> { date, time }
   // Key is simply service.id now, shared across all quantities of that service
   const [serviceSlots, setServiceSlots] = useState<Record<string, { date: string; time: string }>>({});
@@ -116,8 +116,8 @@ export default function App() {
       // but for simplicity here we rely on ID.
       const existing = prev.find(item => item.service.id === service.id);
       if (existing) {
-        return prev.map(item => 
-          item.service.id === service.id 
+        return prev.map(item =>
+          item.service.id === service.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -130,8 +130,8 @@ export default function App() {
     setCart((prev) => {
       const existing = prev.find(item => item.service.id === service.id);
       if (existing && existing.quantity > 1) {
-        return prev.map(item => 
-          item.service.id === service.id 
+        return prev.map(item =>
+          item.service.id === service.id
             ? { ...item, quantity: item.quantity - 1 }
             : item
         );
@@ -144,37 +144,39 @@ export default function App() {
     setCart((prev) => prev.filter((item) => item.service.id !== serviceId));
     // Remove slot for this service ID
     setServiceSlots(prev => {
-        const newState = { ...prev };
-        delete newState[serviceId];
-        return newState;
+      const newState = { ...prev };
+      delete newState[serviceId];
+      return newState;
     });
   };
 
   const setServiceSlot = (serviceId: string, date: string, time: string) => {
     setServiceSlots(prev => ({
-        ...prev,
-        [serviceId]: { date, time }
+      ...prev,
+      [serviceId]: { date, time }
     }));
   };
 
   const onPaymentComplete = () => {
     const newBookings: Booking[] = [];
-    
+
     // Create bookings. If quantity > 1, create multiple bookings sharing the same slot.
     cart.forEach(item => {
-        const slot = serviceSlots[item.service.id] || { date: 'Pending', time: 'Pending' };
-        
-        for (let i = 0; i < item.quantity; i++) {
-            newBookings.push({
-                id: 'bk' + Math.random().toString(36).substr(2, 6),
-                serviceName: item.service.title,
-                status: BookingStatus.PENDING,
-                date: slot.date,
-                time: slot.time,
-                amount: item.service.price, // Individual price per unit
-                partnerName: 'Looking for partner...',
-            });
-        }
+      const slot = serviceSlots[item.service.id] || { date: 'Pending', time: 'Pending' };
+
+      for (let i = 0; i < item.quantity; i++) {
+        newBookings.push({
+          id: 'bk' + Math.random().toString(36).substr(2, 6),
+          serviceName: item.service.title,
+          status: BookingStatus.PENDING,
+          date: slot.date,
+          time: slot.time,
+          amount: item.service.price, // Individual price per unit
+          paidAmount: item.service.price * 0.30, // 30% Advance
+          remainingAmount: item.service.price * 0.70, // 70% Pending
+          partnerName: 'Looking for partner...',
+        });
+      }
     });
 
     setBookings(prev => [...newBookings, ...prev]);
@@ -259,7 +261,7 @@ export default function App() {
         {screenContent}
         {currentScreen === AppScreen.SUB_CATEGORY && (
           <div className="absolute inset-0 z-[60]">
-             <SubCategoryScreen {...commonProps} />
+            <SubCategoryScreen {...commonProps} />
           </div>
         )}
       </>
@@ -269,7 +271,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen bg-gray-200 dark:bg-[#050505] justify-center transition-colors duration-300">
       <div className="w-full max-w-md h-full min-h-screen bg-white dark:bg-black shadow-2xl overflow-hidden relative">
-         {renderScreen()}
+        {renderScreen()}
       </div>
     </div>
   );

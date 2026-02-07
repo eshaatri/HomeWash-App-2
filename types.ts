@@ -77,6 +77,8 @@ export interface Booking {
   partnerName?: string;
   partnerImage?: string;
   otp?: string;
+  paidAmount?: number;
+  remainingAmount?: number;
 }
 
 export interface CartItem {

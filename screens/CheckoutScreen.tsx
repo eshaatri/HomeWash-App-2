@@ -4,66 +4,77 @@ import { AppScreen, NavigationProps } from '../types';
 export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, isPremium, onPaymentComplete, serviceSlots }) => {
   const subTotal = cart.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const tax = subTotal * 0.05;
-  const discount = isPremium ? 250 : 0;
+  // Updated Discount Logic: 10% off for Premium (Matching CartScreen)
+  const discount = isPremium ? (subTotal * 0.10) : 0;
   const total = Math.max(0, subTotal + tax - discount);
+
+  // 30% Advance Payment Logic
+  const advanceAmount = total * 0.30;
+  const remainingAmount = total * 0.70;
 
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-8 bg-alabaster dark:bg-onyx text-onyx dark:text-alabaster font-display antialiased transition-colors duration-300">
       <header className="sticky top-0 z-30 flex items-center justify-between bg-white/95 dark:bg-onyx/95 px-6 py-6 backdrop-blur-md transition-colors duration-300">
-        <button 
+        <button
           onClick={() => navigateTo(AppScreen.SLOT_SELECTION)}
           className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-onyx-light text-onyx dark:text-alabaster transition-colors hover:bg-gray-200 dark:hover:bg-white/10 active:scale-95"
         >
           <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
         </button>
         <h1 className="text-sm font-bold uppercase tracking-widest text-gray-500 dark:text-white/80">Secure Checkout</h1>
-        <div className="h-10 w-10"></div> 
+        <div className="h-10 w-10"></div>
       </header>
 
       <div className="flex flex-col items-center justify-center py-10">
         <span className="mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">Total Payment</span>
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl font-light tracking-tighter text-onyx dark:text-white">₹{total.toFixed(2)}</span>
+          <span className="text-5xl font-light tracking-tighter text-onyx dark:text-white">₹{advanceAmount.toFixed(2)}</span>
+          <span className="text-sm font-bold text-gray-400 dark:text-gray-500 line-through">₹{total.toFixed(2)}</span>
         </div>
-        <div className="mt-4 flex items-center gap-2 rounded-full border border-gray-200 dark:border-white/5 bg-white dark:bg-white/5 px-3 py-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-          <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-white/60">Service Bundle ({cart.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <div className="flex items-center gap-2 rounded-full border border-gray-200 dark:border-white/5 bg-white dark:bg-white/5 px-3 py-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+            <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-white/60">30% Advance Payment</span>
+          </div>
+          <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
+            Pay remaining ₹{remainingAmount.toFixed(2)} at service
+          </p>
         </div>
       </div>
 
       <section className="flex-1 px-6">
-        
+
         {/* Scheduled Items Summary */}
         <div className="mb-6 space-y-3">
-            <div className="flex items-center justify-between">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-white/30">Scheduled Appointments</h2>
-                <button onClick={() => navigateTo(AppScreen.SLOT_SELECTION)} className="text-xs font-bold text-primary hover:underline">Edit All</button>
-            </div>
-            
-            {cart.map((item, index) => {
-                const slot = serviceSlots[item.service.id] || { date: 'Not Set', time: 'Not Set' };
-                
-                return (
-                    <div key={item.service.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 p-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            {/* Number badge */}
-                            <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-xs">
-                                {index + 1}
-                            </div>
-                            <div>
-                                <p className="text-sm font-bold text-onyx dark:text-white">
-                                    {item.service.title}
-                                    {item.quantity > 1 && <span className="ml-1 text-primary">x{item.quantity}</span>}
-                                </p>
-                                <div className="flex items-center gap-1.5 mt-1">
-                                    <span className="material-symbols-outlined text-[14px] text-primary">event</span>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{slot.date} @ {slot.time}</p>
-                                </div>
-                            </div>
-                        </div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-white/30">Scheduled Appointments</h2>
+            <button onClick={() => navigateTo(AppScreen.SLOT_SELECTION)} className="text-xs font-bold text-primary hover:underline">Edit All</button>
+          </div>
+
+          {cart.map((item, index) => {
+            const slot = serviceSlots[item.service.id] || { date: 'Not Set', time: 'Not Set' };
+
+            return (
+              <div key={item.service.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {/* Number badge */}
+                  <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-xs">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-onyx dark:text-white">
+                      {item.service.title}
+                      {item.quantity > 1 && <span className="ml-1 text-primary">x{item.quantity}</span>}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="material-symbols-outlined text-[14px] text-primary">event</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{slot.date} @ {slot.time}</p>
                     </div>
-                );
-            })}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <div className="mb-4 flex items-center justify-between">
@@ -124,11 +135,11 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({ navigateTo, cart, is
           </div>
           <p className="text-[10px] text-gray-400 dark:text-white/30">256-bit SSL Encrypted Transaction</p>
         </div>
-        <button 
+        <button
           onClick={onPaymentComplete}
           className="group relative w-full overflow-hidden rounded-lg bg-onyx dark:bg-white py-4 shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-transform active:scale-[0.98]"
         >
-          <span className="relative z-10 text-base font-bold text-white dark:text-onyx">Pay ₹{total.toFixed(2)}</span>
+          <span className="relative z-10 text-base font-bold text-white dark:text-onyx">Pay Advance ₹{advanceAmount.toFixed(2)}</span>
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 dark:via-gray-200/50 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></div>
         </button>
         <div className="mt-6 flex justify-center gap-4 grayscale opacity-20">
