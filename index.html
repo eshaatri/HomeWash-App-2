@@ -80,6 +80,51 @@
         -ms-overflow-style: none; /* IE and Edge */
         scrollbar-width: none; /* Firefox */
       }
+
+      /* Smooth Popup Animations */
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .slide-up-enter {
+        animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        will-change: transform, opacity;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .fade-in-enter {
+        animation: fadeIn 0.4s ease-out forwards;
+      }
+
+      /* Infinite Horizontal Scroll */
+      @keyframes scrollX {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      .animate-scroll {
+        animation: scrollX 25s linear infinite;
+        width: max-content;
+      }
+      .animate-scroll:hover {
+        animation-play-state: paused;
+      }
     </style>
     <script type="importmap">
       {
