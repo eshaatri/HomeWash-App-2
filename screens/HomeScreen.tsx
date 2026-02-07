@@ -344,6 +344,9 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                   </div>
                 </div>
               )}
+              <span className="text-[11px] font-bold text-center leading-tight text-onyx/80 dark:text-alabaster/80 group-hover:text-onyx dark:group-hover:text-alabaster transition-colors uppercase tracking-wider">
+                {cat.name}
+              </span>
             </button>
           ))}
         </div>
