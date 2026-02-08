@@ -1,15 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationProps, BookingStatus } from "../types";
-import { MOCK_BOOKINGS } from "../mockData";
+import { adminService } from "../services/api";
 
 export const BookingsPage: React.FC<NavigationProps> = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredBookings = MOCK_BOOKINGS.filter((b) => {
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const data = await adminService.getBookings();
+        setBookings(data);
+      } catch (error) {
+        console.error("Failed to fetch bookings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBookings();
+  }, []);
+
+  const filteredBookings = bookings.filter((b) => {
     const matchesSearch =
-      b.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       b.serviceName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || b.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -102,7 +117,7 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="font-mono text-sm text-gray-500">
-                    #{booking.id}
+                    #{booking._id}
                   </span>
                   <span
                     className={`text-xs font-bold px-2 py-1 rounded ${getStatusBadge(booking.status)}`}
@@ -117,7 +132,7 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
                   ₹{booking.amount}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {booking.scheduledDate} • {booking.scheduledTime}
+                  {booking.date} • {booking.time}
                 </p>
               </div>
             </div>
@@ -127,7 +142,9 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
                 <p className="text-xs text-gray-500 uppercase font-bold mb-1">
                   Customer
                 </p>
-                <p className="font-medium">{booking.customerName}</p>
+                <p className="font-medium">
+                  {booking.customerName || "Customer ID: " + booking.customerId}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase font-bold mb-1">
@@ -149,7 +166,10 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
 
             <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500">
-                Created: {booking.createdAt}
+                Created:{" "}
+                {booking.createdAt
+                  ? new Date(booking.createdAt).toLocaleString()
+                  : "N/A"}
               </p>
               <div className="flex gap-2">
                 <button className="px-3 py-1.5 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">

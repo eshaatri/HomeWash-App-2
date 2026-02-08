@@ -7,6 +7,7 @@ import {
   NavigationProps,
 } from "./types";
 import { MOCK_PARTNER, MOCK_JOBS } from "./mockData";
+import { partnerService } from "./services/api";
 import { LoginScreen } from "./screens/LoginScreen";
 import { DashboardScreen } from "./screens/DashboardScreen";
 import { JobsScreen } from "./screens/JobsScreen";
@@ -21,8 +22,28 @@ export default function App() {
   );
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [partner, setPartner] = useState<Partner | null>(null);
-  const [jobs, setJobs] = useState<Job[]>(MOCK_JOBS);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
+
+  // Fetch jobs when partner logs in
+  useEffect(() => {
+    if (partner) {
+      const fetchJobs = async () => {
+        try {
+          const data = await partnerService.getJobs(partner.id);
+          setJobs(data);
+          // Check for active job
+          const active = data.find(
+            (j: any) => j.status !== "COMPLETED" && j.status !== "CANCELLED",
+          );
+          if (active) setActiveJob(active);
+        } catch (error) {
+          console.error("Failed to fetch jobs:", error);
+        }
+      };
+      fetchJobs();
+    }
+  }, [partner]);
 
   // Apply Dark Mode class
   useEffect(() => {
@@ -41,9 +62,14 @@ export default function App() {
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
-  const login = () => {
-    setPartner(MOCK_PARTNER);
-    setCurrentScreen(PartnerScreen.DASHBOARD);
+  const login = async (phone: string) => {
+    try {
+      const userData = await partnerService.login(phone);
+      setPartner(userData);
+      setCurrentScreen(PartnerScreen.DASHBOARD);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   const logout = () => {
@@ -52,29 +78,51 @@ export default function App() {
     setCurrentScreen(PartnerScreen.LOGIN);
   };
 
-  const acceptJob = (jobId: string) => {
-    setJobs((prev) =>
-      prev.map((job) =>
-        job.id === jobId ? { ...job, status: JobStatus.ACCEPTED } : job,
-      ),
-    );
-    const accepted = jobs.find((j) => j.id === jobId);
-    if (accepted) {
-      setActiveJob({ ...accepted, status: JobStatus.ACCEPTED });
-      navigateTo(PartnerScreen.ACTIVE_JOB);
+  const acceptJob = async (jobId: string) => {
+    try {
+      const updatedJob = await partnerService.updateJobStatus(
+        jobId,
+        "PARTNER_ASSIGNED" as any,
+      );
+      setJobs((prev) =>
+        prev.map((job) =>
+          job.id === jobId ? { ...job, status: JobStatus.ACCEPTED } : job,
+        ),
+      );
+      if (updatedJob) {
+        setActiveJob({
+          ...updatedJob,
+          id: updatedJob._id,
+          status: JobStatus.ACCEPTED,
+        });
+        navigateTo(PartnerScreen.ACTIVE_JOB);
+      }
+    } catch (error) {
+      console.error("Failed to accept job:", error);
     }
   };
 
-  const updateJobStatus = (jobId: string, status: JobStatus) => {
-    setJobs((prev) =>
-      prev.map((job) => (job.id === jobId ? { ...job, status } : job)),
-    );
-    if (activeJob?.id === jobId) {
-      setActiveJob({ ...activeJob, status });
-      if (status === JobStatus.COMPLETED) {
-        setActiveJob(null);
-        navigateTo(PartnerScreen.DASHBOARD);
+  const updateJobStatus = async (jobId: string, status: JobStatus) => {
+    try {
+      // Map JobStatus to BookingStatus for API if necessary
+      let apiStatus = status as string;
+      if (status === JobStatus.COMPLETED) apiStatus = "COMPLETED";
+      if (status === JobStatus.IN_PROGRESS) apiStatus = "IN_PROGRESS";
+
+      await partnerService.updateJobStatus(jobId, apiStatus as any);
+
+      setJobs((prev) =>
+        prev.map((job) => (job.id === jobId ? { ...job, status } : job)),
+      );
+      if (activeJob?.id === jobId) {
+        setActiveJob({ ...activeJob, status });
+        if (status === JobStatus.COMPLETED) {
+          setActiveJob(null);
+          navigateTo(PartnerScreen.DASHBOARD);
+        }
       }
+    } catch (error) {
+      console.error("Failed to update job status:", error);
     }
   };
 

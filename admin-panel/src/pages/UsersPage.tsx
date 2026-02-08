@@ -1,15 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationProps } from "../types";
-import { MOCK_CUSTOMERS } from "../mockData";
+import { adminService } from "../services/api";
 
 export const UsersPage: React.FC<NavigationProps> = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredCustomers = MOCK_CUSTOMERS.filter(
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const data = await adminService.getUsers();
+        setCustomers(data.filter((u: any) => u.role === "CUSTOMER"));
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  const filteredCustomers = customers.filter(
     (c) =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.phone.includes(searchTerm) ||
-      c.email.toLowerCase().includes(searchTerm.toLowerCase()),
+      c.phone.includes(searchTerm),
   );
 
   return (
@@ -93,25 +108,29 @@ export const UsersPage: React.FC<NavigationProps> = () => {
                     <div>
                       <p className="font-medium">{customer.name}</p>
                       <p className="text-xs text-gray-500">
-                        Since {customer.joinedDate}
+                        Since{" "}
+                        {customer.createdAt
+                          ? new Date(customer.createdAt).toLocaleDateString()
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4">
                   <p className="text-sm">{customer.phone}</p>
-                  <p className="text-xs text-gray-500">{customer.email}</p>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="font-medium">{customer.totalBookings}</span>
+                  <span className="font-medium">
+                    {customer.totalBookings || 0}
+                  </span>
                 </td>
                 <td className="px-6 py-4">
                   <span className="font-medium text-green-600">
-                    ₹{customer.totalSpent.toLocaleString()}
+                    ₹{(customer.totalSpent || 0).toLocaleString()}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {customer.lastActive}
+                  {customer.lastActive || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors">

@@ -1,16 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationProps, PartnerStatus } from "../types";
-import { MOCK_PARTNERS } from "../mockData";
+import { adminService } from "../services/api";
 
 export const PartnersPage: React.FC<NavigationProps> = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [partners, setPartners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPartners = MOCK_PARTNERS.filter((p) => {
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const data = await adminService.getPartners();
+        setPartners(data);
+      } catch (error) {
+        console.error("Failed to fetch partners:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPartners();
+  }, []);
+
+  const filteredPartners = partners.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.phone.includes(searchTerm) ||
-      p.email.toLowerCase().includes(searchTerm.toLowerCase());
+      p.phone.includes(searchTerm);
     const matchesStatus = statusFilter === "all" || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -60,28 +75,25 @@ export const PartnersPage: React.FC<NavigationProps> = () => {
         {[
           {
             label: "Total Partners",
-            value: MOCK_PARTNERS.length,
+            value: partners.length,
             color: "blue",
           },
           {
             label: "Active",
-            value: MOCK_PARTNERS.filter(
-              (p) => p.status === PartnerStatus.ACTIVE,
-            ).length,
+            value: partners.filter((p) => p.status === PartnerStatus.ACTIVE)
+              .length,
             color: "green",
           },
           {
             label: "Onboarding",
-            value: MOCK_PARTNERS.filter(
-              (p) => p.status === PartnerStatus.ONBOARDING,
-            ).length,
+            value: partners.filter((p) => p.status === PartnerStatus.ONBOARDING)
+              .length,
             color: "yellow",
           },
           {
             label: "Suspended",
-            value: MOCK_PARTNERS.filter(
-              (p) => p.status === PartnerStatus.SUSPENDED,
-            ).length,
+            value: partners.filter((p) => p.status === PartnerStatus.SUSPENDED)
+              .length,
             color: "red",
           },
         ].map((stat, i) => (
@@ -197,11 +209,13 @@ export const PartnersPage: React.FC<NavigationProps> = () => {
                   )}
                 </td>
                 <td className="px-6 py-4">
-                  <span className="font-medium">{partner.completedJobs}</span>
+                  <span className="font-medium">
+                    {partner.completedJobs || 0}
+                  </span>
                 </td>
                 <td className="px-6 py-4">
                   <span className="font-medium text-green-600">
-                    ₹{partner.earnings.toLocaleString()}
+                    ₹{(partner.earnings || 0).toLocaleString()}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AdminPage, Admin, NavigationProps } from "./types";
 import { MOCK_ADMIN } from "./mockData";
+import { adminService } from "./services/api";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { UsersPage } from "./pages/UsersPage";
@@ -30,7 +31,9 @@ export default function App() {
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
-  const login = () => {
+  const login = async () => {
+    // For admin, we can mock it or provide a real login.
+    // Usually admin login is handled separately.
     setAdmin(MOCK_ADMIN);
     setCurrentPage(AdminPage.DASHBOARD);
   };

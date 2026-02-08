@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationProps } from "../types";
-import { MOCK_CATEGORIES, MOCK_SERVICES } from "../mockData";
+import { adminService } from "../services/api";
 
 export const ServicesPage: React.FC<NavigationProps> = () => {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [cats, servs] = await Promise.all([
+          adminService.getCategories(),
+          adminService.getServices(),
+        ]);
+        setCategories(cats);
+        setServices(servs);
+      } catch (error) {
+        console.error("Failed to fetch services data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -31,9 +53,9 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
       <div className="mb-8">
         <h2 className="text-lg font-bold mb-4">Categories</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {MOCK_CATEGORIES.map((category) => (
+          {categories.map((category) => (
             <div
-              key={category.id}
+              key={category._id}
               className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:border-primary/50 transition-colors cursor-pointer"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
@@ -43,7 +65,8 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
               </div>
               <h3 className="font-bold">{category.name}</h3>
               <p className="text-sm text-gray-500">
-                {category.servicesCount} services
+                {services.filter((s) => s.categoryId === category._id).length}{" "}
+                services
               </p>
             </div>
           ))}
@@ -78,17 +101,17 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {MOCK_SERVICES.map((service) => {
-                const category = MOCK_CATEGORIES.find(
-                  (c) => c.id === service.categoryId,
+              {services.map((service) => {
+                const category = categories.find(
+                  (c) => c._id === service.categoryId,
                 );
                 return (
                   <tr
-                    key={service.id}
+                    key={service._id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                   >
                     <td className="px-6 py-4">
-                      <p className="font-medium">{service.name}</p>
+                      <p className="font-medium">{service.title}</p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">

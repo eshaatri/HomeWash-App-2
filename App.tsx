@@ -26,6 +26,7 @@ import {
   ServiceCategory,
 } from "./types";
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from "./mockData";
+import { userService, bookingService } from "./services/api";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(
@@ -41,7 +42,7 @@ export default function App() {
     useState<string>("Current Location");
 
   // Data State
-  const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
 
   // Category State
@@ -81,6 +82,24 @@ export default function App() {
     }
   }, [isPremium]);
 
+  // Fetch bookings when user logs in
+  useEffect(() => {
+    if (user) {
+      const fetchBookings = async () => {
+        try {
+          const data =
+            user.role === UserRole.CUSTOMER
+              ? await bookingService.getCustomerBookings(user.id)
+              : await bookingService.getPartnerBookings(user.id);
+          setBookings(data);
+        } catch (error) {
+          console.error("Failed to fetch bookings:", error);
+        }
+      };
+      fetchBookings();
+    }
+  }, [user]);
+
   // Apply Dark Mode class
   useEffect(() => {
     const root = document.documentElement;
@@ -105,13 +124,17 @@ export default function App() {
     setSelectedSubCategoryId(null);
   };
 
-  const login = (phone: string, role: UserRole) => {
-    if (role === UserRole.PARTNER) {
-      setUser(MOCK_PARTNER);
-      setCurrentScreen(AppScreen.PARTNER_DASHBOARD);
-    } else {
-      setUser(MOCK_USER);
-      setCurrentScreen(AppScreen.HOME);
+  const login = async (phone: string, role: UserRole) => {
+    try {
+      const userData = await userService.login(phone, role);
+      setUser(userData);
+      if (role === UserRole.PARTNER) {
+        setCurrentScreen(AppScreen.PARTNER_DASHBOARD);
+      } else {
+        setCurrentScreen(AppScreen.HOME);
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
     }
   };
 
@@ -178,35 +201,40 @@ export default function App() {
     }));
   };
 
-  const onPaymentComplete = () => {
-    const newBookings: Booking[] = [];
+  const onPaymentComplete = async () => {
+    if (!user) return;
 
-    // Create bookings. If quantity > 1, create multiple bookings sharing the same slot.
-    cart.forEach((item) => {
-      const slot = serviceSlots[item.service.id] || {
-        date: "Pending",
-        time: "Pending",
-      };
+    // Create bookings.
+    try {
+      const promises = cart.map((item) => {
+        const slot = serviceSlots[item.service.id] || {
+          date: "Pending",
+          time: "Pending",
+        };
 
-      for (let i = 0; i < item.quantity; i++) {
-        newBookings.push({
-          id: "bk" + Math.random().toString(36).substr(2, 6),
+        return bookingService.createBooking({
+          customerId: user.id,
+          serviceId: item.service.id,
           serviceName: item.service.title,
           status: BookingStatus.PENDING,
           date: slot.date,
           time: slot.time,
-          amount: item.service.price, // Individual price per unit
-          paidAmount: item.service.price * 0.3, // 30% Advance
-          remainingAmount: item.service.price * 0.7, // 70% Pending
-          partnerName: "Looking for partner...",
+          amount: item.service.price,
         });
-      }
-    });
+      });
 
-    setBookings((prev) => [...newBookings, ...prev]);
-    setCart([]); // Clear cart
-    setServiceSlots({});
-    navigateTo(AppScreen.BOOKING);
+      await Promise.all(promises);
+
+      // Refresh bookings
+      const updatedBookings = await bookingService.getCustomerBookings(user.id);
+      setBookings(updatedBookings);
+
+      setCart([]); // Clear cart
+      setServiceSlots({});
+      navigateTo(AppScreen.BOOKING);
+    } catch (error) {
+      console.error("Failed to create bookings:", error);
+    }
   };
 
   const commonProps = {

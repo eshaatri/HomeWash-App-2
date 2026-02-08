@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavigationProps } from "../types";
 
 interface LoginScreenProps extends NavigationProps {
-  onLogin: () => void;
+  onLogin: (phone: string) => void;
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
@@ -18,7 +18,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
   const handleVerify = () => {
     if (otp.length === 4) {
-      onLogin();
+      onLogin(phone);
     }
   };
 
