@@ -6,7 +6,7 @@ import {
   ServiceCategory,
   UserRole,
   BookingStatus,
-} from "../types";
+} from "../../types";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -24,6 +24,14 @@ export const userService = {
   },
   getUser: async (id: string) => {
     const response = await api.get(`/users/${id}`);
+    return response.data;
+  },
+  updateProfile: async (
+    id: string,
+    update: { name: string; email?: string },
+  ) => {
+    console.log(`Updating profile for ID: ${id}`, update);
+    const response = await api.patch(`/users/${id}`, update);
     return response.data;
   },
 };
@@ -60,6 +68,15 @@ export const bookingService = {
   },
   updateStatus: async (id: string, status: BookingStatus) => {
     const response = await api.patch(`/bookings/${id}/status`, { status });
+    return response.data;
+  },
+};
+
+export const pricingService = {
+  resolvePrice: async (serviceId: string, areaName: string) => {
+    const response = await api.get("/pricing/resolve", {
+      params: { serviceId, areaName },
+    });
     return response.data;
   },
 };

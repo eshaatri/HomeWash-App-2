@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { PartnerScreen, NavigationProps, JobStatus } from "../types";
+import MapComponent from "../components/MapComponent";
 
 export const ActiveJobScreen: React.FC<NavigationProps> = ({
   navigateTo,
@@ -214,12 +215,12 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
               <p className="text-sm text-gray-500">{activeJob.addressLine2}</p>
             </div>
           </div>
-          {activeJob.status === JobStatus.EN_ROUTE && (
-            <button className="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined">map</span>
-              Open in Maps
-            </button>
-          )}
+          <div className="h-48 w-full mt-4 rounded-xl overflow-hidden shadow-sm">
+            <MapComponent
+              destLat={activeJob.lat || 19.076}
+              destLng={activeJob.lng || 72.8777}
+            />
+          </div>
         </div>
       </div>
 

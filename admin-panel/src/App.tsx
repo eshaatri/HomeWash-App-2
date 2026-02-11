@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AdminPage, Admin, NavigationProps } from "./types";
-import { MOCK_ADMIN } from "./mockData";
-import { adminService } from "./services/api";
+import { MOCK_ADMIN, MOCK_VENDOR_ADMIN } from "./mockData";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { UsersPage } from "./pages/UsersPage";
 import { PartnersPage } from "./pages/PartnersPage";
 import { BookingsPage } from "./pages/BookingsPage";
 import { ServicesPage } from "./pages/ServicesPage";
+import { VendorsPage } from "./pages/VendorsPage";
+import { AreasPage } from "./pages/AreasPage";
+import { VendorDashboardPage } from "./pages/VendorDashboardPage";
+import { VendorBookingsPage } from "./pages/VendorBookingsPage";
+import { VendorPartnersPage } from "./pages/VendorPartnersPage";
 import { Sidebar } from "./components/Sidebar";
 
 export default function App() {
@@ -31,11 +35,15 @@ export default function App() {
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
-  const login = async () => {
-    // For admin, we can mock it or provide a real login.
-    // Usually admin login is handled separately.
-    setAdmin(MOCK_ADMIN);
-    setCurrentPage(AdminPage.DASHBOARD);
+  const login = async (role: "ADMIN" | "VENDOR" = "ADMIN") => {
+    // For testing roles
+    if (role === "VENDOR") {
+      setAdmin(MOCK_VENDOR_ADMIN);
+      setCurrentPage(AdminPage.VENDOR_DASHBOARD);
+    } else {
+      setAdmin(MOCK_ADMIN);
+      setCurrentPage(AdminPage.DASHBOARD);
+    }
   };
 
   const logout = () => {
@@ -59,6 +67,12 @@ export default function App() {
         return <LoginPage {...commonProps} onLogin={login} />;
       case AdminPage.DASHBOARD:
         return <DashboardPage {...commonProps} />;
+      case AdminPage.VENDOR_DASHBOARD:
+        return <VendorDashboardPage {...commonProps} />;
+      case AdminPage.VENDOR_BOOKINGS:
+        return <VendorBookingsPage {...commonProps} />;
+      case AdminPage.VENDOR_PARTNERS:
+        return <VendorPartnersPage {...commonProps} />;
       case AdminPage.USERS:
         return <UsersPage {...commonProps} />;
       case AdminPage.PARTNERS:
@@ -67,6 +81,10 @@ export default function App() {
         return <BookingsPage {...commonProps} />;
       case AdminPage.SERVICES:
         return <ServicesPage {...commonProps} />;
+      case AdminPage.VENDORS:
+        return <VendorsPage {...commonProps} />;
+      case AdminPage.AREAS:
+        return <AreasPage {...commonProps} />;
       default:
         return <DashboardPage {...commonProps} />;
     }

@@ -3,10 +3,16 @@ export enum AdminPage {
   DASHBOARD = "DASHBOARD",
   USERS = "USERS",
   PARTNERS = "PARTNERS",
+  VENDORS = "VENDORS",
+  AREAS = "AREAS",
   BOOKINGS = "BOOKINGS",
   SERVICES = "SERVICES",
   REPORTS = "REPORTS",
   SETTINGS = "SETTINGS",
+  // Vendor specific pages
+  VENDOR_DASHBOARD = "VENDOR_DASHBOARD",
+  VENDOR_BOOKINGS = "VENDOR_BOOKINGS",
+  VENDOR_PARTNERS = "VENDOR_PARTNERS",
 }
 
 export enum BookingStatus {
@@ -28,7 +34,8 @@ export interface Admin {
   id: string;
   name: string;
   email: string;
-  role: "SUPER_ADMIN" | "ADMIN" | "SUPPORT";
+  role: "SUPER_ADMIN" | "ADMIN" | "SUPPORT" | "VENDOR";
+  vendorId?: string;
 }
 
 export interface Customer {
@@ -68,6 +75,8 @@ export interface Booking {
   scheduledTime: string;
   address: string;
   createdAt: string;
+  lat?: number;
+  lng?: number;
 }
 
 export interface ServiceCategory {
@@ -84,6 +93,30 @@ export interface Service {
   price: number;
   duration: string;
   isActive: boolean;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+  address: string;
+  activeAreas: string[];
+  isActive: boolean;
+  commissionRate: number;
+  partnersCount: number;
+}
+
+export interface Area {
+  id: string;
+  name: string;
+  city: string;
+  zipCodes: string[];
+  isActive: boolean;
+  vendorsCount: number;
+  lat?: number;
+  lng?: number;
 }
 
 export interface DashboardStats {

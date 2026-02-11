@@ -8,6 +8,8 @@ import {
   DashboardStats,
   BookingStatus,
   PartnerStatus,
+  Vendor,
+  Area,
 } from "./types";
 
 export const MOCK_ADMIN: Admin = {
@@ -15,6 +17,14 @@ export const MOCK_ADMIN: Admin = {
   name: "Sudeep Chopde",
   email: "admin@homewash.com",
   role: "SUPER_ADMIN",
+};
+
+export const MOCK_VENDOR_ADMIN: Admin = {
+  id: "v_admin1",
+  name: "Rajiv Malhotra",
+  email: "rajiv@cleanforce.com",
+  role: "VENDOR",
+  vendorId: "v1",
 };
 
 export const MOCK_STATS: DashboardStats = {
@@ -205,7 +215,6 @@ export const MOCK_BOOKINGS: Booking[] = [
     id: "BK005",
     customerId: "c5",
     customerName: "Sneha Joshi",
-    customerId: "c5",
     serviceName: "AC Servicing",
     amount: 699,
     status: BookingStatus.CANCELLED,
@@ -306,5 +315,79 @@ export const RECENT_ACTIVITY = [
     type: "booking",
     message: "Booking #BK004 completed successfully",
     time: "2 hours ago",
+  },
+];
+
+export const MOCK_VENDORS: Vendor[] = [
+  {
+    id: "v1",
+    name: "CleanForce Solutions",
+    ownerName: "Rajiv Malhotra",
+    email: "rajiv@cleanforce.com",
+    phone: "+91 99887 76655",
+    address: "B-45, Sunshine Towers, Bandra West",
+    activeAreas: ["Bandra", "Juhu", "Khar"],
+    isActive: true,
+    commissionRate: 20,
+    partnersCount: 15,
+  },
+  {
+    id: "v2",
+    name: "Express Cleaners",
+    ownerName: "Sanjay Joshi",
+    email: "sanjay@express.com",
+    phone: "+91 88776 65544",
+    address: "C-12, Green Park, Powai",
+    activeAreas: ["Powai", "Hiranandani", "Andheri East"],
+    isActive: true,
+    commissionRate: 15,
+    partnersCount: 10,
+  },
+  {
+    id: "v3",
+    name: "Elite Home Services",
+    ownerName: "Meera Nair",
+    email: "meera@elite.com",
+    phone: "+91 77665 54433",
+    address: "D-78, Palm Court, Malad West",
+    activeAreas: ["Malad", "Kandivali", "Borivali"],
+    isActive: false,
+    commissionRate: 25,
+    partnersCount: 8,
+  },
+];
+
+export const MOCK_AREAS: Area[] = [
+  {
+    id: "a1",
+    name: "Bandra",
+    city: "Mumbai",
+    zipCodes: ["400050", "400051"],
+    isActive: true,
+    vendorsCount: 2,
+  },
+  {
+    id: "a2",
+    name: "Powai",
+    city: "Mumbai",
+    zipCodes: ["400076"],
+    isActive: true,
+    vendorsCount: 1,
+  },
+  {
+    id: "a3",
+    name: "Juhu",
+    city: "Mumbai",
+    zipCodes: ["400049"],
+    isActive: true,
+    vendorsCount: 3,
+  },
+  {
+    id: "a4",
+    name: "Khar",
+    city: "Mumbai",
+    zipCodes: ["400052"],
+    isActive: false,
+    vendorsCount: 0,
   },
 ];

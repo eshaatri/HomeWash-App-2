@@ -31,6 +31,54 @@ export const adminService = {
     const response = await api.get("/categories");
     return response.data;
   },
+  getVendors: async () => {
+    const response = await api.get("/vendors");
+    return response.data;
+  },
+  createVendor: async (vendorData: any) => {
+    const response = await api.post("/vendors", vendorData);
+    return response.data;
+  },
+  updateVendor: async (id: string, vendorData: any) => {
+    const response = await api.patch(`/vendors/${id}`, vendorData);
+    return response.data;
+  },
+  deleteVendor: async (id: string) => {
+    const response = await api.delete(`/vendors/${id}`);
+    return response.data;
+  },
+
+  getAreas: async () => {
+    const response = await api.get("/areas");
+    return response.data;
+  },
+  createArea: async (areaData: any) => {
+    const response = await api.post("/areas", areaData);
+    return response.data;
+  },
+  updateArea: async (id: string, areaData: any) => {
+    const response = await api.patch(`/areas/${id}`, areaData);
+    return response.data;
+  },
+  deleteArea: async (id: string) => {
+    const response = await api.delete(`/areas/${id}`);
+    return response.data;
+  },
+};
+
+export const vendorService = {
+  getStats: async (vendorId: string) => {
+    const response = await api.get(`/vendors/${vendorId}/stats`);
+    return response.data;
+  },
+  getBookings: async (vendorId: string) => {
+    const response = await api.get(`/vendors/${vendorId}/bookings`);
+    return response.data;
+  },
+  getPartners: async (vendorId: string) => {
+    const response = await api.get(`/vendors/${vendorId}/partners`);
+    return response.data;
+  },
 };
 
 export default api;

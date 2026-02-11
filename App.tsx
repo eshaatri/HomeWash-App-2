@@ -26,7 +26,7 @@ import {
   ServiceCategory,
 } from "./types";
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from "./mockData";
-import { userService, bookingService } from "./services/api";
+import { userService, bookingService } from "./src/services/api";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(
@@ -40,6 +40,7 @@ export default function App() {
   );
   const [currentLocationLabel, setCurrentLocationLabel] =
     useState<string>("Current Location");
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
 
   // Data State
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -127,7 +128,7 @@ export default function App() {
   const login = async (phone: string, role: UserRole) => {
     try {
       const userData = await userService.login(phone, role);
-      setUser(userData);
+      setUser({ ...userData, id: userData._id });
       if (role === UserRole.PARTNER) {
         setCurrentScreen(AppScreen.PARTNER_DASHBOARD);
       } else {
@@ -146,27 +147,30 @@ export default function App() {
   const setCurrentLocation = (
     location: string,
     label: string = "Current Location",
+    area: string | null = null,
   ) => {
     setCurrentLocationState(location);
     setCurrentLocationLabel(label);
+    setSelectedArea(area);
   };
 
   // --- Cart & Booking Logic ---
 
-  const addToCart = (service: Service) => {
+  const addToCart = (service: Service, priceOverride?: number) => {
+    const finalService = priceOverride
+      ? { ...service, price: priceOverride }
+      : service;
+
     setCart((prev) => {
-      // Check if exact same service ID exists (usually simple items)
-      // For configured items, we might generate unique IDs in ServiceDetailScreen,
-      // but for simplicity here we rely on ID.
-      const existing = prev.find((item) => item.service.id === service.id);
+      const existing = prev.find((item) => item.service.id === finalService.id);
       if (existing) {
         return prev.map((item) =>
-          item.service.id === service.id
+          item.service.id === finalService.id
             ? { ...item, quantity: item.quantity + 1 }
             : item,
         );
       }
-      return [...prev, { service, quantity: 1 }];
+      return [...prev, { service: finalService, quantity: 1 }];
     });
   };
 
@@ -201,11 +205,22 @@ export default function App() {
     }));
   };
 
-  const onPaymentComplete = async () => {
+  const onPaymentComplete = async (profileUpdate?: {
+    name: string;
+    email: string;
+  }) => {
     if (!user) return;
 
-    // Create bookings.
     try {
+      if (profileUpdate) {
+        const updatedUser = await userService.updateProfile(
+          user.id,
+          profileUpdate,
+        );
+        setUser({ ...updatedUser, id: updatedUser._id });
+      }
+
+      // Create bookings.
       const promises = cart.map((item) => {
         const slot = serviceSlots[item.service.id] || {
           date: "Pending",
@@ -220,6 +235,7 @@ export default function App() {
           date: slot.date,
           time: slot.time,
           amount: item.service.price,
+          serviceArea: selectedArea || undefined,
         });
       });
 
@@ -237,6 +253,17 @@ export default function App() {
     }
   };
 
+  const updateProfile = async (update: { name: string; email?: string }) => {
+    if (!user) return;
+    try {
+      const updatedUser = await userService.updateProfile(user.id, update);
+      setUser({ ...updatedUser, id: updatedUser._id });
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      throw error;
+    }
+  };
+
   const commonProps = {
     currentScreen,
     navigateTo,
@@ -249,6 +276,7 @@ export default function App() {
     logout,
     currentLocation,
     currentLocationLabel,
+    selectedArea,
     setCurrentLocation,
     bookings,
     cart,
@@ -264,6 +292,7 @@ export default function App() {
     decreaseQuantity,
     setServiceSlot,
     onPaymentComplete,
+    updateProfile,
   };
 
   const renderScreen = () => {

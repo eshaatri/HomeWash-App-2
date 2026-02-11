@@ -119,20 +119,53 @@ const seed = async () => {
     console.log("Services seeded");
 
     await User.create({
-      name: "Arjun Mehta",
+      name: "New User", // Placeholder to trigger name collection if it's "New User" or empty
       phone: "+91 98765 43210",
       role: UserRole.CUSTOMER,
       walletBalance: 2500.0,
+      email: "",
     });
-    await User.create({
-      name: "Rajesh Kumar",
-      phone: "+91 99887 76655",
-      role: UserRole.PARTNER,
-      walletBalance: 4500.5,
-      rating: 4.9,
-      isVerified: true,
-      earningsToday: 2124.5,
-    });
+
+    const demoPartners = [
+      {
+        name: "Mumbai Partner",
+        phone: "+91 90000 00001",
+        role: UserRole.PARTNER,
+        city: "Mumbai",
+        serviceArea: "Bandra",
+        isVerified: true,
+        rating: 4.8,
+      },
+      {
+        name: "Pune Partner",
+        phone: "+91 90000 00002",
+        role: UserRole.PARTNER,
+        city: "Pune",
+        serviceArea: "Conditioned Area",
+        isVerified: true,
+        rating: 4.7,
+      },
+      {
+        name: "Lucknow Partner",
+        phone: "+91 90000 00003",
+        role: UserRole.PARTNER,
+        city: "Lucknow",
+        serviceArea: "Hazratganj",
+        isVerified: true,
+        rating: 4.9,
+      },
+      {
+        name: "Jaipur Partner",
+        phone: "+91 90000 00004",
+        role: UserRole.PARTNER,
+        city: "Jaipur",
+        serviceArea: "Malviya Nagar",
+        isVerified: true,
+        rating: 4.6,
+      },
+    ];
+
+    await User.insertMany(demoPartners);
     console.log("Users seeded");
 
     process.exit(0);

@@ -31,12 +31,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       <div className="p-4">
         <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl p-6 border border-gray-100 dark:border-white/5">
           <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden ring-4 ring-primary/30">
-              <img
-                src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=200&h=200"
-                alt="Partner"
-                className="h-full w-full object-cover"
-              />
+            <div className="h-20 w-20 rounded-full flex items-center justify-center bg-primary/20 text-primary font-black text-2xl ring-4 ring-primary/30">
+              {partner?.name
+                ? partner.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                    .slice(0, 2)
+                : "?"}
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold">{partner?.name}</h2>

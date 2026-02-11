@@ -1,43 +1,43 @@
-
 export enum AppScreen {
-  LOGIN = 'LOGIN',
-  HOME = 'HOME',
-  PROFILE = 'PROFILE',
-  CITY_SELECT = 'CITY_SELECT',
-  MEMBERSHIP = 'MEMBERSHIP',
-  ADDRESSES = 'ADDRESSES',
-  BOOKING = 'BOOKING', // My Bookings List
-  BOOKING_DETAIL = 'BOOKING_DETAIL', // Specific Booking Track
-  SLOT_SELECTION = 'SLOT_SELECTION', // Date & Time Picker
-  SUPPORT = 'SUPPORT',
-  SUB_CATEGORY = 'SUB_CATEGORY',
-  SERVICE_SELECTION = 'SERVICE_SELECTION',
-  SERVICE_DETAIL = 'SERVICE_DETAIL', // New Config Screen
-  CART = 'CART',
-  CHECKOUT = 'CHECKOUT',
-  PARTNER_DASHBOARD = 'PARTNER_DASHBOARD',
+  LOGIN = "LOGIN",
+  HOME = "HOME",
+  PROFILE = "PROFILE",
+  CITY_SELECT = "CITY_SELECT",
+  MEMBERSHIP = "MEMBERSHIP",
+  ADDRESSES = "ADDRESSES",
+  BOOKING = "BOOKING", // My Bookings List
+  BOOKING_DETAIL = "BOOKING_DETAIL", // Specific Booking Track
+  SLOT_SELECTION = "SLOT_SELECTION", // Date & Time Picker
+  SUPPORT = "SUPPORT",
+  SUB_CATEGORY = "SUB_CATEGORY",
+  SERVICE_SELECTION = "SERVICE_SELECTION",
+  SERVICE_DETAIL = "SERVICE_DETAIL", // New Config Screen
+  CART = "CART",
+  CHECKOUT = "CHECKOUT",
+  PARTNER_DASHBOARD = "PARTNER_DASHBOARD",
 }
 
 export enum UserRole {
-  CUSTOMER = 'CUSTOMER',
-  PARTNER = 'PARTNER',
-  ADMIN = 'ADMIN'
+  CUSTOMER = "CUSTOMER",
+  PARTNER = "PARTNER",
+  ADMIN = "ADMIN",
 }
 
 export enum BookingStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  PARTNER_ASSIGNED = 'PARTNER_ASSIGNED',
-  PARTNER_EN_ROUTE = 'PARTNER_EN_ROUTE',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED'
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  PARTNER_ASSIGNED = "PARTNER_ASSIGNED",
+  PARTNER_EN_ROUTE = "PARTNER_EN_ROUTE",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
 }
 
 export interface User {
   id: string;
   name: string;
   phone: string;
+  email?: string;
   role: UserRole;
   walletBalance: number;
   rating?: number; // For partners
@@ -79,6 +79,7 @@ export interface Booking {
   otp?: string;
   paidAmount?: number;
   remainingAmount?: number;
+  serviceArea?: string;
 }
 
 export interface CartItem {
@@ -96,11 +97,12 @@ export interface NavigationProps {
   user: User | null;
   login: (phone: string, role: UserRole) => void;
   logout: () => void;
-  
+
   // Location State
   currentLocation: string;
   currentLocationLabel: string;
-  setCurrentLocation: (location: string, label?: string) => void;
+  selectedArea: string | null;
+  setCurrentLocation: (location: string, label?: string, area?: string) => void;
 
   // Data State
   bookings: Booking[];
@@ -111,7 +113,7 @@ export interface NavigationProps {
   // Category Selection
   selectedCategory: ServiceCategory | null;
   setSelectedCategory: (category: ServiceCategory | null) => void;
-  
+
   // Sub Category Selection
   selectedSubCategoryId: string | null;
   setSelectedSubCategoryId: (id: string | null) => void;
@@ -121,9 +123,13 @@ export interface NavigationProps {
   setSelectedService: (service: Service | null) => void;
 
   // Actions
-  addToCart: (service: Service) => void;
+  addToCart: (service: Service, price?: number) => void;
   removeFromCart: (serviceId: string) => void;
   decreaseQuantity: (service: Service) => void;
   setServiceSlot: (serviceId: string, date: string, time: string) => void;
-  onPaymentComplete: () => void;
+  onPaymentComplete: (profileUpdate?: {
+    name: string;
+    email: string;
+  }) => Promise<void>;
+  updateProfile: (update: { name: string; email?: string }) => Promise<void>;
 }

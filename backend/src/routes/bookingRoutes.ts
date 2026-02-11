@@ -1,5 +1,6 @@
 import express from "express";
 import Booking from "../models/Booking";
+import User from "../models/User";
 
 const router = express.Router();
 
@@ -8,12 +9,10 @@ router.get("/", async (req, res) => {
     const bookings = await Booking.find().sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message:
-          error instanceof Error ? error.message : "Error fetching bookings",
-      });
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : "Error fetching bookings",
+    });
   }
 });
 
@@ -24,32 +23,38 @@ router.get("/customer/:customerId", async (req, res) => {
     }).sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message:
-          error instanceof Error
-            ? error.message
-            : "Error fetching customer bookings",
-      });
+    res.status(500).json({
+      message:
+        error instanceof Error
+          ? error.message
+          : "Error fetching customer bookings",
+    });
   }
 });
 
 router.get("/partner/:partnerId", async (req, res) => {
   try {
+    const partner = await User.findById(req.params.partnerId);
+    if (!partner) return res.status(404).json({ message: "Partner not found" });
+
     const bookings = await Booking.find({
-      partnerId: req.params.partnerId,
+      $or: [
+        { partnerId: req.params.partnerId },
+        {
+          status: "PENDING",
+          serviceArea: partner.serviceArea,
+          partnerId: { $exists: false },
+        },
+      ],
     }).sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message:
-          error instanceof Error
-            ? error.message
-            : "Error fetching partner bookings",
-      });
+    res.status(500).json({
+      message:
+        error instanceof Error
+          ? error.message
+          : "Error fetching partner bookings",
+    });
   }
 });
 
@@ -58,12 +63,10 @@ router.post("/", async (req, res) => {
     const booking = await Booking.create(req.body);
     res.status(201).json(booking);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message:
-          error instanceof Error ? error.message : "Error creating booking",
-      });
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : "Error creating booking",
+    });
   }
 });
 
@@ -77,12 +80,9 @@ router.patch("/:id/status", async (req, res) => {
     );
     res.json(booking);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message:
-          error instanceof Error ? error.message : "Error updating status",
-      });
+    res.status(500).json({
+      message: error instanceof Error ? error.message : "Error updating status",
+    });
   }
 });
 
