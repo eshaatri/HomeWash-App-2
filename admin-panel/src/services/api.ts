@@ -64,6 +64,14 @@ export const adminService = {
     const response = await api.delete(`/areas/${id}`);
     return response.data;
   },
+  updateUser: async (id: string, userData: any) => {
+    const response = await api.patch(`/users/${id}`, userData);
+    return response.data;
+  },
+  deleteUser: async (id: string) => {
+    const response = await api.delete(`/users/${id}`);
+    return response.data;
+  },
 };
 
 export const vendorService = {
