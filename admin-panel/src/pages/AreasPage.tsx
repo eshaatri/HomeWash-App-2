@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavigationProps, Area } from "../types";
+import { NavigationProps, Area, Vendor } from "../types";
 import { adminService } from "../services/api";
 import { Modal } from "../components/Modal";
 import MapComponent from "../components/MapComponent";
@@ -7,6 +7,7 @@ import MapComponent from "../components/MapComponent";
 export const AreasPage: React.FC<NavigationProps> = () => {
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
@@ -20,22 +21,29 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     isActive: true,
     lat: 19.076,
     lng: 72.8777,
+    assignedVendorId: "",
+    assignedVendorName: "",
   });
+  const [geoJsonData, setGeoJsonData] = useState<any>(null);
 
-  const fetchAreas = async () => {
+  const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getAreas();
-      setAreas(data);
+      const [areasData, vendorsData] = await Promise.all([
+        adminService.getAreas(),
+        adminService.getVendors(),
+      ]);
+      setAreas(areasData);
+      setVendors(vendorsData);
     } catch (error) {
-      console.error("Failed to fetch areas:", error);
+      console.error("Failed to fetch initial data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAreas();
+    fetchInitialData();
   }, []);
 
   const handleOpenModal = (area?: Area) => {
@@ -48,6 +56,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         isActive: area.isActive,
         lat: area.lat || 19.076,
         lng: area.lng || 72.8777,
+        assignedVendorId: area.assignedVendorId || "",
+        assignedVendorName: area.assignedVendorName || "",
       });
     } else {
       setEditingArea(null);
@@ -58,7 +68,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         isActive: true,
         lat: 19.076,
         lng: 72.8777,
+        assignedVendorId: "",
+        assignedVendorName: "",
       });
+      setGeoJsonData(null);
     }
     setIsModalOpen(true);
   };
@@ -87,7 +100,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       } else {
         await adminService.createArea(payload);
       }
-      fetchAreas();
+      fetchInitialData();
       handleCloseModal();
     } catch (error) {
       console.error("Failed to save area:", error);
@@ -103,13 +116,123 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     ) {
       try {
         await adminService.deleteArea(id);
-        fetchAreas();
+        fetchInitialData();
       } catch (error) {
         console.error("Failed to delete area:", error);
         alert("Failed to delete area.");
       }
     }
   };
+
+  // Debounced effect to fetch GeoJSON overlay
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const fetchOverlay = async () => {
+      // Prioritize zip codes if present, otherwise use area name
+      const query = formData.zipCodes
+        ? formData.zipCodes.split(",")[0].trim()
+        : formData.name;
+
+      if (!query || query.length < 3) {
+        setGeoJsonData(null);
+        return;
+      }
+
+      try {
+        // Step 1: Search with high precision (structured query)
+        const baseUrl = "https://nominatim.openstreetmap.org/search";
+        const params = new URLSearchParams({
+          format: "json",
+          polygon_geojson: "1",
+          addressdetails: "1",
+          limit: "15",
+          country: "India",
+        });
+
+        if (formData.zipCodes) {
+          params.append("postalcode", query);
+        } else {
+          params.append("q", `${query} ${formData.city}`);
+        }
+
+        const response = await fetch(`${baseUrl}?${params.toString()}`);
+        let results = await response.json();
+
+        // Step 2: Selection Logic logic
+        const findPolygon = (list: any[]) =>
+          list.find(
+            (r: any) =>
+              r.geojson &&
+              r.geojson.type !== "Point" &&
+              (r.osm_type === "relation" || r.osm_type === "way") &&
+              (r.type === "suburb" ||
+                r.type === "city_district" ||
+                r.type === "administrative" ||
+                r.class === "boundary"),
+          ) ||
+          list.find(
+            (r: any) =>
+              r.geojson &&
+              r.geojson.type !== "Point" &&
+              r.geojson.type !== "LineString",
+          );
+
+        let bestMatch = findPolygon(results);
+
+        // Step 3: Fallback - if no polygon found, try a broader search just by the name
+        if (!bestMatch && !formData.zipCodes) {
+          const fallbackParams = new URLSearchParams({
+            q: query,
+            format: "json",
+            polygon_geojson: "1",
+            limit: "10",
+          });
+          const fallbackRes = await fetch(
+            `${baseUrl}?${fallbackParams.toString()}`,
+          );
+          const fallbackResults = await fallbackRes.json();
+          bestMatch = findPolygon(fallbackResults);
+        }
+
+        // Final fallback to the very first result if still nothing
+        if (!bestMatch && results.length > 0) {
+          bestMatch = results[0];
+        }
+
+        if (bestMatch && bestMatch.geojson) {
+          console.log("Boundary Match Found:", {
+            name: bestMatch.display_name,
+            type: bestMatch.type,
+            geo: bestMatch.geojson.type,
+          });
+          setGeoJsonData(bestMatch.geojson);
+
+          if (!editingArea && bestMatch.lat && bestMatch.lon) {
+            setFormData((prev) => ({
+              ...prev,
+              lat: parseFloat(bestMatch.lat),
+              lng: parseFloat(bestMatch.lon),
+            }));
+          }
+        } else {
+          setGeoJsonData(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch map overlay:", error);
+        setGeoJsonData(null);
+      }
+    };
+
+    const timer = setTimeout(fetchOverlay, 1000);
+    return () => clearTimeout(timer);
+  }, [
+    formData.name,
+    formData.zipCodes,
+    formData.city,
+    isModalOpen,
+    editingArea,
+  ]);
 
   const filteredAreas = areas.filter(
     (a) =>
@@ -284,6 +407,20 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                   </div>
                 </div>
 
+                <div className="flex items-center gap-2 py-2 px-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/30">
+                  <span className="material-symbols-outlined text-orange-500 text-sm">
+                    storefront
+                  </span>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-orange-400">
+                      Assigned Vendor
+                    </p>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                      {area.assignedVendorName || "No Vendor Assigned"}
+                    </p>
+                  </div>
+                </div>
+
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
                     <span className="material-symbols-outlined text-sm">
@@ -320,139 +457,182 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title={editingArea ? "Edit Area" : "Add New Area"}
+        fullScreen={true}
+        title={editingArea ? "Edit Area Details" : "Create New Service Area"}
       >
-        <form onSubmit={handleSubmit} className="space-y-4 font-display">
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              Area Name
-            </label>
-            <input
-              required
-              type="text"
-              placeholder="e.g. Bandra West"
-              className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              City
-            </label>
-            <input
-              required
-              type="text"
-              className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, city: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              Select Center on Map
-            </label>
-            <div className="h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mb-2">
-              <MapComponent
-                zoom={14}
-                markers={[
-                  {
-                    id: "temp",
-                    lat: formData.lat || 19.076,
-                    lng: formData.lng || 72.8777,
-                    title: "Selected Center",
-                  },
-                ]}
-                onMapClick={(lat, lng) =>
-                  setFormData({ ...formData, lat, lng })
-                }
-              />
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col lg:flex-row h-full min-h-[500px] font-display"
+        >
+          {/* Left Column: Form Details */}
+          <div className="w-full lg:w-[400px] p-8 space-y-6 border-r border-gray-100 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm overflow-y-auto">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  Area Name
+                </label>
                 <input
-                  type="number"
-                  step="any"
-                  className="w-full px-3 py-1 text-xs rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none"
-                  value={formData.lat}
+                  required
+                  type="text"
+                  placeholder="e.g. Bandra West"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
+                  value={formData.name}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      lat: parseFloat(e.target.value),
-                    })
+                    setFormData({ ...formData, name: e.target.value })
                   }
                 />
               </div>
-              <div className="flex-1">
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  City
+                </label>
                 <input
-                  type="number"
-                  step="any"
-                  className="w-full px-3 py-1 text-xs rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none"
-                  value={formData.lng}
+                  required
+                  type="text"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold"
+                  value={formData.city}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      lng: parseFloat(e.target.value),
-                    })
+                    setFormData({ ...formData, city: e.target.value })
                   }
                 />
               </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  Assign Vendor
+                </label>
+                <select
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm"
+                  value={formData.assignedVendorId}
+                  onChange={(e) => {
+                    const vendor = vendors.find(
+                      (v) => (v.id || (v as any)._id) === e.target.value,
+                    );
+                    setFormData({
+                      ...formData,
+                      assignedVendorId: e.target.value,
+                      assignedVendorName: vendor ? vendor.name : "",
+                    });
+                  }}
+                >
+                  <option value="">Select Vendor</option>
+                  {vendors.map((vendor) => (
+                    <option
+                      key={vendor.id || (vendor as any)._id}
+                      value={vendor.id || (vendor as any)._id}
+                    >
+                      {vendor.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  Zip Codes (Comma separated)
+                </label>
+                <textarea
+                  required
+                  placeholder="400050, 400051"
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm placeholder:font-normal"
+                  value={formData.zipCodes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, zipCodes: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center gap-2 cursor-pointer group py-2">
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={formData.isActive}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isActive: e.target.checked })
+                  }
+                />
+                <div
+                  className={`w-10 h-5 rounded-full p-1 transition-colors ${formData.isActive ? "bg-primary" : "bg-gray-300"}`}
+                >
+                  <div
+                    className={`w-3 h-3 bg-white rounded-full transition-transform ${formData.isActive ? "translate-x-5" : "translate-x-0"}`}
+                  ></div>
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400">
+                  {formData.isActive ? "Operational" : "Paused"}
+                </span>
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              Zip Codes (Comma separated)
-            </label>
-            <textarea
-              required
-              placeholder="400050, 400051"
-              rows={3}
-              className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm placeholder:font-normal"
-              value={formData.zipCodes}
-              onChange={(e) =>
-                setFormData({ ...formData, zipCodes: e.target.value })
-              }
-            />
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer group py-2">
-            <input
-              type="checkbox"
-              className="hidden"
-              checked={formData.isActive}
-              onChange={(e) =>
-                setFormData({ ...formData, isActive: e.target.checked })
-              }
-            />
-            <div
-              className={`w-10 h-5 rounded-full p-1 transition-colors ${formData.isActive ? "bg-primary" : "bg-gray-300"}`}
-            >
-              <div
-                className={`w-3 h-3 bg-white rounded-full transition-transform ${formData.isActive ? "translate-x-5" : "translate-x-0"}`}
-              ></div>
+
+            <div className="pt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 py-3 rounded-xl bg-primary text-white font-black uppercase tracking-widest hover:bg-primary-dim transition-colors shadow-lg shadow-primary/20"
+              >
+                {editingArea ? "Save" : "Create"}
+              </button>
             </div>
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400">
-              {formData.isActive ? "Operational" : "Paused"}
-            </span>
           </div>
 
-          <div className="pt-4 flex gap-3">
-            <button
-              type="button"
-              onClick={handleCloseModal}
-              className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 py-3 rounded-xl bg-primary text-white font-black uppercase tracking-widest hover:bg-primary-dim transition-colors shadow-lg shadow-primary/20"
-            >
-              {editingArea ? "Save Area" : "Create Area"}
-            </button>
+          {/* Right Column: Large Interactive Map */}
+          <div className="flex-1 min-h-[400px] relative bg-gray-100 dark:bg-black/20 overflow-hidden">
+            <div className="absolute top-4 left-4 z-[1000] flex gap-2">
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">
+                  Pinning Area
+                </p>
+                <div className="flex gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">
+                      LATITUDE
+                    </span>
+                    <span className="text-sm font-black text-gray-900 dark:text-white">
+                      {formData.lat.toFixed(6)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">
+                      LONGITUDE
+                    </span>
+                    <span className="text-sm font-black text-gray-900 dark:text-white">
+                      {formData.lng.toFixed(6)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <MapComponent
+              zoom={14}
+              geoJsonData={geoJsonData}
+              markers={[
+                {
+                  id: "temp",
+                  lat: formData.lat || 19.076,
+                  lng: formData.lng || 72.8777,
+                  title: formData.name || "Selected Center",
+                },
+              ]}
+              onMapClick={(lat, lng) => setFormData({ ...formData, lat, lng })}
+            />
+
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-black/60 backdrop-blur-md text-white px-6 py-2.5 rounded-full border border-white/10 shadow-2xl">
+              <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm text-primary">
+                  info
+                </span>
+                Click on the map to set the area center
+              </p>
+            </div>
           </div>
         </form>
       </Modal>

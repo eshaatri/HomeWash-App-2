@@ -106,6 +106,7 @@ export interface Vendor {
   isActive: boolean;
   commissionRate: number;
   partnersCount: number;
+  ownerId?: string;
 }
 
 export interface Area {
@@ -117,6 +118,8 @@ export interface Area {
   vendorsCount: number;
   lat?: number;
   lng?: number;
+  assignedVendorId?: string;
+  assignedVendorName?: string;
 }
 
 export interface DashboardStats {

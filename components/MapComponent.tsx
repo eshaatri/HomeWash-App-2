@@ -32,7 +32,12 @@ const LocationPickerEvents = ({
 
   useEffect(() => {
     map.setView([center.lat, center.lng], map.getZoom());
-  }, [center.lat, center.lng]);
+    // Fix for grey tiles issue (manual resize recount)
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [center.lat, center.lng, map]);
 
   useMapEvents({
     moveend() {

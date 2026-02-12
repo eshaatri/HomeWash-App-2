@@ -254,6 +254,30 @@ export const AddressScreen: React.FC<NavigationProps> = ({
     setAddresses(addresses.filter((a) => a.id !== id));
   };
 
+  // Debounced address search to move map
+  React.useEffect(() => {
+    if (!newAddress || newAddress.length < 5 || isLocating) return;
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(newAddress)}&limit=1`,
+        );
+        const data = await response.json();
+        if (data && data[0]) {
+          setCoords({
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon),
+          });
+        }
+      } catch (error) {
+        console.error("Auto-geocoding failed:", error);
+      }
+    }, 1200);
+
+    return () => clearTimeout(timeoutId);
+  }, [newAddress]);
+
   return (
     <div className="bg-[#f8f7f6] dark:bg-[#121212] min-h-screen flex flex-col font-display antialiased transition-colors duration-300 relative">
       {/* Header */}

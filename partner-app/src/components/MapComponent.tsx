@@ -1,5 +1,5 @@
 import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 
 // Fix for default marker icon issue
@@ -21,6 +21,17 @@ interface MapComponentProps {
   zoom?: number;
 }
 
+const ResizeFix = () => {
+  const map = useMap();
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+};
+
 const MapComponent: React.FC<MapComponentProps> = ({
   destLat,
   destLng,
@@ -38,6 +49,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <ResizeFix />
         <Marker position={[destLat, destLng]}>
           <Popup>Customer Location</Popup>
         </Marker>
