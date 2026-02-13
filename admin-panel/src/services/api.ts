@@ -72,6 +72,22 @@ export const adminService = {
     const response = await api.delete(`/users/${id}`);
     return response.data;
   },
+  getSubCategories: async () => {
+    const response = await api.get("/subcategories");
+    return response.data;
+  },
+  updateService: async (id: string, serviceData: any) => {
+    const response = await api.patch(`/services/${id}`, serviceData);
+    return response.data;
+  },
+  updateCategory: async (id: string, categoryData: any) => {
+    const response = await api.patch(`/categories/${id}`, categoryData);
+    return response.data;
+  },
+  updateSubCategory: async (id: string, subCategoryData: any) => {
+    const response = await api.patch(`/subcategories/${id}`, subCategoryData);
+    return response.data;
+  },
 };
 
 export const vendorService = {

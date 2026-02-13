@@ -1,32 +1,14 @@
-import {
-  Booking,
-  BookingStatus,
-  Service,
-  ServiceCategory,
-  User,
-  UserRole,
-} from "./types";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import Category from "../models/Category";
+import Service from "../models/Service";
+import User, { UserRole } from "../models/User";
+import Booking, { BookingStatus } from "../models/Booking";
+import SubCategory from "../models/SubCategory";
 
-export const MOCK_USER: User = {
-  id: "u1",
-  name: "Arjun Mehta",
-  phone: "+91 98765 43210",
-  role: UserRole.CUSTOMER,
-  walletBalance: 2500.0,
-};
+dotenv.config();
 
-export const MOCK_PARTNER: User = {
-  id: "p1",
-  name: "Rajesh Kumar",
-  phone: "+91 99887 76655",
-  role: UserRole.PARTNER,
-  walletBalance: 4500.5,
-  rating: 4.9,
-  isVerified: true,
-  earningsToday: 2124.5,
-};
-
-export const CATEGORIES: ServiceCategory[] = [
+const CATEGORIES = [
   {
     id: "c1",
     name: "Home Cleaning",
@@ -65,13 +47,7 @@ export const CATEGORIES: ServiceCategory[] = [
   },
 ];
 
-export interface ExtendedService extends Service {
-  inclusions?: string[];
-  reviews?: string;
-  subCategoryId?: string;
-}
-
-export const SUB_CATEGORIES_DB: Record<
+const SUB_CATEGORIES_DB: Record<
   string,
   { title: string; sections: { title: string; items: any[] }[] }
 > = {
@@ -249,8 +225,8 @@ export const SUB_CATEGORIES_DB: Record<
   },
 };
 
-export const SERVICES: ExtendedService[] = [
-  // Furnished Apartment Services
+const SERVICES = [
+  // Furnished Apartment Services (Old s1 broken down)
   {
     id: "s1_1bhk",
     title: "1 BHK",
@@ -367,6 +343,7 @@ export const SERVICES: ExtendedService[] = [
       "Dry vacuuming of walls and ceiling",
     ],
   },
+
   {
     id: "s2_bun",
     title: "Bungalow Deep Clean",
@@ -385,7 +362,6 @@ export const SERVICES: ExtendedService[] = [
       "Extensive glass window cleaning",
     ],
   },
-  // Bathroom Services Replacement
   {
     id: "s_bath_intense",
     title: "Intense bathroom cleaning",
@@ -406,7 +382,6 @@ export const SERVICES: ExtendedService[] = [
       "Recommended for deep-cleaning and tough stains",
     ],
   },
-  // Kitchen Services - Added Occupied/Unoccupied
   {
     id: "kitchen_occupied",
     title: "Occupied kitchen cleaning",
@@ -855,17 +830,134 @@ export const SERVICES: ExtendedService[] = [
   },
 ];
 
-export const MOCK_BOOKINGS: Booking[] = [
-  {
-    id: "b1",
-    serviceName: "Furnished Apartment Cleaning",
-    status: BookingStatus.PARTNER_EN_ROUTE,
-    date: "Today",
-    time: "2:00 PM",
-    amount: 3499.0,
-    partnerName: "Rajesh Kumar",
-    partnerImage:
-      "https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=200&h=200",
-    otp: "4492",
-  },
-];
+const seed = async () => {
+  try {
+    await mongoose.connect(
+      process.env.MONGODB_URI || "mongodb://localhost:27017/homewash",
+    );
+
+    console.log("Clearing DB...");
+    await Category.deleteMany({});
+    await SubCategory.deleteMany({});
+    await Service.deleteMany({});
+    await User.deleteMany({});
+    await Booking.deleteMany({});
+
+    console.log("Seeding Categories...");
+    const categoryMap = new Map<string, any>(); // originalId -> Document
+
+    for (const cat of CATEGORIES) {
+      const newCat = await Category.create({
+        name: cat.name,
+        icon: cat.icon,
+        color: cat.color,
+      });
+      categoryMap.set(cat.id, newCat);
+    }
+
+    console.log("Seeding SubCategories...");
+    // Iterate over SUB_CATEGORIES_DB which is keys "c1", "c2" etc mapping to objects
+    for (const [catId, catData] of Object.entries(SUB_CATEGORIES_DB)) {
+      const categoryDoc = categoryMap.get(catId);
+      if (!categoryDoc) continue;
+
+      for (const section of catData.sections) {
+        for (const item of section.items) {
+          await SubCategory.create({
+            name: item.name,
+            categoryId: categoryDoc._id,
+            sectionTitle: section.title,
+            icon: item.icon,
+            color: item.color,
+            image: item.image,
+            originalId: item.id, // e.g. "apartment"
+          });
+        }
+      }
+    }
+
+    console.log("Seeding Services...");
+    for (const service of SERVICES) {
+      const categoryDoc = categoryMap.get(service.categoryId);
+      if (!categoryDoc) {
+        console.warn(
+          `Category not found for service: ${service.title} (${service.categoryId})`,
+        );
+        continue;
+      }
+
+      await Service.create({
+        title: service.title,
+        price: service.price,
+        originalPrice: service.originalPrice,
+        duration: service.duration,
+        description: service.description,
+        rating: service.rating,
+        reviewCount: service.reviewCount,
+        image: service.image,
+        bestseller: service.bestseller,
+        categoryId: categoryDoc._id,
+        subCategoryId: service.subCategoryId, // e.g. "apartment" - matching originalId in SubCategory
+        offerTag: (service as any).offerTag,
+      });
+    }
+
+    // Seed Mock Users
+    await User.create({
+      name: "New User",
+      phone: "+91 98765 43210",
+      role: UserRole.CUSTOMER,
+      walletBalance: 2500.0,
+      email: "",
+    });
+
+    const demoPartners = [
+      {
+        name: "Mumbai Partner",
+        phone: "+91 90000 00001",
+        role: UserRole.PARTNER,
+        city: "Mumbai",
+        serviceArea: "Bandra",
+        isVerified: true,
+        rating: 4.8,
+      },
+      {
+        name: "Pune Partner",
+        phone: "+91 90000 00002",
+        role: UserRole.PARTNER,
+        city: "Pune",
+        serviceArea: "Conditioned Area",
+        isVerified: true,
+        rating: 4.7,
+      },
+      {
+        name: "Lucknow Partner",
+        phone: "+91 90000 00003",
+        role: UserRole.PARTNER,
+        city: "Lucknow",
+        serviceArea: "Hazratganj",
+        isVerified: true,
+        rating: 4.9,
+      },
+      {
+        name: "Jaipur Partner",
+        phone: "+91 90000 00004",
+        role: UserRole.PARTNER,
+        city: "Jaipur",
+        serviceArea: "Malviya Nagar",
+        isVerified: true,
+        rating: 4.6,
+      },
+    ];
+
+    await User.insertMany(demoPartners);
+
+    console.log("Seeding Complete!");
+    process.exit(0);
+  } catch (error) {
+    console.error("Seeding Error:", error);
+    process.exit(1);
+  }
+};
+
+seed();

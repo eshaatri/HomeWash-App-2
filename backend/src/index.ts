@@ -11,6 +11,7 @@ import bookingRoutes from "./routes/bookingRoutes";
 import vendorRoutes from "./routes/vendorRoutes";
 import areaRoutes from "./routes/areaRoutes";
 import pricingRoutes from "./routes/pricingRoutes";
+import subCategoryRoutes from "./routes/subCategoryRoutes";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/areas", areaRoutes);
 app.use("/api/vendors", vendorRoutes);
+app.use("/api/subcategories", subCategoryRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/pricing", pricingRoutes);
 
