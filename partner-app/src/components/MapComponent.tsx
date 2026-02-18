@@ -1,19 +1,7 @@
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L from "leaflet";
+import React, { useCallback, useRef } from "react";
+import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 
-// Fix for default marker icon issue
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-
-let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
 interface MapComponentProps {
   destLat: number;
@@ -21,15 +9,28 @@ interface MapComponentProps {
   zoom?: number;
 }
 
-const ResizeFix = () => {
-  const map = useMap();
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [map]);
-  return null;
+const containerStyle = {
+  width: "100%",
+  height: "100%",
+};
+
+const mapOptions: google.maps.MapOptions = {
+  disableDefaultUI: true,
+  zoomControl: false,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: false,
+  gestureHandling: "greedy",
+  styles: [
+    {
+      featureType: "poi",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "transit",
+      stylers: [{ visibility: "off" }],
+    },
+  ],
 };
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -37,23 +38,46 @@ const MapComponent: React.FC<MapComponentProps> = ({
   destLng,
   zoom = 15,
 }) => {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+  });
+
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  const onLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+  }, []);
+
+  if (loadError) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl">
+        <p className="text-sm text-red-500">Failed to load map</p>
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl animate-pulse">
+        <span className="material-symbols-outlined text-3xl text-gray-300 animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full overflow-hidden rounded-2xl border-4 border-white dark:border-gray-800 shadow-lg">
-      <MapContainer
-        center={[destLat, destLng]}
+      {/* @ts-ignore - React 19 type compat */}
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={{ lat: destLat, lng: destLng }}
         zoom={zoom}
-        style={{ width: "100%", height: "100%" }}
-        zoomControl={false}
+        onLoad={onLoad}
+        options={mapOptions}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <ResizeFix />
-        <Marker position={[destLat, destLng]}>
-          <Popup>Customer Location</Popup>
-        </Marker>
-      </MapContainer>
+        <MarkerF position={{ lat: destLat, lng: destLng }} />
+      </GoogleMap>
 
       {/* Navigation Shortcut Overlay */}
       <button

@@ -12,6 +12,7 @@ import vendorRoutes from "./routes/vendorRoutes";
 import areaRoutes from "./routes/areaRoutes";
 import pricingRoutes from "./routes/pricingRoutes";
 import subCategoryRoutes from "./routes/subCategoryRoutes";
+import vendorConfigRoutes from "./routes/vendorConfigRoutes";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/subcategories", subCategoryRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/pricing", pricingRoutes);
+app.use("/api/vendor-configs", vendorConfigRoutes);
 
 app.get("/", (req, res) => {
   res.send("HomeWash API is running...");

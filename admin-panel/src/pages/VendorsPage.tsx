@@ -3,7 +3,13 @@ import { NavigationProps, Vendor } from "../types";
 import { adminService } from "../services/api";
 import { Modal } from "../components/Modal";
 
-export const VendorsPage: React.FC<NavigationProps> = () => {
+interface VendorsPageProps extends NavigationProps {
+  onManageServices?: (id: string) => void;
+}
+
+export const VendorsPage: React.FC<VendorsPageProps> = ({
+  onManageServices,
+}) => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -273,6 +279,17 @@ export const VendorsPage: React.FC<NavigationProps> = () => {
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={() =>
+                        onManageServices?.(vendor.id || (vendor as any)._id)
+                      }
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group"
+                      title="Manage Services"
+                    >
+                      <span className="material-symbols-outlined text-lg text-gray-400 group-hover:text-primary">
+                        settings_applications
+                      </span>
+                    </button>
                     <button
                       onClick={() => handleOpenModal(vendor)}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group"

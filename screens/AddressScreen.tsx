@@ -94,43 +94,49 @@ export const AddressScreen: React.FC<NavigationProps> = ({
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
         try {
-          // Real reverse geocoding request
+          // Google Geocoding reverse geocoding request
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
           );
           const data = await response.json();
 
-          if (data && data.address) {
-            // Prioritize specific address parts for a clean display
+          if (data.status === "OK" && data.results && data.results.length > 0) {
+            const result = data.results[0];
+            const components = result.address_components || [];
+
+            const getComponent = (type: string) =>
+              components.find((c: any) => c.types.includes(type))?.long_name;
+
             const suburb =
-              data.address.suburb ||
-              data.address.neighbourhood ||
-              data.address.residential;
+              getComponent("sublocality_level_1") ||
+              getComponent("sublocality") ||
+              getComponent("neighborhood");
             const city =
-              data.address.city ||
-              data.address.town ||
-              data.address.state_district;
-            const postcode = data.address.postcode;
+              getComponent("locality") ||
+              getComponent("administrative_area_level_2");
+            const postcode = getComponent("postal_code");
 
             let formatted = "Unknown Location";
             if (suburb && city) {
               formatted = `${suburb}, ${city}`;
             } else if (city) {
               formatted = city;
-            } else if (data.display_name) {
-              formatted = data.display_name.split(",").slice(0, 2).join(",");
+            } else if (result.formatted_address) {
+              formatted = result.formatted_address
+                .split(",")
+                .slice(0, 2)
+                .join(",");
             }
 
             if (postcode && formatted.length < 25) {
               formatted += ` ${postcode}`;
             }
 
-            if (
-              !checkCoverage(formatted) &&
-              !checkCoverage(JSON.stringify(data.address))
-            ) {
+            const fullAddress = result.formatted_address || formatted;
+            if (!checkCoverage(formatted) && !checkCoverage(fullAddress)) {
               setErrorData({
                 title: "Area Not Serviceable",
                 message:
@@ -147,9 +153,6 @@ export const AddressScreen: React.FC<NavigationProps> = ({
             setIsAdding(true);
             setIsLocating(false);
           } else {
-            // Fallback to coordinates if address lookup fails
-            const coordString = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-            // We cannot verify coverage for coordinates only, so we block it based on requirements
             setErrorData({
               title: "Location Unidentified",
               message: "We could not verify the city of your location.",
@@ -254,20 +257,22 @@ export const AddressScreen: React.FC<NavigationProps> = ({
     setAddresses(addresses.filter((a) => a.id !== id));
   };
 
-  // Debounced address search to move map
+  // Debounced address search to move map (Google Geocoding)
   React.useEffect(() => {
     if (!newAddress || newAddress.length < 5 || isLocating) return;
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
     const timeoutId = setTimeout(async () => {
       try {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(newAddress)}&limit=1`,
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(newAddress)}&key=${apiKey}`,
         );
         const data = await response.json();
-        if (data && data[0]) {
+        if (data.status === "OK" && data.results && data.results[0]) {
+          const loc = data.results[0].geometry.location;
           setCoords({
-            lat: parseFloat(data[0].lat),
-            lng: parseFloat(data[0].lon),
+            lat: loc.lat,
+            lng: loc.lng,
           });
         }
       } catch (error) {

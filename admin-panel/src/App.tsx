@@ -12,6 +12,7 @@ import { AreasPage } from "./pages/AreasPage";
 import { VendorDashboardPage } from "./pages/VendorDashboardPage";
 import { VendorBookingsPage } from "./pages/VendorBookingsPage";
 import { VendorPartnersPage } from "./pages/VendorPartnersPage";
+import { VendorServiceConfigPage } from "./pages/VendorServiceConfigPage";
 import { Sidebar } from "./components/Sidebar";
 
 export default function App() {
@@ -19,6 +20,9 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [selectedVendorId, setSelectedVendorId] = useState<
+    string | undefined
+  >();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -82,9 +86,25 @@ export default function App() {
       case AdminPage.SERVICES:
         return <ServicesPage {...commonProps} />;
       case AdminPage.VENDORS:
-        return <VendorsPage {...commonProps} />;
+        return (
+          <VendorsPage
+            {...commonProps}
+            onManageServices={(id: string) => {
+              setSelectedVendorId(id);
+              navigateTo(AdminPage.VENDOR_SERVICE_CONFIG);
+            }}
+          />
+        );
       case AdminPage.AREAS:
         return <AreasPage {...commonProps} />;
+      case AdminPage.VENDOR_SERVICE_CONFIG:
+        return (
+          <VendorServiceConfigPage
+            {...commonProps}
+            selectedVendorId={selectedVendorId}
+            onBack={() => navigateTo(AdminPage.VENDORS)}
+          />
+        );
       default:
         return <DashboardPage {...commonProps} />;
     }

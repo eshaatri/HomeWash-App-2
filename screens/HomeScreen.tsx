@@ -40,30 +40,43 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
+          const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
           try {
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
             );
             const data = await response.json();
 
-            if (data && data.address) {
+            if (
+              data.status === "OK" &&
+              data.results &&
+              data.results.length > 0
+            ) {
+              const result = data.results[0];
+              const components = result.address_components || [];
+
+              const getComponent = (type: string) =>
+                components.find((c: any) => c.types.includes(type))?.long_name;
+
               const suburb =
-                data.address.suburb ||
-                data.address.neighbourhood ||
-                data.address.residential;
+                getComponent("sublocality_level_1") ||
+                getComponent("sublocality") ||
+                getComponent("neighborhood");
               const city =
-                data.address.city ||
-                data.address.town ||
-                data.address.state_district;
-              const postcode = data.address.postcode;
+                getComponent("locality") ||
+                getComponent("administrative_area_level_2");
+              const postcode = getComponent("postal_code");
 
               let formatted = "Unknown Location";
               if (suburb && city) {
                 formatted = `${suburb}, ${city}`;
               } else if (city) {
                 formatted = city;
-              } else if (data.display_name) {
-                formatted = data.display_name.split(",").slice(0, 2).join(",");
+              } else if (result.formatted_address) {
+                formatted = result.formatted_address
+                  .split(",")
+                  .slice(0, 2)
+                  .join(",");
               }
 
               if (postcode && formatted.length < 25) {

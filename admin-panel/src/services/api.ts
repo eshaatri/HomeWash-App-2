@@ -88,6 +88,14 @@ export const adminService = {
     const response = await api.patch(`/subcategories/${id}`, subCategoryData);
     return response.data;
   },
+  getVendorConfigs: async (vendorId: string) => {
+    const response = await api.get(`/vendor-configs/vendor/${vendorId}`);
+    return response.data;
+  },
+  updateVendorConfig: async (configData: any) => {
+    const response = await api.post("/vendor-configs", configData);
+    return response.data;
+  },
 };
 
 export const vendorService = {
