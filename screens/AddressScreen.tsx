@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { AppScreen, NavigationProps } from "../types";
 import MapComponent from "../components/MapComponent";
 
@@ -50,6 +50,124 @@ export const AddressScreen: React.FC<NavigationProps> = ({
   const [isLocating, setIsLocating] = useState(false);
   const [coords, setCoords] = useState({ lat: 19.076, lng: 72.8777 });
 
+  // Search & Autocomplete State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<
+    Array<{
+      placeId: string;
+      description: string;
+      mainText: string;
+      secondaryText: string;
+    }>
+  >([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounced search using Google Places API (New) REST endpoint
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchQuery(query);
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query || query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      try {
+        const response = await fetch(
+          `https://places.googleapis.com/v1/places:autocomplete`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Goog-Api-Key": apiKey,
+            },
+            body: JSON.stringify({
+              input: query,
+              includedRegionCodes: ["in"],
+              languageCode: "en",
+            }),
+          },
+        );
+        const data = await response.json();
+
+        if (data.suggestions && data.suggestions.length > 0) {
+          setSuggestions(
+            data.suggestions
+              .filter((s: any) => s.placePrediction)
+              .map((s: any) => ({
+                placeId:
+                  s.placePrediction.placeId ||
+                  s.placePrediction.place?.split("/").pop() ||
+                  "",
+                description: s.placePrediction.text?.text || "",
+                mainText:
+                  s.placePrediction.structuredFormat?.mainText?.text ||
+                  s.placePrediction.text?.text ||
+                  "",
+                secondaryText:
+                  s.placePrediction.structuredFormat?.secondaryText?.text || "",
+              })),
+          );
+          setShowSuggestions(true);
+        } else {
+          setSuggestions([]);
+          setShowSuggestions(false);
+        }
+      } catch (err) {
+        console.error("Places autocomplete failed:", err);
+        setSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+  }, []);
+
+  // Handle suggestion selection: geocode and open the add form
+  const handleSelectSuggestion = useCallback(
+    (suggestion: { placeId: string; description: string }) => {
+      setShowSuggestions(false);
+      setSearchQuery("");
+      setSuggestions([]);
+
+      if (!window.google || !window.google.maps) return;
+
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ placeId: suggestion.placeId }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+          const result = results[0];
+          const loc = result.geometry.location;
+
+          if (
+            !checkCoverage(suggestion.description) &&
+            !checkCoverage(result.formatted_address)
+          ) {
+            setErrorData({
+              title: "Area Not Serviceable",
+              message: "We currently do not operate in this area.",
+              help: "Our services are currently available in Mumbai, Pune, Lucknow, and Jaipur.",
+            });
+            return;
+          }
+
+          setCoords({ lat: loc.lat(), lng: loc.lng() });
+          setNewAddress(suggestion.description);
+          setIsAdding(true);
+        }
+      });
+    },
+    [],
+  );
+
   // New State for Error Modal
   const [errorData, setErrorData] = useState<{
     title: string;
@@ -92,83 +210,86 @@ export const AddressScreen: React.FC<NavigationProps> = ({
     }
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      (position) => {
         const { latitude, longitude } = position.coords;
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-        try {
-          // Google Geocoding reverse geocoding request
-          const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
-          );
-          const data = await response.json();
-
-          if (data.status === "OK" && data.results && data.results.length > 0) {
-            const result = data.results[0];
-            const components = result.address_components || [];
-
-            const getComponent = (type: string) =>
-              components.find((c: any) => c.types.includes(type))?.long_name;
-
-            const suburb =
-              getComponent("sublocality_level_1") ||
-              getComponent("sublocality") ||
-              getComponent("neighborhood");
-            const city =
-              getComponent("locality") ||
-              getComponent("administrative_area_level_2");
-            const postcode = getComponent("postal_code");
-
-            let formatted = "Unknown Location";
-            if (suburb && city) {
-              formatted = `${suburb}, ${city}`;
-            } else if (city) {
-              formatted = city;
-            } else if (result.formatted_address) {
-              formatted = result.formatted_address
-                .split(",")
-                .slice(0, 2)
-                .join(",");
-            }
-
-            if (postcode && formatted.length < 25) {
-              formatted += ` ${postcode}`;
-            }
-
-            const fullAddress = result.formatted_address || formatted;
-            if (!checkCoverage(formatted) && !checkCoverage(fullAddress)) {
-              setErrorData({
-                title: "Area Not Serviceable",
-                message:
-                  "We currently do not operate in this detected location.",
-                help: "Our services are currently available in Mumbai, Pune, Lucknow, and Jaipur.",
-              });
-              setIsLocating(false);
-              return;
-            }
-
-            const area = extractArea(formatted);
-            setCoords({ lat: latitude, lng: longitude });
-            setNewAddress(formatted);
-            setIsAdding(true);
-            setIsLocating(false);
-          } else {
-            setErrorData({
-              title: "Location Unidentified",
-              message: "We could not verify the city of your location.",
-              help: "Please enter your address manually to ensure we serve your area.",
-            });
-            setIsLocating(false);
-          }
-        } catch (error) {
-          console.error("Geocoding failed:", error);
+        if (!window.google || !window.google.maps) {
           setErrorData({
-            title: "Network Error",
-            message: "Unable to fetch location details.",
-            help: "Please check your internet connection or enter address manually.",
+            title: "Map Not Ready",
+            message: "Google Maps is still loading.",
+            help: "Please wait a moment and try again.",
           });
           setIsLocating(false);
+          return;
         }
+
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode(
+          { location: { lat: latitude, lng: longitude } },
+          (results, status) => {
+            if (
+              status === google.maps.GeocoderStatus.OK &&
+              results &&
+              results.length > 0
+            ) {
+              const result = results[0];
+              const components = result.address_components || [];
+
+              const getComponent = (type: string) =>
+                components.find((c) => c.types.includes(type))?.long_name;
+
+              const suburb =
+                getComponent("sublocality_level_1") ||
+                getComponent("sublocality") ||
+                getComponent("neighborhood");
+              const city =
+                getComponent("locality") ||
+                getComponent("administrative_area_level_2");
+              const postcode = getComponent("postal_code");
+
+              let formatted = "Unknown Location";
+              if (suburb && city) {
+                formatted = `${suburb}, ${city}`;
+              } else if (city) {
+                formatted = city;
+              } else if (result.formatted_address) {
+                formatted = result.formatted_address
+                  .split(",")
+                  .slice(0, 2)
+                  .join(",");
+              }
+
+              if (postcode && formatted.length < 25) {
+                formatted += ` ${postcode}`;
+              }
+
+              const fullAddress = result.formatted_address || formatted;
+              if (!checkCoverage(formatted) && !checkCoverage(fullAddress)) {
+                setErrorData({
+                  title: "Area Not Serviceable",
+                  message:
+                    "We currently do not operate in this detected location.",
+                  help: "Our services are currently available in Mumbai, Pune, Lucknow, and Jaipur.",
+                });
+                setIsLocating(false);
+                return;
+              }
+
+              const area = extractArea(formatted);
+              setCoords({ lat: latitude, lng: longitude });
+              setNewAddress(formatted);
+              setIsAdding(true);
+              setIsLocating(false);
+            } else {
+              setErrorData({
+                title: "Location Unidentified",
+                message: "We could not verify the city of your location.",
+                help: "Please enter your address manually to ensure we serve your area.",
+              });
+              setIsLocating(false);
+            }
+          },
+        );
       },
       (error) => {
         setIsLocating(false);
@@ -257,28 +378,32 @@ export const AddressScreen: React.FC<NavigationProps> = ({
     setAddresses(addresses.filter((a) => a.id !== id));
   };
 
-  // Debounced address search to move map (Google Geocoding)
+  // Debounced address search to move map (Google Maps JS Geocoder)
   React.useEffect(() => {
-    if (!newAddress || newAddress.length < 5 || isLocating) return;
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!newAddress || newAddress.length < 3 || isLocating) return;
 
-    const timeoutId = setTimeout(async () => {
-      try {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(newAddress)}&key=${apiKey}`,
+    const timeoutId = setTimeout(() => {
+      // Use the Google Maps JS API Geocoder (works with browser-restricted API keys)
+      if (window.google && window.google.maps) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode(
+          { address: newAddress, region: "in" },
+          (results, status) => {
+            if (
+              status === google.maps.GeocoderStatus.OK &&
+              results &&
+              results[0]
+            ) {
+              const loc = results[0].geometry.location;
+              setCoords({
+                lat: loc.lat(),
+                lng: loc.lng(),
+              });
+            }
+          },
         );
-        const data = await response.json();
-        if (data.status === "OK" && data.results && data.results[0]) {
-          const loc = data.results[0].geometry.location;
-          setCoords({
-            lat: loc.lat,
-            lng: loc.lng,
-          });
-        }
-      } catch (error) {
-        console.error("Auto-geocoding failed:", error);
       }
-    }, 1200);
+    }, 600);
 
     return () => clearTimeout(timeoutId);
   }, [newAddress]);
@@ -313,16 +438,71 @@ export const AddressScreen: React.FC<NavigationProps> = ({
       </header>
 
       <main className="flex-1 w-full max-w-md mx-auto px-4 py-4 flex flex-col gap-4">
-        {/* Search Bar */}
+        {/* Search Bar with Autocomplete */}
         <div className="relative">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10">
             search
           </span>
+          {isSearching && (
+            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 animate-spin z-10 text-sm">
+              progress_activity
+            </span>
+          )}
+          {searchQuery && !isSearching && (
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setSuggestions([]);
+                setShowSuggestions(false);
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          )}
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             placeholder="Search for area, street name..."
-            className="w-full h-12 rounded-xl bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 pl-11 pr-4 text-sm font-medium text-onyx dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
+            className="w-full h-12 rounded-xl bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 pl-11 pr-10 text-sm font-medium text-onyx dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
           />
+
+          {/* Autocomplete Suggestions Dropdown */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl z-50 overflow-hidden max-h-72 overflow-y-auto">
+              {suggestions.map((s, i) => (
+                <button
+                  key={s.placeId}
+                  onClick={() => handleSelectSuggestion(s)}
+                  className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors ${
+                    i < suggestions.length - 1
+                      ? "border-b border-gray-100 dark:border-white/5"
+                      : ""
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-primary mt-0.5 text-lg flex-shrink-0">
+                    location_on
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-onyx dark:text-white truncate">
+                      {s.mainText}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {s.secondaryText}
+                    </p>
+                  </div>
+                </button>
+              ))}
+              <div className="px-4 py-2 bg-gray-50 dark:bg-black/20 flex items-center justify-end gap-1">
+                <span className="text-[9px] text-gray-400">Powered by</span>
+                <span className="text-[9px] font-bold text-gray-500">
+                  Google
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Use Current Location Button */}

@@ -1,7 +1,8 @@
-import React, { useCallback, useRef } from "react";
-import { GoogleMap, useLoadScript } from "@react-google-maps/api";
+import React, { useCallback, useRef, useEffect, useState } from "react";
+import { GoogleMap, useLoadScript, Libraries } from "@react-google-maps/api";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+const LIBRARIES: Libraries = ["places"];
 
 interface MapComponentProps {
   center?: { lat: number; lng: number };
@@ -24,7 +25,18 @@ const mapOptions: google.maps.MapOptions = {
   styles: [
     {
       featureType: "poi",
+      elementType: "labels.icon",
       stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "poi.business",
+      elementType: "labels.text",
+      stylers: [{ visibility: "on" }],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "labels.text",
+      stylers: [{ visibility: "on" }],
     },
     {
       featureType: "transit",
@@ -40,9 +52,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: LIBRARIES,
   });
 
   const mapRef = useRef<google.maps.Map | null>(null);
+  const isProgrammaticPanRef = useRef(false);
 
   const onLoad = useCallback(
     (map: google.maps.Map) => {
@@ -54,6 +68,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const onIdle = useCallback(() => {
     if (mapRef.current && onLocationSelect) {
+      // Skip reporting location if this idle event was from a programmatic pan
+      if (isProgrammaticPanRef.current) {
+        isProgrammaticPanRef.current = false;
+        return;
+      }
       const newCenter = mapRef.current.getCenter();
       if (newCenter) {
         onLocationSelect(newCenter.lat(), newCenter.lng());
@@ -61,15 +80,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   }, [onLocationSelect]);
 
-  // Update map center when prop changes
-  React.useEffect(() => {
+  // Update map center when prop changes (e.g., from geocoding)
+  useEffect(() => {
     if (mapRef.current) {
       const currentCenter = mapRef.current.getCenter();
       if (currentCenter) {
         const diff =
           Math.abs(currentCenter.lat() - center.lat) +
           Math.abs(currentCenter.lng() - center.lng);
-        if (diff > 0.0001) {
+        if (diff > 0.001) {
+          isProgrammaticPanRef.current = true;
           mapRef.current.panTo(center);
         }
       }
