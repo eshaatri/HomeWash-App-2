@@ -8,27 +8,81 @@ export const PartnersPage: React.FC<NavigationProps> = () => {
   const [partners, setPartners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchPartners = async () => {
+    setLoading(true);
+    try {
+      const data = await adminService.getPartners();
+      setPartners(data);
+    } catch (error) {
+      console.error("Failed to fetch partners:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        const data = await adminService.getPartners();
-        setPartners(data);
-      } catch (error) {
-        console.error("Failed to fetch partners:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchPartners();
   }, []);
 
+  const handleAddPartner = async () => {
+    const name = prompt("Enter partner name:");
+    const phone = prompt("Enter partner phone:");
+    if (name && phone) {
+      try {
+        await adminService.createUser({ name, phone, role: "PARTNER" });
+        alert("Partner added successfully!");
+        fetchPartners();
+      } catch (error) {
+        alert("Failed to add partner.");
+      }
+    }
+  };
+
+  const handleDeletePartner = async (id: string, name: string) => {
+    if (confirm(`Are you sure you want to delete partner ${name}?`)) {
+      try {
+        await adminService.deleteUser(id);
+        alert("Partner deleted successfully!");
+        fetchPartners();
+      } catch (error) {
+        alert("Failed to delete partner.");
+      }
+    }
+  };
+
+  const handleToggleStatus = async (partner: any) => {
+    const newStatus =
+      partner.status === PartnerStatus.ACTIVE
+        ? PartnerStatus.SUSPENDED
+        : PartnerStatus.ACTIVE;
+    try {
+      await adminService.updateUser(partner.id || partner._id, {
+        status: newStatus,
+      });
+      alert(`Partner status updated to ${newStatus}`);
+      fetchPartners();
+    } catch (error) {
+      alert("Failed to update status.");
+    }
+  };
+
   const filteredPartners = partners.filter((p) => {
+    const name = p.name || "";
+    const phone = p.phone || "";
     const matchesSearch =
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.phone.includes(searchTerm);
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      phone.includes(searchTerm);
     const matchesStatus = statusFilter === "all" || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const getStatusBadge = (status: PartnerStatus) => {
     switch (status) {
@@ -64,7 +118,10 @@ export const PartnersPage: React.FC<NavigationProps> = () => {
             Manage service partners
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dim transition-colors">
+        <button
+          onClick={handleAddPartner}
+          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dim transition-colors"
+        >
           <span className="material-symbols-outlined text-lg">person_add</span>
           Add Partner
         </button>
@@ -163,68 +220,110 @@ export const PartnersPage: React.FC<NavigationProps> = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredPartners.map((partner) => (
-              <tr
-                key={partner.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                      {partner.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{partner.name}</p>
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded ${getTierBadge(partner.tier)}`}
-                        >
-                          {partner.tier}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500">{partner.phone}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`text-xs font-bold px-2 py-1 rounded ${getStatusBadge(partner.status)}`}
-                  >
-                    {partner.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  {partner.rating > 0 ? (
-                    <div className="flex items-center gap-1">
-                      <span
-                        className="material-symbols-outlined text-yellow-500 text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        star
-                      </span>
-                      <span className="font-medium">{partner.rating}</span>
-                    </div>
-                  ) : (
-                    <span className="text-gray-400">N/A</span>
-                  )}
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-medium">
-                    {partner.completedJobs || 0}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-medium text-green-600">
-                    ₹{(partner.earnings || 0).toLocaleString()}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors">
-                    <span className="material-symbols-outlined">more_vert</span>
-                  </button>
+            {filteredPartners.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-6 py-12 text-center text-gray-500"
+                >
+                  No partners found matching your search.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredPartners.map((partner) => (
+                <tr
+                  key={partner.id || partner._id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        {(partner.name || "?").charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">
+                            {partner.name || "Unknown"}
+                          </p>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded ${getTierBadge(partner.tier || "")}`}
+                          >
+                            {partner.tier || "N/A"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          {partner.phone || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`text-xs font-bold px-2 py-1 rounded ${getStatusBadge(partner.status)}`}
+                    >
+                      {partner.status || "UNKNOWN"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {(partner.rating || 0) > 0 ? (
+                      <div className="flex items-center gap-1">
+                        <span
+                          className="material-symbols-outlined text-yellow-500 text-sm"
+                          style={{ fontVariationSettings: "'FILL' 1" }}
+                        >
+                          star
+                        </span>
+                        <span className="font-medium">{partner.rating}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">N/A</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-medium">
+                      {partner.completedJobs || 0}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-medium text-green-600">
+                      ₹{(partner.earnings || 0).toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleToggleStatus(partner)}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                        title={
+                          partner.status === PartnerStatus.ACTIVE
+                            ? "Suspend"
+                            : "Activate"
+                        }
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          {partner.status === PartnerStatus.ACTIVE
+                            ? "block"
+                            : "check_circle"}
+                        </span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDeletePartner(
+                            partner.id || partner._id,
+                            partner.name,
+                          )
+                        }
+                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 rounded-lg transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          delete
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -3,10 +3,30 @@ import { NavigationProps } from "../types";
 import { MOCK_EARNINGS_HISTORY } from "../mockData";
 
 export const WalletScreen: React.FC<NavigationProps> = ({ partner }) => {
+  const handleWithdraw = async () => {
+    if ((partner?.walletBalance || 0) < 500) {
+      alert("Minimum withdrawal amount is ₹500.");
+      return;
+    }
+    const amount = prompt(
+      "Enter amount to withdraw:",
+      partner?.walletBalance.toString(),
+    );
+    if (amount && Number(amount) > 0) {
+      if (Number(amount) > (partner?.walletBalance || 0)) {
+        alert("Insufficient balance.");
+        return;
+      }
+      alert(
+        `Withdrawal request of ₹${amount} submitted! It will be credited to your bank account within 24-48 hours.`,
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#121212] pb-20">
       {/* Header */}
-      <header className="bg-white dark:bg-[#1a1a1a] px-4 py-4 border-b border-gray-100 dark:border-white/5 sticky top-0 z-30">
+      <header className="bg-white dark:bg-[#1a1a1a] px-4 py-4 border-b border-gray-100 dark:border-white/5 sticky top-0 z-30 flex items-center justify-between">
         <h1 className="text-xl font-bold">Wallet</h1>
       </header>
 
@@ -20,10 +40,16 @@ export const WalletScreen: React.FC<NavigationProps> = ({ partner }) => {
             ₹{partner?.walletBalance.toLocaleString()}
           </p>
           <div className="flex gap-3 mt-6">
-            <button className="flex-1 bg-black text-white py-3 rounded-xl font-bold text-sm hover:bg-black/80 transition-colors">
+            <button
+              onClick={handleWithdraw}
+              className="flex-1 bg-black text-white py-3 rounded-xl font-bold text-sm hover:bg-black/80 transition-colors"
+            >
               Withdraw
             </button>
-            <button className="flex-1 bg-white/20 backdrop-blur py-3 rounded-xl font-bold text-sm hover:bg-white/30 transition-colors">
+            <button
+              onClick={() => alert("Transaction history coming soon!")}
+              className="flex-1 bg-white/20 backdrop-blur py-3 rounded-xl font-bold text-sm hover:bg-white/30 transition-colors"
+            >
               History
             </button>
           </div>

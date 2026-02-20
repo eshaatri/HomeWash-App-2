@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   PartnerScreen,
   Partner,
@@ -6,7 +6,6 @@ import {
   JobStatus,
   NavigationProps,
 } from "./types";
-import { MOCK_PARTNER, MOCK_JOBS } from "./mockData";
 import { partnerService } from "./services/api";
 import { LoginScreen } from "./screens/LoginScreen";
 import { DashboardScreen } from "./screens/DashboardScreen";
@@ -25,25 +24,37 @@ export default function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
 
+  const fetchJobs = async () => {
+    if (!partner) return;
+    try {
+      const partnerId = partner.id || partner._id || "";
+      if (!partnerId) return;
+      const data = await partnerService.getJobs(partnerId);
+      // Map back to our view format if needed
+      const mappedJobs = data.map((j: any) => ({
+        ...j,
+        id: j._id, // Ensure frontend uses .id
+      }));
+      setJobs(mappedJobs);
+      // Check for active job
+      const active = mappedJobs.find(
+        (j: any) =>
+          j.status !== "COMPLETED" &&
+          j.status !== "CANCELLED" &&
+          j.status !== "PENDING",
+      );
+      if (active) setActiveJob(active);
+    } catch (error) {
+      console.error("Failed to fetch jobs:", error);
+    }
+  };
+
   // Fetch jobs when partner logs in
   useEffect(() => {
-    if (partner) {
-      const fetchJobs = async () => {
-        try {
-          const data = await partnerService.getJobs(partner.id);
-          setJobs(data);
-          // Check for active job
-          const active = data.find(
-            (j: any) => j.status !== "COMPLETED" && j.status !== "CANCELLED",
-          );
-          if (active) setActiveJob(active);
-        } catch (error) {
-          console.error("Failed to fetch jobs:", error);
-        }
-      };
-      fetchJobs();
-    }
+    fetchJobs();
   }, [partner]);
+
+  const refreshJobs = () => fetchJobs();
 
   // Apply Dark Mode class
   useEffect(() => {
@@ -102,6 +113,14 @@ export default function App() {
     }
   };
 
+  const rejectJob = async (jobId: string) => {
+    if (confirm("Are you sure you want to reject this job?")) {
+      // For now, we just filter it out locally to simulate rejection
+      setJobs((prev) => prev.filter((j) => j.id !== jobId));
+      alert("Job rejected.");
+    }
+  };
+
   const updateJobStatus = async (jobId: string, status: JobStatus) => {
     try {
       // Map JobStatus to BookingStatus for API if necessary
@@ -118,6 +137,17 @@ export default function App() {
         setActiveJob({ ...activeJob, status });
         if (status === JobStatus.COMPLETED) {
           setActiveJob(null);
+          // Update partner stats locally for immediate feedback
+          if (partner) {
+            setPartner({
+              ...partner,
+              completedJobs: (partner.completedJobs || 0) + 1,
+              walletBalance:
+                (partner.walletBalance || 0) + (activeJob.amount || 0),
+              earningsToday:
+                (partner.earningsToday || 0) + (activeJob.amount || 0),
+            });
+          }
           navigateTo(PartnerScreen.DASHBOARD);
         }
       }
@@ -137,7 +167,9 @@ export default function App() {
     activeJob,
     setActiveJob,
     acceptJob,
+    rejectJob,
     updateJobStatus,
+    refreshJobs,
   };
 
   const renderScreen = () => {

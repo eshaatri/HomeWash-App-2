@@ -10,7 +10,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   partner,
   activeJob,
   jobs,
-  onLogout,
+  refreshJobs,
 }) => {
   const [isOnline, setIsOnline] = useState(true);
   const pendingJobs = jobs.filter((j) => j.status === JobStatus.PENDING);
@@ -127,7 +127,12 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500">
               New Leads ({pendingJobs.length})
             </h3>
-            <button className="text-primary text-xs font-bold">Refresh</button>
+            <button
+              onClick={refreshJobs}
+              className="text-primary text-xs font-bold hover:opacity-70 transition-opacity"
+            >
+              Refresh
+            </button>
           </div>
           <div className="space-y-3">
             {pendingJobs.slice(0, 3).map((job) => (

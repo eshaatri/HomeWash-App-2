@@ -7,25 +7,86 @@ export const UsersPage: React.FC<NavigationProps> = () => {
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await adminService.getUsers();
+      setCustomers(data.filter((u: any) => u.role === "CUSTOMER"));
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await adminService.getUsers();
-        setCustomers(data.filter((u: any) => u.role === "CUSTOMER"));
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
   }, []);
 
-  const filteredCustomers = customers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.phone.includes(searchTerm),
-  );
+  const handleExport = () => {
+    const headers = ["ID", "Name", "Phone", "Bookings", "Spent", "Joined Date"];
+    const csvData = filteredCustomers.map((c) =>
+      [
+        c.id || c._id,
+        c.name,
+        c.phone,
+        c.totalBookings || 0,
+        c.totalSpent || 0,
+        c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "N/A",
+      ].join(","),
+    );
+
+    const csvContent = [headers.join(","), ...csvData].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `customers_export_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+  };
+
+  const handleAddCustomer = async () => {
+    const name = prompt("Enter customer name:");
+    const phone = prompt("Enter customer phone:");
+    if (name && phone) {
+      try {
+        await adminService.createUser({ name, phone, role: "CUSTOMER" });
+        alert("Customer added successfully!");
+        fetchUsers();
+      } catch (error) {
+        alert("Failed to add customer.");
+      }
+    }
+  };
+
+  const handleDeleteCustomer = async (id: string, name: string) => {
+    if (confirm(`Are you sure you want to delete customer ${name}?`)) {
+      try {
+        await adminService.deleteUser(id);
+        alert("Customer deleted successfully!");
+        fetchUsers();
+      } catch (error) {
+        alert("Failed to delete customer.");
+      }
+    }
+  };
+
+  const filteredCustomers = customers.filter((c) => {
+    const name = c.name || "";
+    const phone = c.phone || "";
+    return (
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      phone.includes(searchTerm)
+    );
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -39,10 +100,22 @@ export const UsersPage: React.FC<NavigationProps> = () => {
             Manage your customer base
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dim transition-colors">
-          <span className="material-symbols-outlined text-lg">add</span>
-          Add Customer
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 border border-gray-200 dark:border-gray-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <span className="material-symbols-outlined text-lg">download</span>
+            Export
+          </button>
+          <button
+            onClick={handleAddCustomer}
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dim transition-colors"
+          >
+            <span className="material-symbols-outlined text-lg">add</span>
+            Add Customer
+          </button>
+        </div>
       </div>
 
       {/* Search & Filters */}
@@ -95,50 +168,87 @@ export const UsersPage: React.FC<NavigationProps> = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredCustomers.map((customer) => (
-              <tr
-                key={customer.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                      {customer.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-medium">{customer.name}</p>
-                      <p className="text-xs text-gray-500">
-                        Since{" "}
-                        {customer.createdAt
-                          ? new Date(customer.createdAt).toLocaleDateString()
-                          : "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <p className="text-sm">{customer.phone}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-medium">
-                    {customer.totalBookings || 0}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-medium text-green-600">
-                    ₹{(customer.totalSpent || 0).toLocaleString()}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  {customer.lastActive || "N/A"}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors">
-                    <span className="material-symbols-outlined">more_vert</span>
-                  </button>
+            {filteredCustomers.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-6 py-12 text-center text-gray-500"
+                >
+                  No customers found matching your search.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredCustomers.map((customer) => (
+                <tr
+                  key={customer.id || customer._id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        {(customer.name || "?").charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium">
+                          {customer.name || "Unknown"}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Since{" "}
+                          {customer.createdAt
+                            ? new Date(customer.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <p className="text-sm">{customer.phone || "N/A"}</p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-medium">
+                      {customer.totalBookings || 0}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-medium text-green-600">
+                      ₹{(customer.totalSpent || 0).toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {customer.lastActive || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() =>
+                          alert(
+                            `Customer: ${customer.name}\nPhone: ${customer.phone}\nRole: CUSTOMER`,
+                          )
+                        }
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          visibility
+                        </span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDeleteCustomer(
+                            customer.id || customer._id,
+                            customer.name,
+                          )
+                        }
+                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 rounded-lg transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          delete
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

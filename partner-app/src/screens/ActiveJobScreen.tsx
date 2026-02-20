@@ -61,13 +61,16 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
     if (nextStatus === JobStatus.IN_PROGRESS) {
       setShowOtpModal(true);
     } else if (nextStatus) {
-      updateJobStatus(activeJob.id, nextStatus);
+      updateJobStatus(activeJob.id || activeJob._id || "", nextStatus);
     }
   };
 
   const handleOtpVerify = () => {
     if (otpInput === activeJob.otpStart) {
-      updateJobStatus(activeJob.id, JobStatus.IN_PROGRESS);
+      updateJobStatus(
+        activeJob.id || activeJob._id || "",
+        JobStatus.IN_PROGRESS,
+      );
       setShowOtpModal(false);
       setOtpInput("");
     }
@@ -190,12 +193,18 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
               <p className="text-sm text-gray-500">{activeJob.customerPhone}</p>
             </div>
             <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center">
+              <a
+                href={`tel:${activeJob.customerPhone}`}
+                className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center transition-transform active:scale-90"
+              >
                 <span className="material-symbols-outlined">call</span>
-              </button>
-              <button className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+              </a>
+              <a
+                href={`sms:${activeJob.customerPhone}`}
+                className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center transition-transform active:scale-90"
+              >
                 <span className="material-symbols-outlined">chat</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -215,10 +224,17 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
             </div>
           </div>
           {activeJob.status === JobStatus.EN_ROUTE && (
-            <button className="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                activeJob.address + " " + activeJob.addressLine2,
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+            >
               <span className="material-symbols-outlined">map</span>
               Open in Maps
-            </button>
+            </a>
           )}
         </div>
       </div>

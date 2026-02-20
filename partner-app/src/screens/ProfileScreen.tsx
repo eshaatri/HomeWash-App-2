@@ -12,12 +12,40 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onLogout,
 }) => {
   const menuItems = [
-    { icon: "account_circle", label: "Personal Details", action: () => {} },
-    { icon: "description", label: "Documents", action: () => {} },
-    { icon: "account_balance", label: "Bank Details", action: () => {} },
-    { icon: "notifications", label: "Notifications", action: () => {} },
-    { icon: "help", label: "Help & Support", action: () => {} },
-    { icon: "policy", label: "Terms & Conditions", action: () => {} },
+    {
+      icon: "account_circle",
+      label: "Personal Details",
+      action: () => alert("User profile editing coming soon!"),
+    },
+    {
+      icon: "description",
+      label: "Documents",
+      action: () => alert("KYC documents are verified."),
+    },
+    {
+      icon: "account_balance",
+      label: "Bank Details",
+      action: () =>
+        alert(
+          "Primary Bank: HDFC Bank State Bank of India\nAccount: **** 4920",
+        ),
+    },
+    {
+      icon: "notifications",
+      label: "Notifications",
+      action: () => alert("No new notifications."),
+    },
+    {
+      icon: "help",
+      label: "Help & Support",
+      action: () =>
+        alert("Contact support at help@homewash.com or call 1800-XXX-XXXX"),
+    },
+    {
+      icon: "policy",
+      label: "Terms & Conditions",
+      action: () => alert("Opening Terms and Conditions document..."),
+    },
   ];
 
   return (

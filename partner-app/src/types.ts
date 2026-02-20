@@ -18,7 +18,8 @@ export enum JobStatus {
 }
 
 export interface Partner {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
   phone: string;
   rating: number;
@@ -30,7 +31,8 @@ export interface Partner {
 }
 
 export interface Job {
-  id: string;
+  id?: string;
+  _id?: string;
   serviceName: string;
   customerName: string;
   customerPhone: string;
@@ -57,5 +59,7 @@ export interface NavigationProps {
   activeJob: Job | null;
   setActiveJob: (job: Job | null) => void;
   acceptJob: (jobId: string) => void;
+  rejectJob: (jobId: string) => void;
   updateJobStatus: (jobId: string, status: JobStatus) => void;
+  refreshJobs: () => void;
 }
