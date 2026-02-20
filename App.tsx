@@ -26,7 +26,7 @@ import {
   ServiceCategory,
 } from "./types";
 import { MOCK_BOOKINGS, MOCK_PARTNER, MOCK_USER } from "./mockData";
-import { userService, bookingService } from "./services/api";
+import { userService, bookingService } from "./src/services/api";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(
