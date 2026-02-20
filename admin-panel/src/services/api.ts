@@ -16,7 +16,7 @@ export const adminService = {
     return response.data;
   },
   createUser: async (userData: any) => {
-    const response = await api.post("/users/login", userData); // Uses login for auto-creation logic or we could add a dedicated POST
+    const response = await api.post("/users/login", userData);
     return response.data;
   },
   updateUser: async (id: string, userData: any) => {
@@ -89,6 +89,85 @@ export const adminService = {
   },
   deleteCategory: async (id: string) => {
     const response = await api.delete(`/categories/${id}`);
+    return response.data;
+  },
+
+  // SubCategories
+  getSubCategories: async () => {
+    const response = await api.get("/subcategories");
+    return response.data;
+  },
+  createSubCategory: async (data: any) => {
+    const response = await api.post("/subcategories", data);
+    return response.data;
+  },
+  updateSubCategory: async (id: string, data: any) => {
+    const response = await api.patch(`/subcategories/${id}`, data);
+    return response.data;
+  },
+  deleteSubCategory: async (id: string) => {
+    const response = await api.delete(`/subcategories/${id}`);
+    return response.data;
+  },
+
+  // Vendors
+  getVendors: async () => {
+    const response = await api.get("/vendors");
+    return response.data;
+  },
+  createVendor: async (data: any) => {
+    const response = await api.post("/vendors", data);
+    return response.data;
+  },
+  updateVendor: async (id: string, data: any) => {
+    const response = await api.patch(`/vendors/${id}`, data);
+    return response.data;
+  },
+  deleteVendor: async (id: string) => {
+    const response = await api.delete(`/vendors/${id}`);
+    return response.data;
+  },
+
+  // Areas
+  getAreas: async () => {
+    const response = await api.get("/areas");
+    return response.data;
+  },
+  createArea: async (data: any) => {
+    const response = await api.post("/areas", data);
+    return response.data;
+  },
+  updateArea: async (id: string, data: any) => {
+    const response = await api.patch(`/areas/${id}`, data);
+    return response.data;
+  },
+  deleteArea: async (id: string) => {
+    const response = await api.delete(`/areas/${id}`);
+    return response.data;
+  },
+
+  // Vendor Configs
+  getVendorConfigs: async (vendorId: string) => {
+    const response = await api.get(`/vendor-configs/vendor/${vendorId}`);
+    return response.data;
+  },
+  updateVendorConfig: async (data: any) => {
+    const response = await api.post("/vendor-configs", data);
+    return response.data;
+  },
+};
+
+export const vendorService = {
+  getStats: async (vendorId: string) => {
+    const response = await api.get(`/vendors/${vendorId}/stats`);
+    return response.data;
+  },
+  getBookings: async (vendorId: string) => {
+    const response = await api.get(`/vendors/${vendorId}/bookings`);
+    return response.data;
+  },
+  getPartners: async (vendorId: string) => {
+    const response = await api.get(`/vendors/${vendorId}/partners`);
     return response.data;
   },
 };
