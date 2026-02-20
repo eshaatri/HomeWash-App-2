@@ -38,6 +38,8 @@ export interface Job {
   customerPhone: string;
   address: string;
   addressLine2: string;
+  lat: number;
+  lng: number;
   amount: number;
   paymentMethod: "CASH" | "ONLINE";
   status: JobStatus;

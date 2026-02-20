@@ -15,19 +15,84 @@ export const Sidebar: React.FC<SidebarProps> = ({
   toggleDarkMode,
   onLogout,
 }) => {
-  const menuItems = [
-    { page: AdminPage.DASHBOARD, icon: "dashboard", label: "Dashboard" },
-    { page: AdminPage.BOOKINGS, icon: "calendar_month", label: "Bookings" },
-    { page: AdminPage.USERS, icon: "people", label: "Customers" },
-    { page: AdminPage.PARTNERS, icon: "engineering", label: "Partners" },
+  const allMenuItems = [
+    {
+      page: AdminPage.DASHBOARD,
+      icon: "dashboard",
+      label: "Dashboard",
+      roles: ["SUPER_ADMIN", "ADMIN"],
+    },
+    {
+      page: AdminPage.VENDOR_DASHBOARD,
+      icon: "dashboard",
+      label: "Dashboard",
+      roles: ["VENDOR"],
+    },
+    {
+      page: AdminPage.BOOKINGS,
+      icon: "calendar_month",
+      label: "All Bookings",
+      roles: ["SUPER_ADMIN", "ADMIN"],
+    },
+    {
+      page: AdminPage.VENDOR_BOOKINGS,
+      icon: "calendar_month",
+      label: "My Bookings",
+      roles: ["VENDOR"],
+    },
+    {
+      page: AdminPage.USERS,
+      icon: "people",
+      label: "Customers",
+      roles: ["SUPER_ADMIN", "ADMIN"],
+    },
+    {
+      page: AdminPage.VENDORS,
+      icon: "storefront",
+      label: "Vendors",
+      roles: ["SUPER_ADMIN", "ADMIN"],
+    },
+    {
+      page: AdminPage.AREAS,
+      icon: "map",
+      label: "Service Areas",
+      roles: ["SUPER_ADMIN", "ADMIN"],
+    },
+    {
+      page: AdminPage.PARTNERS,
+      icon: "engineering",
+      label: "Partners",
+      roles: ["SUPER_ADMIN", "ADMIN"],
+    },
+    {
+      page: AdminPage.VENDOR_PARTNERS,
+      icon: "engineering",
+      label: "My Partners",
+      roles: ["VENDOR"],
+    },
     {
       page: AdminPage.SERVICES,
       icon: "home_repair_service",
       label: "Services",
+      roles: ["SUPER_ADMIN", "ADMIN"],
     },
-    { page: AdminPage.REPORTS, icon: "analytics", label: "Reports" },
-    { page: AdminPage.SETTINGS, icon: "settings", label: "Settings" },
+    {
+      page: AdminPage.REPORTS,
+      icon: "analytics",
+      label: "Reports",
+      roles: ["SUPER_ADMIN", "ADMIN", "VENDOR"],
+    },
+    {
+      page: AdminPage.SETTINGS,
+      icon: "settings",
+      label: "Settings",
+      roles: ["SUPER_ADMIN", "ADMIN", "VENDOR"],
+    },
   ];
+
+  const menuItems = allMenuItems.filter((item) =>
+    item.roles.includes(admin?.role || ""),
+  );
 
   return (
     <aside

@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import { NavigationProps } from "../types";
 
 interface LoginPageProps extends NavigationProps {
-  onLogin: () => void;
+  onLogin: (role: "ADMIN" | "VENDOR") => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"ADMIN" | "VENDOR">("ADMIN");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+    onLogin(role);
   };
 
   return (
@@ -38,6 +39,30 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           onSubmit={handleSubmit}
           className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl"
         >
+          <div className="flex p-1 bg-gray-100 dark:bg-gray-700 rounded-xl mb-6">
+            <button
+              type="button"
+              onClick={() => setRole("ADMIN")}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
+                role === "ADMIN"
+                  ? "bg-white dark:bg-gray-600 text-primary shadow-sm"
+                  : "text-gray-500"
+              }`}
+            >
+              Admin Portal
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("VENDOR")}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
+                role === "VENDOR"
+                  ? "bg-white dark:bg-gray-600 text-primary shadow-sm"
+                  : "text-gray-500"
+              }`}
+            >
+              Vendor Portal
+            </button>
+          </div>
           <div className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

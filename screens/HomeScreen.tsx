@@ -40,30 +40,43 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
+          const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
           try {
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
             );
             const data = await response.json();
 
-            if (data && data.address) {
+            if (
+              data.status === "OK" &&
+              data.results &&
+              data.results.length > 0
+            ) {
+              const result = data.results[0];
+              const components = result.address_components || [];
+
+              const getComponent = (type: string) =>
+                components.find((c: any) => c.types.includes(type))?.long_name;
+
               const suburb =
-                data.address.suburb ||
-                data.address.neighbourhood ||
-                data.address.residential;
+                getComponent("sublocality_level_1") ||
+                getComponent("sublocality") ||
+                getComponent("neighborhood");
               const city =
-                data.address.city ||
-                data.address.town ||
-                data.address.state_district;
-              const postcode = data.address.postcode;
+                getComponent("locality") ||
+                getComponent("administrative_area_level_2");
+              const postcode = getComponent("postal_code");
 
               let formatted = "Unknown Location";
               if (suburb && city) {
                 formatted = `${suburb}, ${city}`;
               } else if (city) {
                 formatted = city;
-              } else if (data.display_name) {
-                formatted = data.display_name.split(",").slice(0, 2).join(",");
+              } else if (result.formatted_address) {
+                formatted = result.formatted_address
+                  .split(",")
+                  .slice(0, 2)
+                  .join(",");
               }
 
               if (postcode && formatted.length < 25) {
@@ -246,13 +259,11 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
           </button>
           <button
             onClick={() => navigateTo(AppScreen.PROFILE)}
-            className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-onyx-light transition-transform active:scale-95`}
+            className={`relative flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 dark:border-white/10 bg-primary/10 text-primary font-bold transition-transform active:scale-95`}
           >
-            <img
-              alt="Profile"
-              className="h-full w-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFK0Fz8B0V8pQ3JrplcKD15JYgq3Cl8REYDUeN_qpGXmcLMshGFME5GoGxZROWR1SSaovL3PHRMzm-vOitRuzsbp9zWBAWyQzgY_ZnKzT9U-VqculLggQXOWyl2_hU8dadTv8DtwcEEpUU3PMtc0YJKYgXDxdLyoUM72UJRwT3e5bwlltq17PCqYwpToIJLdFQNjCJpMmPLY_DmQ4l488SzICvGQSFIwleL36Ge0lXezGBHQ3SHeUOpqT9B_5TppuEFDAsfH6rJ-0"
-            />
+            <span className="text-sm">
+              {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+            </span>
           </button>
         </div>
       </header>
@@ -471,13 +482,9 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className={`h-10 w-10 rounded-full border-2 overflow-hidden bg-white/40 backdrop-blur-sm shadow-inner ${isPremium ? "border-black/30" : "border-black/10"}`}
+                  className={`h-10 w-10 rounded-full border-2 flex items-center justify-center bg-primary/10 text-primary font-bold backdrop-blur-sm shadow-inner ${isPremium ? "border-black/30" : "border-black/10"}`}
                 >
-                  <img
-                    src={MOCK_BOOKINGS[0].partnerImage}
-                    className="w-full h-full object-cover"
-                    alt="Partner"
-                  />
+                  {MOCK_BOOKINGS[0].partnerName.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <p

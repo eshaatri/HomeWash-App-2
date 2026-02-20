@@ -24,6 +24,8 @@ export interface IBooking extends Document {
   otp?: string;
   paidAmount?: number;
   remainingAmount?: number;
+  vendorId?: string;
+  serviceArea?: string;
 }
 
 const BookingSchema: Schema = new Schema(
@@ -45,6 +47,8 @@ const BookingSchema: Schema = new Schema(
     otp: { type: String },
     paidAmount: { type: Number },
     remainingAmount: { type: Number },
+    vendorId: { type: String },
+    serviceArea: { type: String },
   },
   {
     timestamps: true,
