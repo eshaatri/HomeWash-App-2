@@ -13,6 +13,8 @@ import { VendorDashboardPage } from "./pages/VendorDashboardPage";
 import { VendorBookingsPage } from "./pages/VendorBookingsPage";
 import { VendorPartnersPage } from "./pages/VendorPartnersPage";
 import { VendorServiceConfigPage } from "./pages/VendorServiceConfigPage";
+import { ReportsPage } from "./pages/ReportsPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { Sidebar } from "./components/Sidebar";
 
 export default function App() {
@@ -97,6 +99,10 @@ export default function App() {
         );
       case AdminPage.AREAS:
         return <AreasPage {...commonProps} />;
+      case AdminPage.REPORTS:
+        return <ReportsPage {...commonProps} />;
+      case AdminPage.SETTINGS:
+        return <SettingsPage {...commonProps} />;
       case AdminPage.VENDOR_SERVICE_CONFIG:
         return (
           <VendorServiceConfigPage
