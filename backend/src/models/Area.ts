@@ -9,6 +9,7 @@ export interface IArea extends Document {
   assignedVendorName?: string;
   lat?: number;
   lng?: number;
+  geoJson?: any;
 }
 
 const AreaSchema: Schema = new Schema(
@@ -21,6 +22,7 @@ const AreaSchema: Schema = new Schema(
     assignedVendorName: { type: String },
     lat: { type: Number },
     lng: { type: Number },
+    geoJson: { type: Schema.Types.Mixed },
   },
   { timestamps: true },
 );

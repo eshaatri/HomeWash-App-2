@@ -155,6 +155,16 @@ export const adminService = {
     const response = await api.post("/vendor-configs", data);
     return response.data;
   },
+
+  // Location / Boundaries
+  getBoundary: async (params: {
+    zipcode?: string;
+    city?: string;
+    name?: string;
+  }) => {
+    const response = await api.get("/location/boundary", { params });
+    return response.data;
+  },
 };
 
 export const vendorService = {

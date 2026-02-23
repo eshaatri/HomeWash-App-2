@@ -121,6 +121,7 @@ export interface Area {
   lng?: number;
   assignedVendorId?: string;
   assignedVendorName?: string;
+  geoJson?: any;
 }
 
 export interface DashboardStats {

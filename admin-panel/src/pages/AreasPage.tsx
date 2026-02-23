@@ -3,6 +3,11 @@ import { NavigationProps, Area, Vendor } from "../types";
 import { adminService } from "../services/api";
 import { Modal } from "../components/Modal";
 import MapComponent from "../components/MapComponent";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+import { union } from "@turf/union";
+
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+const LIBRARIES: any = ["places", "geometry", "drawing"];
 
 export const AreasPage: React.FC<NavigationProps> = () => {
   const [areas, setAreas] = useState<Area[]>([]);
@@ -25,6 +30,48 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     assignedVendorName: "",
   });
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: LIBRARIES,
+  });
+
+  const [autocomplete, setAutocomplete] =
+    useState<google.maps.places.Autocomplete | null>(null);
+
+  const onLoadAutocomplete = (
+    autocompleteInst: google.maps.places.Autocomplete,
+  ) => {
+    setAutocomplete(autocompleteInst);
+  };
+
+  const onPlaceChanged = () => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+
+      let newCity = formData.city;
+      let newZip = formData.zipCodes;
+
+      const cityComp = place.address_components?.find((c: any) =>
+        c.types.includes("locality"),
+      );
+      if (cityComp) newCity = cityComp.long_name;
+
+      const zipComp = place.address_components?.find((c: any) =>
+        c.types.includes("postal_code"),
+      );
+      if (zipComp) newZip = zipComp.long_name;
+
+      setFormData({
+        ...formData,
+        name: place.name || formData.name,
+        city: newCity,
+        zipCodes: newZip,
+        lat: place.geometry?.location?.lat() || formData.lat,
+        lng: place.geometry?.location?.lng() || formData.lng,
+      });
+    }
+  };
 
   const fetchInitialData = async () => {
     try {
@@ -59,6 +106,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         assignedVendorId: area.assignedVendorId || "",
         assignedVendorName: area.assignedVendorName || "",
       });
+      setGeoJsonData(area.geoJson || null);
     } else {
       setEditingArea(null);
       setFormData({
@@ -81,15 +129,42 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     setEditingArea(null);
   };
 
+  const handleMergeShapes = () => {
+    if (
+      !geoJsonData ||
+      geoJsonData.type !== "FeatureCollection" ||
+      !geoJsonData.features ||
+      geoJsonData.features.length < 2
+    )
+      return;
+
+    try {
+      let merged = geoJsonData.features[0];
+      for (let i = 1; i < geoJsonData.features.length; i++) {
+        merged = union(merged, geoJsonData.features[i]);
+      }
+      setGeoJsonData(merged);
+    } catch (error) {
+      console.error("Merge error:", error);
+      alert("Failed to merge shapes. Ensure the boundaries overlap slightly.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
+    const payload: any = {
       ...formData,
       zipCodes: formData.zipCodes
         .split(",")
         .map((z) => z.trim())
         .filter((z) => z !== ""),
     };
+
+    if (geoJsonData) {
+      payload.geoJson = geoJsonData;
+    } else {
+      payload.geoJson = null; // Clear if empty
+    }
 
     try {
       if (editingArea) {
@@ -108,130 +183,114 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this area? This might affect existing vendor associations.",
-      )
-    ) {
-      try {
-        await adminService.deleteArea(id);
-        fetchInitialData();
-      } catch (error) {
-        console.error("Failed to delete area:", error);
-        alert("Failed to delete area.");
-      }
+  const [areaToDelete, setAreaToDelete] = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (!areaToDelete) return;
+    try {
+      await adminService.deleteArea(areaToDelete);
+      fetchInitialData();
+      setAreaToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete area:", error);
+      alert("Failed to delete area.");
+      setAreaToDelete(null);
     }
   };
 
+  const handleDelete = (id: string) => {
+    setAreaToDelete(id);
+  };
+
   // Debounced effect to fetch GeoJSON overlay
+  const [initialModalZip, setInitialModalZip] = useState("");
+
+  useEffect(() => {
+    if (isModalOpen) {
+      setInitialModalZip(
+        formData.zipCodes ? formData.zipCodes.split(",")[0].trim() : "",
+      );
+    }
+  }, [isModalOpen, editingArea]);
+
   useEffect(() => {
     if (!isModalOpen) return;
 
+    let isCurrentRequest = true;
+
     const fetchOverlay = async () => {
-      // Prioritize zip codes if present, otherwise use area name
-      const query = formData.zipCodes
+      const currentZipQuery = formData.zipCodes
         ? formData.zipCodes.split(",")[0].trim()
-        : formData.name;
+        : "";
+      const query = currentZipQuery || formData.name;
 
       if (!query || query.length < 3) {
-        setGeoJsonData(null);
+        if (isCurrentRequest) setGeoJsonData(null);
+        return;
+      }
+
+      // Skip fetching if this is an editing area and zip hasn't changed,
+      // preserving their custom drawn geometry.
+      if (
+        editingArea &&
+        editingArea.geoJson &&
+        currentZipQuery === initialModalZip
+      ) {
         return;
       }
 
       try {
-        // Step 1: Search with high precision (structured query)
-        const baseUrl = "https://nominatim.openstreetmap.org/search";
-        const params = new URLSearchParams({
-          format: "json",
-          polygon_geojson: "1",
-          addressdetails: "1",
-          limit: "15",
-          country: "India",
+        const data = await adminService.getBoundary({
+          zipcode: currentZipQuery,
+          city: formData.city,
+          name: formData.name,
         });
 
-        if (formData.zipCodes) {
-          params.append("postalcode", query);
-        } else {
-          params.append("q", `${query} ${formData.city}`);
-        }
+        if (!isCurrentRequest) return;
 
-        const response = await fetch(`${baseUrl}?${params.toString()}`);
-        let results = await response.json();
+        if (data && data.source) {
+          if (data.geojson) {
+            console.log(
+              `Boundary Match Found via ${data.source}:`,
+              data.display_name || query,
+            );
+            setGeoJsonData(data.geojson);
+          } else {
+            console.log(
+              `No boundary geometry found. Panning to ${data.source}:`,
+              data.display_name || query,
+            );
+            setGeoJsonData(null);
+          }
 
-        // Step 2: Selection Logic logic
-        const findPolygon = (list: any[]) =>
-          list.find(
-            (r: any) =>
-              r.geojson &&
-              r.geojson.type !== "Point" &&
-              (r.osm_type === "relation" || r.osm_type === "way") &&
-              (r.type === "suburb" ||
-                r.type === "city_district" ||
-                r.type === "administrative" ||
-                r.class === "boundary"),
-          ) ||
-          list.find(
-            (r: any) =>
-              r.geojson &&
-              r.geojson.type !== "Point" &&
-              r.geojson.type !== "LineString",
-          );
-
-        let bestMatch = findPolygon(results);
-
-        // Step 3: Fallback - if no polygon found, try a broader search just by the name
-        if (!bestMatch && !formData.zipCodes) {
-          const fallbackParams = new URLSearchParams({
-            q: query,
-            format: "json",
-            polygon_geojson: "1",
-            limit: "10",
-          });
-          const fallbackRes = await fetch(
-            `${baseUrl}?${fallbackParams.toString()}`,
-          );
-          const fallbackResults = await fallbackRes.json();
-          bestMatch = findPolygon(fallbackResults);
-        }
-
-        // Final fallback to the very first result if still nothing
-        if (!bestMatch && results.length > 0) {
-          bestMatch = results[0];
-        }
-
-        if (bestMatch && bestMatch.geojson) {
-          console.log("Boundary Match Found:", {
-            name: bestMatch.display_name,
-            type: bestMatch.type,
-            geo: bestMatch.geojson.type,
-          });
-          setGeoJsonData(bestMatch.geojson);
-
-          if (!editingArea && bestMatch.lat && bestMatch.lon) {
+          if (!editingArea && data.lat && data.lon) {
             setFormData((prev) => ({
               ...prev,
-              lat: parseFloat(bestMatch.lat),
-              lng: parseFloat(bestMatch.lon),
+              lat: parseFloat(data.lat),
+              lng: parseFloat(data.lon),
             }));
           }
         } else {
           setGeoJsonData(null);
         }
       } catch (error) {
-        console.error("Failed to fetch map overlay:", error);
-        setGeoJsonData(null);
+        console.error("Failed to fetch boundary via proxy:", error);
+        if (isCurrentRequest) setGeoJsonData(null);
       }
     };
 
     const timer = setTimeout(fetchOverlay, 1000);
-    return () => clearTimeout(timer);
+    return () => {
+      isCurrentRequest = false;
+      clearTimeout(timer);
+    };
   }, [
     formData.name,
     formData.zipCodes,
     formData.city,
     isModalOpen,
     editingArea,
+    initialModalZip, // Added dependency
   ]);
 
   const filteredAreas = areas.filter(
@@ -422,15 +481,13 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                    <span className="material-symbols-outlined text-sm">
-                      storefront
-                    </span>
-                    <span>{area.vendorsCount || 0} Vendors</span>
-                  </div>
+                  <div />
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleOpenModal(area)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenModal(area);
+                      }}
                       className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-primary transition-colors"
                     >
                       <span className="material-symbols-outlined text-lg">
@@ -438,7 +495,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                       </span>
                     </button>
                     <button
-                      onClick={() => handleDelete(area.id || (area as any)._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(area.id || (area as any)._id);
+                      }}
                       className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <span className="material-symbols-outlined text-lg">
@@ -471,16 +531,38 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                 <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
                   Area Name
                 </label>
-                <input
-                  required
-                  type="text"
-                  placeholder="e.g. Bandra West"
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
+                {isLoaded ? (
+                  <Autocomplete
+                    onLoad={onLoadAutocomplete}
+                    onPlaceChanged={onPlaceChanged}
+                    options={{
+                      types: ["(regions)"],
+                      componentRestrictions: { country: "in" },
+                    }}
+                  >
+                    <input
+                      required
+                      type="text"
+                      placeholder="e.g. Bandra West"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                    />
+                  </Autocomplete>
+                ) : (
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. Bandra West"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                  />
+                )}
               </div>
 
               <div>
@@ -533,8 +615,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                   Zip Codes (Comma separated)
                 </label>
                 <textarea
-                  required
-                  placeholder="400050, 400051"
+                  placeholder="400050, 400051 (Optional if drawing area)"
                   rows={4}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm placeholder:font-normal"
                   value={formData.zipCodes}
@@ -585,7 +666,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
 
           {/* Right Column: Large Interactive Map */}
           <div className="flex-1 min-h-[400px] relative bg-gray-100 dark:bg-black/20 overflow-hidden">
-            <div className="absolute top-4 left-4 z-[1000] flex gap-2">
+            <div className="absolute top-4 left-4 z-[1000] flex gap-2 items-center">
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
                 <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">
                   Pinning Area
@@ -609,32 +690,102 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                   </div>
                 </div>
               </div>
+
+              {geoJsonData && (
+                <div className="flex gap-2">
+                  {geoJsonData.type === "FeatureCollection" &&
+                    geoJsonData.features?.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={handleMergeShapes}
+                        className="bg-indigo-500 hover:bg-indigo-600 text-white shadow-xl px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 h-fit"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          merge
+                        </span>
+                        Merge Shapes
+                      </button>
+                    )}
+                  <button
+                    type="button"
+                    onClick={() => setGeoJsonData(null)}
+                    className="bg-red-500 hover:bg-red-600 text-white shadow-xl px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 h-fit"
+                  >
+                    <span className="material-symbols-outlined text-sm">
+                      delete
+                    </span>
+                    Clear Shape
+                  </button>
+                </div>
+              )}
             </div>
 
             <MapComponent
               zoom={14}
+              center={{
+                lat: formData.lat || 19.076,
+                lng: formData.lng || 72.8777,
+              }}
               geoJsonData={geoJsonData}
+              pincode={
+                formData.zipCodes ? formData.zipCodes.split(",")[0].trim() : ""
+              }
+              isEditable={true}
+              onGeoJsonChange={setGeoJsonData}
               markers={[
                 {
                   id: "temp",
                   lat: formData.lat || 19.076,
                   lng: formData.lng || 72.8777,
                   title: formData.name || "Selected Center",
+                  details:
+                    "Drag this pin to manually adjust the center coordinate.",
+                  draggable: true,
+                  onDragEnd: (lat, lng) =>
+                    setFormData({ ...formData, lat, lng }),
                 },
               ]}
-              onMapClick={(lat, lng) => setFormData({ ...formData, lat, lng })}
             />
 
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-black/60 backdrop-blur-md text-white px-6 py-2.5 rounded-full border border-white/10 shadow-2xl">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-black/60 backdrop-blur-md text-white px-6 py-2.5 rounded-full border border-white/10 shadow-2xl pointer-events-none">
               <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                 <span className="material-symbols-outlined text-sm text-primary">
-                  info
+                  pan_tool
                 </span>
-                Click on the map to set the area center
+                Drag the pin to adjust area center
               </p>
             </div>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!areaToDelete}
+        onClose={() => setAreaToDelete(null)}
+        title="Delete Area"
+      >
+        <div className="p-6">
+          <p className="text-gray-600 dark:text-gray-300 mb-8 font-medium">
+            Are you sure you want to delete this specific operational area? This
+            will unassign any vendors operating silently within its geometry
+            boundaries.
+          </p>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setAreaToDelete(null)}
+              className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmDelete}
+              className="flex-1 py-3 rounded-xl bg-red-500 text-white font-black uppercase tracking-widest hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+            >
+              Confirm Deletion
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
