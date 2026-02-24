@@ -14,20 +14,21 @@ export enum AppScreen {
   SERVICE_DETAIL = "SERVICE_DETAIL", // New Config Screen
   CART = "CART",
   CHECKOUT = "CHECKOUT",
-  PARTNER_DASHBOARD = "PARTNER_DASHBOARD",
+  PROFESSIONAL_DASHBOARD = "PROFESSIONAL_DASHBOARD",
 }
 
 export enum UserRole {
   CUSTOMER = "CUSTOMER",
-  PARTNER = "PARTNER",
+  PROFESSIONAL = "PROFESSIONAL",
+  PARTNER = "PARTNER", // Renamed from VENDOR
   ADMIN = "ADMIN",
 }
 
 export enum BookingStatus {
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
-  PARTNER_ASSIGNED = "PARTNER_ASSIGNED",
-  PARTNER_EN_ROUTE = "PARTNER_EN_ROUTE",
+  PROFESSIONAL_ASSIGNED = "PROFESSIONAL_ASSIGNED",
+  PROFESSIONAL_EN_ROUTE = "PROFESSIONAL_EN_ROUTE",
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
@@ -40,9 +41,9 @@ export interface User {
   email?: string;
   role: UserRole;
   walletBalance: number;
-  rating?: number; // For partners
-  isVerified?: boolean; // For partners
-  earningsToday?: number; // For partners
+  rating?: number; // For professionals/partners
+  isVerified?: boolean; // For professionals/partners
+  earningsToday?: number; // For professionals/partners
 }
 
 export interface Service {
@@ -74,8 +75,8 @@ export interface Booking {
   date: string;
   time: string;
   amount: number;
-  partnerName?: string;
-  partnerImage?: string;
+  professionalName?: string;
+  professionalImage?: string;
   otp?: string;
   paidAmount?: number;
   remainingAmount?: number;

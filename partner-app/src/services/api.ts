@@ -9,13 +9,16 @@ const api = axios.create({
   },
 });
 
-export const partnerService = {
+export const professionalService = {
   login: async (phone: string) => {
-    const response = await api.post("/users/login", { phone, role: "PARTNER" });
+    const response = await api.post("/users/login", {
+      phone,
+      role: "PROFESSIONAL",
+    });
     return response.data;
   },
-  getJobs: async (partnerId: string) => {
-    const response = await api.get(`/bookings/partner/${partnerId}`);
+  getJobs: async (professionalId: string) => {
+    const response = await api.get(`/bookings/professional/${professionalId}`);
     return response.data;
   },
   updateJobStatus: async (
@@ -29,7 +32,7 @@ export const partnerService = {
     });
     return response.data;
   },
-  getWalletHistory: async (partnerId: string) => {
+  getWalletHistory: async (professionalId: string) => {
     // Currently returns mock data as backend doesn't have a transaction model yet
     return [
       { date: "Feb 5, 2024", jobs: 4, amount: 2450 },
@@ -37,9 +40,9 @@ export const partnerService = {
       { date: "Feb 3, 2024", jobs: 5, amount: 3100 },
     ];
   },
-  withdrawFunds: async (partnerId: string, amount: number) => {
+  withdrawFunds: async (professionalId: string, amount: number) => {
     // Mock withdrawal request
-    console.log(`Withdrawal requested for ${partnerId}: ₹${amount}`);
+    console.log(`Withdrawal requested for ${professionalId}: ₹${amount}`);
     return { success: true, message: "Withdrawal request submitted" };
   },
 };

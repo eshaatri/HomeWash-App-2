@@ -6,7 +6,7 @@ interface ProfileScreenProps extends NavigationProps {
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
-  partner,
+  professional,
   isDarkMode,
   toggleDarkMode,
   onLogout,
@@ -60,8 +60,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl p-6 border border-gray-100 dark:border-white/5">
           <div className="flex items-center gap-4">
             <div className="h-20 w-20 rounded-full flex items-center justify-center bg-primary/20 text-primary font-black text-2xl ring-4 ring-primary/30">
-              {partner?.name
-                ? partner.name
+              {professional?.name
+                ? professional.name
                     .split(" ")
                     .map((n) => n[0])
                     .join("")
@@ -70,19 +70,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 : "?"}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">{partner?.name}</h2>
-              <p className="text-gray-500 text-sm">{partner?.phone}</p>
+              <h2 className="text-xl font-bold">{professional?.name}</h2>
+              <p className="text-gray-500 text-sm">{professional?.phone}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span
                   className={`text-xs font-bold px-2 py-1 rounded ${
-                    partner?.tier === "GOLD"
+                    professional?.tier === "GOLD"
                       ? "bg-yellow-100 text-yellow-700"
-                      : partner?.tier === "PLATINUM"
+                      : professional?.tier === "PLATINUM"
                         ? "bg-purple-100 text-purple-700"
                         : "bg-gray-100 text-gray-700"
                   }`}
                 >
-                  {partner?.tier}
+                  {professional?.tier}
                 </span>
                 <span className="flex items-center gap-1 text-sm">
                   <span
@@ -91,7 +91,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   >
                     star
                   </span>
-                  {partner?.rating}
+                  {professional?.rating}
                 </span>
               </div>
             </div>
@@ -102,7 +102,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       {/* Stats */}
       <div className="px-4 grid grid-cols-2 gap-3 mb-4">
         <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-gray-100 dark:border-white/5 text-center">
-          <p className="text-2xl font-black">{partner?.completedJobs}</p>
+          <p className="text-2xl font-black">{professional?.completedJobs}</p>
           <p className="text-xs text-gray-500 font-bold">Jobs Completed</p>
         </div>
         <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-gray-100 dark:border-white/5 text-center">

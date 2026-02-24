@@ -63,39 +63,41 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
     );
   };
 
-  const handleAssignPartner = async (bookingId: string) => {
+  const handleAssignProfessional = async (bookingId: string) => {
     try {
-      const partners = await adminService.getPartners();
-      if (partners.length === 0) {
-        alert("No partners available to assign.");
+      const professionals = await adminService.getProfessionals();
+      if (professionals.length === 0) {
+        alert("No professionals available to assign.");
         return;
       }
 
-      const partnerNames = partners
+      const professionalNames = professionals
         .map((p: any, i: number) => `${i + 1}. ${p.name} (${p.phone})`)
         .join("\n");
       const choice = prompt(
-        `Select a partner (Enter number 1-${partners.length}):\n${partnerNames}`,
+        `Select a professional (Enter number 1-${professionals.length}):\n${professionalNames}`,
       );
 
       if (choice) {
         const index = parseInt(choice) - 1;
-        if (index >= 0 && index < partners.length) {
-          const selectedPartner = partners[index];
-          await adminService.assignPartner(
+        if (index >= 0 && index < professionals.length) {
+          const selectedProfessional = professionals[index];
+          await adminService.assignProfessional(
             bookingId,
-            selectedPartner.id || selectedPartner._id,
-            selectedPartner.name,
+            selectedProfessional.id || selectedProfessional._id,
+            selectedProfessional.name,
           );
-          alert(`Partner ${selectedPartner.name} assigned successfully!`);
+          alert(
+            `Professional ${selectedProfessional.name} assigned successfully!`,
+          );
           fetchBookings(); // Refresh list
         } else {
           alert("Invalid selection.");
         }
       }
     } catch (error) {
-      console.error("Failed to assign partner:", error);
-      alert("Error assigning partner.");
+      console.error("Failed to assign professional:", error);
+      alert("Error assigning professional.");
     }
   };
 
@@ -116,7 +118,7 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
       case BookingStatus.IN_PROGRESS:
         return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
       case BookingStatus.CONFIRMED:
-      case BookingStatus.PARTNER_ASSIGNED:
+      case BookingStatus.PROFESSIONAL_ASSIGNED:
         return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400";
       case BookingStatus.PENDING:
         return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
@@ -246,10 +248,10 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase font-bold mb-1">
-                    Partner
+                    Professional
                   </p>
                   <p className="font-medium">
-                    {booking.partnerName || "Not assigned"}
+                    {booking.professionalName || "Not assigned"}
                   </p>
                 </div>
                 <div>
@@ -279,11 +281,11 @@ export const BookingsPage: React.FC<NavigationProps> = () => {
                   {booking.status === BookingStatus.PENDING && (
                     <button
                       onClick={() =>
-                        handleAssignPartner(booking.id || booking._id)
+                        handleAssignProfessional(booking.id || booking._id)
                       }
                       className="px-3 py-1.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dim transition-colors"
                     >
-                      Assign Partner
+                      Assign Professional
                     </button>
                   )}
                 </div>

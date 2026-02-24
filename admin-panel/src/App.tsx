@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { AdminPage, Admin, NavigationProps } from "./types";
-import { MOCK_ADMIN, MOCK_VENDOR_ADMIN } from "./mockData";
+import { MOCK_ADMIN, MOCK_PARTNER_ADMIN } from "./mockData";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { UsersPage } from "./pages/UsersPage";
-import { PartnersPage } from "./pages/PartnersPage";
+import { ProfessionalsPage } from "./pages/ProfessionalsPage";
 import { BookingsPage } from "./pages/BookingsPage";
 import { ServicesPage } from "./pages/ServicesPage";
-import { VendorsPage } from "./pages/VendorsPage";
+import { PartnersPage } from "./pages/PartnersPage";
 import { AreasPage } from "./pages/AreasPage";
-import { VendorDashboardPage } from "./pages/VendorDashboardPage";
-import { VendorBookingsPage } from "./pages/VendorBookingsPage";
-import { VendorPartnersPage } from "./pages/VendorPartnersPage";
-import { VendorServiceConfigPage } from "./pages/VendorServiceConfigPage";
+import { PartnerDashboardPage } from "./pages/PartnerDashboardPage";
+import { PartnerBookingsPage } from "./pages/PartnerBookingsPage";
+import { PartnerProfessionalsPage } from "./pages/PartnerProfessionalsPage";
+import { PartnerServiceConfigPage } from "./pages/PartnerServiceConfigPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { Sidebar } from "./components/Sidebar";
@@ -22,7 +22,7 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [selectedVendorId, setSelectedVendorId] = useState<
+  const [selectedPartnerId, setSelectedPartnerId] = useState<
     string | undefined
   >();
 
@@ -41,11 +41,11 @@ export default function App() {
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
-  const login = async (role: "ADMIN" | "VENDOR" = "ADMIN") => {
+  const login = async (role: "ADMIN" | "PARTNER" = "ADMIN") => {
     // For testing roles
-    if (role === "VENDOR") {
-      setAdmin(MOCK_VENDOR_ADMIN);
-      setCurrentPage(AdminPage.VENDOR_DASHBOARD);
+    if (role === "PARTNER") {
+      setAdmin(MOCK_PARTNER_ADMIN);
+      setCurrentPage(AdminPage.PARTNER_DASHBOARD);
     } else {
       setAdmin(MOCK_ADMIN);
       setCurrentPage(AdminPage.DASHBOARD);
@@ -73,27 +73,27 @@ export default function App() {
         return <LoginPage {...commonProps} onLogin={login} />;
       case AdminPage.DASHBOARD:
         return <DashboardPage {...commonProps} />;
-      case AdminPage.VENDOR_DASHBOARD:
-        return <VendorDashboardPage {...commonProps} />;
-      case AdminPage.VENDOR_BOOKINGS:
-        return <VendorBookingsPage {...commonProps} />;
-      case AdminPage.VENDOR_PARTNERS:
-        return <VendorPartnersPage {...commonProps} />;
+      case AdminPage.PARTNER_DASHBOARD:
+        return <PartnerDashboardPage {...commonProps} />;
+      case AdminPage.PARTNER_BOOKINGS:
+        return <PartnerBookingsPage {...commonProps} />;
+      case AdminPage.PARTNER_PROFESSIONALS:
+        return <PartnerProfessionalsPage {...commonProps} />;
       case AdminPage.USERS:
         return <UsersPage {...commonProps} />;
-      case AdminPage.PARTNERS:
-        return <PartnersPage {...commonProps} />;
+      case AdminPage.PROFESSIONALS:
+        return <ProfessionalsPage {...commonProps} />;
       case AdminPage.BOOKINGS:
         return <BookingsPage {...commonProps} />;
       case AdminPage.SERVICES:
         return <ServicesPage {...commonProps} />;
-      case AdminPage.VENDORS:
+      case AdminPage.PARTNERS:
         return (
-          <VendorsPage
+          <PartnersPage
             {...commonProps}
             onManageServices={(id: string) => {
-              setSelectedVendorId(id);
-              navigateTo(AdminPage.VENDOR_SERVICE_CONFIG);
+              setSelectedPartnerId(id);
+              navigateTo(AdminPage.PARTNER_SERVICE_CONFIG);
             }}
           />
         );
@@ -103,12 +103,12 @@ export default function App() {
         return <ReportsPage {...commonProps} />;
       case AdminPage.SETTINGS:
         return <SettingsPage {...commonProps} />;
-      case AdminPage.VENDOR_SERVICE_CONFIG:
+      case AdminPage.PARTNER_SERVICE_CONFIG:
         return (
-          <VendorServiceConfigPage
+          <PartnerServiceConfigPage
             {...commonProps}
-            selectedVendorId={selectedVendorId}
-            onBack={() => navigateTo(AdminPage.VENDORS)}
+            selectedPartnerId={selectedPartnerId}
+            onBack={() => navigateTo(AdminPage.PARTNERS)}
           />
         );
       default:

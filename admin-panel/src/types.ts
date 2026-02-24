@@ -2,30 +2,31 @@ export enum AdminPage {
   LOGIN = "LOGIN",
   DASHBOARD = "DASHBOARD",
   USERS = "USERS",
-  PARTNERS = "PARTNERS",
-  VENDORS = "VENDORS",
+  PROFESSIONALS = "PROFESSIONALS", // Renamed from PARTNERS
+  PARTNERS = "PARTNERS", // Renamed from VENDORS
   AREAS = "AREAS",
   BOOKINGS = "BOOKINGS",
   SERVICES = "SERVICES",
   REPORTS = "REPORTS",
   SETTINGS = "SETTINGS",
-  // Vendor specific pages
-  VENDOR_DASHBOARD = "VENDOR_DASHBOARD",
-  VENDOR_BOOKINGS = "VENDOR_BOOKINGS",
-  VENDOR_PARTNERS = "VENDOR_PARTNERS",
-  VENDOR_SERVICE_CONFIG = "VENDOR_SERVICE_CONFIG",
+  // Partner specific pages (previously Vendor)
+  PARTNER_DASHBOARD = "PARTNER_DASHBOARD",
+  PARTNER_BOOKINGS = "PARTNER_BOOKINGS",
+  PARTNER_PROFESSIONALS = "PARTNER_PROFESSIONALS",
+  PARTNER_SERVICE_CONFIG = "PARTNER_SERVICE_CONFIG",
 }
 
 export enum BookingStatus {
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
-  PARTNER_ASSIGNED = "PARTNER_ASSIGNED",
+  PROFESSIONAL_ASSIGNED = "PROFESSIONAL_ASSIGNED",
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
 }
 
-export enum PartnerStatus {
+export enum ProfessionalStatus {
+  // Renamed from PartnerStatus
   ONBOARDING = "ONBOARDING",
   ACTIVE = "ACTIVE",
   SUSPENDED = "SUSPENDED",
@@ -35,8 +36,8 @@ export interface Admin {
   id: string;
   name: string;
   email: string;
-  role: "SUPER_ADMIN" | "ADMIN" | "SUPPORT" | "VENDOR";
-  vendorId?: string;
+  role: "SUPER_ADMIN" | "ADMIN" | "SUPPORT" | "PARTNER";
+  partnerId?: string; // Formerly vendorId
 }
 
 export interface Customer {
@@ -50,12 +51,13 @@ export interface Customer {
   lastActive: string;
 }
 
-export interface Partner {
+export interface Professional {
+  // Renamed from Partner
   id: string;
   name: string;
   phone: string;
   email: string;
-  status: PartnerStatus;
+  status: ProfessionalStatus;
   rating: number;
   completedJobs: number;
   earnings: number;
@@ -67,8 +69,8 @@ export interface Booking {
   id: string;
   customerId: string;
   customerName: string;
-  partnerId?: string;
-  partnerName?: string;
+  professionalId?: string; // Formerly partnerId
+  professionalName?: string; // Formerly partnerName
   serviceName: string;
   amount: number;
   status: BookingStatus;
@@ -96,7 +98,8 @@ export interface Service {
   isActive: boolean;
 }
 
-export interface Vendor {
+export interface Partner {
+  // Renamed from Vendor
   id: string;
   name: string;
   ownerName: string;
@@ -106,7 +109,7 @@ export interface Vendor {
   activeAreas: string[];
   isActive: boolean;
   commissionRate: number;
-  partnersCount: number;
+  professionalsCount: number; // Formerly partnersCount
   ownerId?: string;
 }
 
@@ -116,11 +119,11 @@ export interface Area {
   city: string;
   zipCodes: string[];
   isActive: boolean;
-  vendorsCount: number;
+  partnersCount: number; // Formerly vendorsCount
   lat?: number;
   lng?: number;
-  assignedVendorId?: string;
-  assignedVendorName?: string;
+  assignedPartnerId?: string; // Formerly assignedVendorId
+  assignedPartnerName?: string; // Formerly assignedVendorName
   geoJson?: any;
 }
 
@@ -129,8 +132,8 @@ export interface DashboardStats {
   revenueChange: number;
   totalBookings: number;
   bookingsChange: number;
-  activePartners: number;
-  partnersChange: number;
+  activeProfessionals: number; // Formerly activePartners
+  professionalsChange: number; // Formerly partnersChange
   activeUsers: number;
   usersChange: number;
 }

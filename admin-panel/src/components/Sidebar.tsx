@@ -23,10 +23,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       roles: ["SUPER_ADMIN", "ADMIN"],
     },
     {
-      page: AdminPage.VENDOR_DASHBOARD,
+      page: AdminPage.PARTNER_DASHBOARD,
       icon: "dashboard",
       label: "Dashboard",
-      roles: ["VENDOR"],
+      roles: ["PARTNER"],
     },
     {
       page: AdminPage.BOOKINGS,
@@ -35,10 +35,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       roles: ["SUPER_ADMIN", "ADMIN"],
     },
     {
-      page: AdminPage.VENDOR_BOOKINGS,
+      page: AdminPage.PARTNER_BOOKINGS,
       icon: "calendar_month",
       label: "My Bookings",
-      roles: ["VENDOR"],
+      roles: ["PARTNER"],
     },
     {
       page: AdminPage.USERS,
@@ -47,9 +47,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       roles: ["SUPER_ADMIN", "ADMIN"],
     },
     {
-      page: AdminPage.VENDORS,
+      page: AdminPage.PARTNERS,
       icon: "storefront",
-      label: "Vendors",
+      label: "Partners",
       roles: ["SUPER_ADMIN", "ADMIN"],
     },
     {
@@ -59,16 +59,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       roles: ["SUPER_ADMIN", "ADMIN"],
     },
     {
-      page: AdminPage.PARTNERS,
+      page: AdminPage.PROFESSIONALS,
       icon: "engineering",
-      label: "Partners",
+      label: "Professionals",
       roles: ["SUPER_ADMIN", "ADMIN"],
     },
     {
-      page: AdminPage.VENDOR_PARTNERS,
+      page: AdminPage.PARTNER_PROFESSIONALS,
       icon: "engineering",
-      label: "My Partners",
-      roles: ["VENDOR"],
+      label: "My Professionals",
+      roles: ["PARTNER"],
     },
     {
       page: AdminPage.SERVICES,
@@ -80,13 +80,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       page: AdminPage.REPORTS,
       icon: "analytics",
       label: "Reports",
-      roles: ["SUPER_ADMIN", "ADMIN", "VENDOR"],
+      roles: ["SUPER_ADMIN", "ADMIN", "PARTNER"],
     },
     {
       page: AdminPage.SETTINGS,
       icon: "settings",
       label: "Settings",
-      roles: ["SUPER_ADMIN", "ADMIN", "VENDOR"],
+      roles: ["SUPER_ADMIN", "ADMIN", "PARTNER"],
     },
   ];
 

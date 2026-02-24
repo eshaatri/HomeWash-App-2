@@ -476,7 +476,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
             <p
               className={`text-sm font-bold mb-5 leading-tight ${isPremium ? "text-black/70" : "text-black/50"}`}
             >
-              Partner is arriving in 5 mins
+              Professional is arriving in 5 mins
             </p>
 
             <div className="flex items-center justify-between">
@@ -484,13 +484,13 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                 <div
                   className={`h-10 w-10 rounded-full border-2 flex items-center justify-center bg-primary/10 text-primary font-bold backdrop-blur-sm shadow-inner ${isPremium ? "border-black/30" : "border-black/10"}`}
                 >
-                  {MOCK_BOOKINGS[0].partnerName.charAt(0).toUpperCase()}
+                  {MOCK_BOOKINGS[0].professionalName.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <p
                     className={`text-xs font-black ${isPremium ? "text-black" : "text-black/80"}`}
                   >
-                    {MOCK_BOOKINGS[0].partnerName}
+                    {MOCK_BOOKINGS[0].professionalName}
                   </p>
                   <div
                     className={`flex items-center text-[10px] gap-1 font-black ${isPremium ? "text-black/70" : "text-black/50"}`}

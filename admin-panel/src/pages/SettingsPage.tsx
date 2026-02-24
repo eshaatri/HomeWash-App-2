@@ -36,7 +36,7 @@ const DEFAULT_SETTINGS: SettingsState = {
   sessionTimeout: "1 Hour",
   notifications: {
     "Booking Confirmation": { push: true, email: true, sms: false },
-    "Partner Assignment": { push: true, email: true, sms: false },
+    "Professional Assignment": { push: true, email: true, sms: false },
     "In-Route Alerts": { push: true, email: false, sms: false },
     "Feedback Requests": { push: true, email: true, sms: false },
   },

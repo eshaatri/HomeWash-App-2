@@ -35,7 +35,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           </span>
         </div>
         <h1 className="text-3xl font-black text-white mb-2">
-          HomeWash Partner
+          HomeWash Professional
         </h1>
         <p className="text-gray-400 text-sm">Earn money on your own schedule</p>
       </div>
@@ -43,7 +43,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
       {/* Login Form */}
       <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl p-6 shadow-xl">
         <h2 className="text-xl font-bold mb-6 text-onyx dark:text-white">
-          {showOtp ? "Enter OTP" : "Login as Partner"}
+          {showOtp ? "Enter OTP" : "Login as Professional"}
         </h2>
 
         {!showOtp ? (

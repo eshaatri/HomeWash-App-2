@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PartnerScreen, NavigationProps, JobStatus } from "../types";
+import { ProfessionalScreen, NavigationProps, JobStatus } from "../types";
 
 export const JobsScreen: React.FC<NavigationProps> = ({
   navigateTo,
@@ -147,7 +147,7 @@ export const JobsScreen: React.FC<NavigationProps> = ({
               <button
                 onClick={() => {
                   setActiveJob(job);
-                  navigateTo(PartnerScreen.ACTIVE_JOB);
+                  navigateTo(ProfessionalScreen.ACTIVE_JOB);
                 }}
                 className="w-full bg-primary text-black py-3 rounded-lg text-sm font-bold hover:bg-primary-dim transition-colors"
               >

@@ -2,18 +2,18 @@ import React from "react";
 import { NavigationProps } from "../types";
 import { MOCK_EARNINGS_HISTORY } from "../mockData";
 
-export const WalletScreen: React.FC<NavigationProps> = ({ partner }) => {
+export const WalletScreen: React.FC<NavigationProps> = ({ professional }) => {
   const handleWithdraw = async () => {
-    if ((partner?.walletBalance || 0) < 500) {
+    if ((professional?.walletBalance || 0) < 500) {
       alert("Minimum withdrawal amount is ₹500.");
       return;
     }
     const amount = prompt(
       "Enter amount to withdraw:",
-      partner?.walletBalance.toString(),
+      professional?.walletBalance.toString(),
     );
     if (amount && Number(amount) > 0) {
-      if (Number(amount) > (partner?.walletBalance || 0)) {
+      if (Number(amount) > (professional?.walletBalance || 0)) {
         alert("Insufficient balance.");
         return;
       }
@@ -37,7 +37,7 @@ export const WalletScreen: React.FC<NavigationProps> = ({ partner }) => {
             Available Balance
           </p>
           <p className="text-4xl font-black mt-2">
-            ₹{partner?.walletBalance.toLocaleString()}
+            ₹{professional?.walletBalance.toLocaleString()}
           </p>
           <div className="flex gap-3 mt-6">
             <button
@@ -61,7 +61,7 @@ export const WalletScreen: React.FC<NavigationProps> = ({ partner }) => {
         <div className="bg-white dark:bg-[#1a1a1a] p-3 rounded-xl border border-gray-100 dark:border-white/5 text-center">
           <p className="text-xs text-gray-500 font-bold">Today</p>
           <p className="text-lg font-black text-green-600">
-            ₹{partner?.earningsToday}
+            ₹{professional?.earningsToday}
           </p>
         </div>
         <div className="bg-white dark:bg-[#1a1a1a] p-3 rounded-xl border border-gray-100 dark:border-white/5 text-center">

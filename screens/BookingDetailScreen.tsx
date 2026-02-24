@@ -16,12 +16,12 @@ export const BookingDetailScreen: React.FC<Props> = ({
       time: "10:00 AM",
     },
     {
-      status: BookingStatus.PARTNER_ASSIGNED,
-      label: "Partner Assigned",
+      status: BookingStatus.PROFESSIONAL_ASSIGNED,
+      label: "Professional Assigned",
       time: "10:05 AM",
     },
     {
-      status: BookingStatus.PARTNER_EN_ROUTE,
+      status: BookingStatus.PROFESSIONAL_EN_ROUTE,
       label: "Out for Service",
       time: "01:30 PM",
     },
@@ -77,7 +77,7 @@ export const BookingDetailScreen: React.FC<Props> = ({
             />
           </svg>
         </div>
-        {/* Partner Marker */}
+        {/* Professional Marker */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
           <div className="bg-primary p-2 rounded-full shadow-lg border-2 border-white dark:border-black animate-bounce">
             <span className="material-symbols-outlined text-black">
@@ -85,22 +85,22 @@ export const BookingDetailScreen: React.FC<Props> = ({
             </span>
           </div>
           <div className="bg-black/70 text-white text-[10px] px-2 py-1 rounded mt-1 font-bold">
-            5 mins away
+            Professional is arriving in 5 mins
           </div>
         </div>
       </div>
 
       <div className="flex-1 bg-white dark:bg-[#1a1a1a] -mt-4 rounded-t-3xl relative z-10 p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-        {/* Partner Info */}
+        {/* Professional Info */}
         <div className="flex items-start justify-between border-b border-gray-100 dark:border-white/5 pb-6 mb-6">
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 rounded-full flex items-center justify-center bg-primary/10 text-primary font-black text-xl border-2 border-white dark:border-gray-700 shadow-md">
-              {booking.partnerName
-                ? booking.partnerName.charAt(0).toUpperCase()
+              {booking.professionalName
+                ? booking.professionalName.charAt(0).toUpperCase()
                 : "P"}
             </div>
             <div>
-              <h2 className="font-bold text-lg">{booking.partnerName}</h2>
+              <h2 className="font-bold text-lg">{booking.professionalName}</h2>
               <div className="flex items-center gap-1 text-sm text-gray-500">
                 <span className="material-symbols-outlined text-[16px] text-yellow-500 fill-current">
                   star
@@ -127,7 +127,7 @@ export const BookingDetailScreen: React.FC<Props> = ({
                 Start Service OTP
               </p>
               <p className="text-blue-800 dark:text-blue-200 text-xs mt-1">
-                Share this code with partner when they arrive.
+                Share this code with professional when they arrive.
               </p>
             </div>
             <div className="text-3xl font-mono font-bold text-blue-700 dark:text-blue-300 tracking-widest bg-white dark:bg-black/20 px-3 py-1 rounded-lg border border-blue-200 dark:border-blue-900/50">

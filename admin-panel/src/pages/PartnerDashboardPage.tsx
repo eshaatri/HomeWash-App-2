@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { NavigationProps, Booking, AdminPage } from "../types";
-import { vendorService } from "../services/api";
+import { partnerService } from "../services/api";
 
-export const VendorDashboardPage: React.FC<NavigationProps> = ({
+export const PartnerDashboardPage: React.FC<NavigationProps> = ({
   admin,
   navigateTo,
 }) => {
@@ -11,19 +11,19 @@ export const VendorDashboardPage: React.FC<NavigationProps> = ({
 
   useEffect(() => {
     const fetchStats = async () => {
-      if (admin?.vendorId) {
+      if (admin?.partnerId) {
         try {
-          const data = await vendorService.getStats(admin.vendorId);
+          const data = await partnerService.getStats(admin.partnerId);
           setStats(data);
         } catch (error) {
-          console.error("Failed to fetch vendor stats:", error);
+          console.error("Failed to fetch partner stats:", error);
         } finally {
           setLoading(false);
         }
       }
     };
     fetchStats();
-  }, [admin?.vendorId]);
+  }, [admin?.partnerId]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -41,7 +41,7 @@ export const VendorDashboardPage: React.FC<NavigationProps> = ({
   };
 
   if (loading) {
-    return <div className="p-6 text-center">Loading dashboard...</div>;
+    return <div className="p-6 text-center">Loading partner dashboard...</div>;
   }
 
   const statCards = [
@@ -58,14 +58,14 @@ export const VendorDashboardPage: React.FC<NavigationProps> = ({
       color: "blue",
     },
     {
-      label: "Active Partners",
-      value: stats?.activePartners || 0,
+      label: "Active Professionals",
+      value: stats?.activeProfessionals || 0,
       icon: "engineering",
       color: "purple",
     },
     {
-      label: "Vendor Commission",
-      value: `${admin?.role === "VENDOR" ? "20%" : "N/A"}`,
+      label: "Partner Commission",
+      value: `${admin?.role === "PARTNER" ? "20%" : "N/A"}`,
       icon: "percent",
       color: "orange",
     },
@@ -75,7 +75,7 @@ export const VendorDashboardPage: React.FC<NavigationProps> = ({
     <div className="p-6">
       <div className="mb-8">
         <h1 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-          Franchise Dashboard
+          Partner Dashboard
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
           Welcome back, {admin?.name}. Here's your performance summary.
@@ -120,7 +120,7 @@ export const VendorDashboardPage: React.FC<NavigationProps> = ({
               Recent Assigned Bookings
             </h2>
             <button
-              onClick={() => navigateTo(AdminPage.VENDOR_BOOKINGS)}
+              onClick={() => navigateTo(AdminPage.PARTNER_BOOKINGS)}
               className="text-primary text-xs font-bold uppercase tracking-widest hover:underline"
             >
               View All
@@ -177,7 +177,7 @@ export const VendorDashboardPage: React.FC<NavigationProps> = ({
           </h2>
           <div className="grid gap-3">
             <button
-              onClick={() => navigateTo(AdminPage.VENDOR_PARTNERS)}
+              onClick={() => navigateTo(AdminPage.PARTNER_PROFESSIONALS)}
               className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
             >
               <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -185,9 +185,9 @@ export const VendorDashboardPage: React.FC<NavigationProps> = ({
               </div>
               <div>
                 <p className="font-black uppercase tracking-widest text-[10px] text-gray-400">
-                  Team
+                  Professionals
                 </p>
-                <p className="font-bold text-sm">Manage Partners</p>
+                <p className="font-bold text-sm">Manage Professionals</p>
               </div>
             </button>
             <button className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-primary/50 hover:bg-primary/5 transition-all text-left">

@@ -3,8 +3,8 @@ import mongoose, { Schema, Document } from "mongoose";
 export enum BookingStatus {
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
-  PARTNER_ASSIGNED = "PARTNER_ASSIGNED",
-  PARTNER_EN_ROUTE = "PARTNER_EN_ROUTE",
+  PROFESSIONAL_ASSIGNED = "PROFESSIONAL_ASSIGNED",
+  PROFESSIONAL_EN_ROUTE = "PROFESSIONAL_EN_ROUTE",
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
@@ -18,13 +18,13 @@ export interface IBooking extends Document {
   date: string;
   time: string;
   amount: number;
-  partnerId?: string;
-  partnerName?: string;
-  partnerImage?: string;
+  professionalId?: string;
+  professionalName?: string;
+  professionalImage?: string;
   otp?: string;
   paidAmount?: number;
   remainingAmount?: number;
-  vendorId?: string;
+  partnerId?: string;
   serviceArea?: string;
 }
 
@@ -41,13 +41,13 @@ const BookingSchema: Schema = new Schema(
     date: { type: String, required: true },
     time: { type: String, required: true },
     amount: { type: Number, required: true },
-    partnerId: { type: String },
-    partnerName: { type: String },
-    partnerImage: { type: String },
+    professionalId: { type: String },
+    professionalName: { type: String },
+    professionalImage: { type: String },
     otp: { type: String },
     paidAmount: { type: Number },
     remainingAmount: { type: Number },
-    vendorId: { type: String },
+    partnerId: { type: String },
     serviceArea: { type: String },
   },
   {

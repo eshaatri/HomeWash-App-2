@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { NavigationProps, BookingStatus } from "../types";
 import {
-  MOCK_STATS,
   MOCK_SERVICES,
-  MOCK_VENDORS,
-  MOCK_BOOKINGS,
   MOCK_PARTNERS,
+  MOCK_BOOKINGS,
+  MOCK_PROFESSIONALS,
 } from "../mockData";
 
-export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
+export const ReportsPage: React.FC<NavigationProps> = () => {
   const [reportType, setReportType] = useState<
-    "services" | "vendors" | "revenue"
+    "services" | "partners" | "revenue"
   >("services");
 
   // Calculate Service Performance Stats
@@ -33,25 +32,25 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
     };
   }).sort((a, b) => b.revenue - a.revenue);
 
-  // Calculate Top Performing Vendors
-  const vendorStats = MOCK_VENDORS.map((vendor) => {
-    // In mock data, we don't have direct link between bookings and vendors,
-    // but we can simulate based on their partner count or areas
+  // Calculate Top Performing Partners
+  const partnerStatsReport = MOCK_PARTNERS.map((partner) => {
+    // In mock data, we don't have direct link between bookings and partners,
+    // but we can simulate based on their professional count or areas
     const simulatedRevenue =
-      vendor.partnersCount * 15000 + Math.random() * 5000;
+      partner.professionalsCount * 15000 + Math.random() * 5000;
     const simulatedBookings = Math.floor(simulatedRevenue / 800);
     return {
-      name: vendor.name,
-      owner: vendor.ownerName,
+      name: partner.name,
+      owner: partner.ownerName,
       bookings: simulatedBookings,
       revenue: Math.floor(simulatedRevenue),
-      partners: vendor.partnersCount,
+      professionals: partner.professionalsCount,
       rating: (4 + Math.random()).toFixed(1),
     };
   }).sort((a, b) => b.revenue - a.revenue);
 
-  // Partner Performance
-  const partnerStats = MOCK_PARTNERS.sort(
+  // Top Professionals Performance
+  const topProfessionalStats = MOCK_PROFESSIONALS.sort(
     (a, b) => b.earnings - a.earnings,
   ).slice(0, 5);
 
@@ -68,7 +67,7 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
         </div>
 
         <div className="flex bg-gray-200 dark:bg-gray-800 p-1 rounded-xl">
-          {(["services", "vendors", "revenue"] as const).map((type) => (
+          {(["services", "partners", "revenue"] as const).map((type) => (
             <button
               key={type}
               onClick={() => setReportType(type)}
@@ -152,11 +151,11 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
             </div>
           )}
 
-          {reportType === "vendors" && (
+          {reportType === "partners" && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
               <div className="p-6 border-b border-gray-50 dark:border-gray-700">
                 <h2 className="text-lg font-black uppercase tracking-tighter">
-                  Top Performing Franchises
+                  Top Performing Partners
                 </h2>
               </div>
               <div className="overflow-x-auto">
@@ -164,10 +163,10 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
                   <thead>
                     <tr className="bg-gray-50 dark:bg-gray-900/50">
                       <th className="p-4 text-xs font-black uppercase tracking-widest text-gray-400">
-                        Vendor
+                        Partner
                       </th>
                       <th className="p-4 text-xs font-black uppercase tracking-widest text-gray-400 text-center">
-                        Partners
+                        Professionals
                       </th>
                       <th className="p-4 text-xs font-black uppercase tracking-widest text-gray-400 text-right">
                         Revenue
@@ -178,7 +177,7 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
-                    {vendorStats.map((v, i) => (
+                    {partnerStatsReport.map((v, i) => (
                       <tr
                         key={i}
                         className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
@@ -193,7 +192,7 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
                         </td>
                         <td className="p-4 text-center">
                           <span className="text-sm font-medium">
-                            {v.partners}
+                            {v.professionals}
                           </span>
                         </td>
                         <td className="p-4 text-right">
@@ -280,7 +279,7 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <p className="text-xs font-bold uppercase tracking-widest">
-                    Partner Utilization
+                    Professional Utilization
                   </p>
                   <p className="text-xs font-black">88%</p>
                 </div>
@@ -304,10 +303,10 @@ export const ReportsPage: React.FC<NavigationProps> = ({ isDarkMode }) => {
 
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
             <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">
-              Top Partners
+              Top Professionals
             </h3>
             <div className="space-y-4">
-              {partnerStats.map((p, i) => (
+              {topProfessionalStats.map((p, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-xs">
                     {p.name.charAt(0)}

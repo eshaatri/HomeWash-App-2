@@ -56,8 +56,8 @@ export const bookingService = {
     const response = await api.get(`/bookings/customer/${customerId}`);
     return response.data;
   },
-  getPartnerBookings: async (partnerId: string) => {
-    const response = await api.get(`/bookings/partner/${partnerId}`);
+  getProfessionalBookings: async (professionalId: string) => {
+    const response = await api.get(`/bookings/professional/${professionalId}`);
     return response.data;
   },
   createBooking: async (

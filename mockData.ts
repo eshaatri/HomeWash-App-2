@@ -15,11 +15,11 @@ export const MOCK_USER: User = {
   walletBalance: 2500.0,
 };
 
-export const MOCK_PARTNER: User = {
+export const MOCK_PROFESSIONAL: User = {
   id: "p1",
   name: "Rajesh Kumar",
   phone: "+91 99887 76655",
-  role: UserRole.PARTNER,
+  role: UserRole.PROFESSIONAL,
   walletBalance: 4500.5,
   rating: 4.9,
   isVerified: true,
@@ -859,12 +859,12 @@ export const MOCK_BOOKINGS: Booking[] = [
   {
     id: "b1",
     serviceName: "Furnished Apartment Cleaning",
-    status: BookingStatus.PARTNER_EN_ROUTE,
+    status: BookingStatus.PROFESSIONAL_EN_ROUTE,
     date: "Today",
     time: "2:00 PM",
     amount: 3499.0,
-    partnerName: "Rajesh Kumar",
-    partnerImage:
+    professionalName: "Rajesh Kumar",
+    professionalImage:
       "https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=200&h=200",
     otp: "4492",
   },

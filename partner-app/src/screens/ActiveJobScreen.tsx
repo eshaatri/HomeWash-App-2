@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PartnerScreen, NavigationProps, JobStatus } from "../types";
+import { ProfessionalScreen, NavigationProps, JobStatus } from "../types";
 
 export const ActiveJobScreen: React.FC<NavigationProps> = ({
   navigateTo,
@@ -17,7 +17,7 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
         </span>
         <p className="text-gray-500">No active job</p>
         <button
-          onClick={() => navigateTo(PartnerScreen.JOBS)}
+          onClick={() => navigateTo(ProfessionalScreen.JOBS)}
           className="mt-4 text-primary font-bold"
         >
           View Available Jobs
@@ -98,14 +98,16 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
       <header className="bg-white dark:bg-[#1a1a1a] px-4 py-4 border-b border-gray-100 dark:border-white/5 sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigateTo(PartnerScreen.DASHBOARD)}
+            onClick={() => navigateTo(ProfessionalScreen.DASHBOARD)}
             className="p-2 -ml-2"
           >
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div>
             <h1 className="font-bold">Active Job</h1>
-            <p className="text-xs text-gray-500">#{activeJob.id}</p>
+            <p className="text-xs text-gray-500">
+              #{activeJob.id || activeJob._id}
+            </p>
           </div>
         </div>
       </header>

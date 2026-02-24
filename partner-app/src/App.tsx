@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import {
-  PartnerScreen,
-  Partner,
+  ProfessionalScreen,
+  Professional,
   Job,
   JobStatus,
   NavigationProps,
 } from "./types";
-import { partnerService } from "./services/api";
+import { professionalService } from "./services/api";
 import { LoginScreen } from "./screens/LoginScreen";
 import { DashboardScreen } from "./screens/DashboardScreen";
 import { JobsScreen } from "./screens/JobsScreen";
@@ -16,20 +16,20 @@ import { ProfileScreen } from "./screens/ProfileScreen";
 import { BottomNav } from "./components/BottomNav";
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<PartnerScreen>(
-    PartnerScreen.LOGIN,
+  const [currentScreen, setCurrentScreen] = useState<ProfessionalScreen>(
+    ProfessionalScreen.LOGIN,
   );
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [partner, setPartner] = useState<Partner | null>(null);
+  const [professional, setProfessional] = useState<Professional | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
 
   const fetchJobs = async () => {
-    if (!partner) return;
+    if (!professional) return;
     try {
-      const partnerId = partner.id || partner._id || "";
-      if (!partnerId) return;
-      const data = await partnerService.getJobs(partnerId);
+      const professionalId = professional.id || professional._id || "";
+      if (!professionalId) return;
+      const data = await professionalService.getJobs(professionalId);
       // Map back to our view format if needed
       const mappedJobs = data.map((j: any) => ({
         ...j,
@@ -49,10 +49,10 @@ export default function App() {
     }
   };
 
-  // Fetch jobs when partner logs in
+  // Fetch jobs when professional logs in
   useEffect(() => {
     fetchJobs();
-  }, [partner]);
+  }, [professional]);
 
   const refreshJobs = () => fetchJobs();
 
@@ -66,7 +66,7 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  const navigateTo = (screen: PartnerScreen) => {
+  const navigateTo = (screen: ProfessionalScreen) => {
     window.scrollTo(0, 0);
     setCurrentScreen(screen);
   };
@@ -75,25 +75,25 @@ export default function App() {
 
   const login = async (phone: string) => {
     try {
-      const userData = await partnerService.login(phone);
-      setPartner(userData);
-      setCurrentScreen(PartnerScreen.DASHBOARD);
+      const userData = await professionalService.login(phone);
+      setProfessional(userData);
+      setCurrentScreen(ProfessionalScreen.DASHBOARD);
     } catch (error) {
       console.error("Login failed:", error);
     }
   };
 
   const logout = () => {
-    setPartner(null);
+    setProfessional(null);
     setActiveJob(null);
-    setCurrentScreen(PartnerScreen.LOGIN);
+    setCurrentScreen(ProfessionalScreen.LOGIN);
   };
 
   const acceptJob = async (jobId: string) => {
     try {
-      const updatedJob = await partnerService.updateJobStatus(
+      const updatedJob = await professionalService.updateJobStatus(
         jobId,
-        "PARTNER_ASSIGNED" as any,
+        "PROFESSIONAL_ASSIGNED" as any,
       );
       setJobs((prev) =>
         prev.map((job) =>
@@ -106,7 +106,7 @@ export default function App() {
           id: updatedJob._id,
           status: JobStatus.ACCEPTED,
         });
-        navigateTo(PartnerScreen.ACTIVE_JOB);
+        navigateTo(ProfessionalScreen.ACTIVE_JOB);
       }
     } catch (error) {
       console.error("Failed to accept job:", error);
@@ -128,7 +128,7 @@ export default function App() {
       if (status === JobStatus.COMPLETED) apiStatus = "COMPLETED";
       if (status === JobStatus.IN_PROGRESS) apiStatus = "IN_PROGRESS";
 
-      await partnerService.updateJobStatus(jobId, apiStatus as any);
+      await professionalService.updateJobStatus(jobId, apiStatus as any);
 
       setJobs((prev) =>
         prev.map((job) => (job.id === jobId ? { ...job, status } : job)),
@@ -137,18 +137,18 @@ export default function App() {
         setActiveJob({ ...activeJob, status });
         if (status === JobStatus.COMPLETED) {
           setActiveJob(null);
-          // Update partner stats locally for immediate feedback
-          if (partner) {
-            setPartner({
-              ...partner,
-              completedJobs: (partner.completedJobs || 0) + 1,
+          // Update stats locally for immediate feedback
+          if (professional) {
+            setProfessional({
+              ...professional,
+              completedJobs: (professional.completedJobs || 0) + 1,
               walletBalance:
-                (partner.walletBalance || 0) + (activeJob.amount || 0),
+                (professional.walletBalance || 0) + (activeJob.amount || 0),
               earningsToday:
-                (partner.earningsToday || 0) + (activeJob.amount || 0),
+                (professional.earningsToday || 0) + (activeJob.amount || 0),
             });
           }
-          navigateTo(PartnerScreen.DASHBOARD);
+          navigateTo(ProfessionalScreen.DASHBOARD);
         }
       }
     } catch (error) {
@@ -161,8 +161,8 @@ export default function App() {
     navigateTo,
     isDarkMode,
     toggleDarkMode,
-    partner,
-    setPartner,
+    professional,
+    setProfessional,
     jobs,
     activeJob,
     setActiveJob,
@@ -174,24 +174,25 @@ export default function App() {
 
   const renderScreen = () => {
     switch (currentScreen) {
-      case PartnerScreen.LOGIN:
+      case ProfessionalScreen.LOGIN:
         return <LoginScreen {...commonProps} onLogin={login} />;
-      case PartnerScreen.DASHBOARD:
+      case ProfessionalScreen.DASHBOARD:
         return <DashboardScreen {...commonProps} onLogout={logout} />;
-      case PartnerScreen.JOBS:
+      case ProfessionalScreen.JOBS:
         return <JobsScreen {...commonProps} />;
-      case PartnerScreen.ACTIVE_JOB:
+      case ProfessionalScreen.ACTIVE_JOB:
         return <ActiveJobScreen {...commonProps} />;
-      case PartnerScreen.WALLET:
+      case ProfessionalScreen.WALLET:
         return <WalletScreen {...commonProps} />;
-      case PartnerScreen.PROFILE:
+      case ProfessionalScreen.PROFILE:
         return <ProfileScreen {...commonProps} onLogout={logout} />;
       default:
         return <DashboardScreen {...commonProps} onLogout={logout} />;
     }
   };
 
-  const showBottomNav = partner && currentScreen !== PartnerScreen.LOGIN;
+  const showBottomNav =
+    professional && currentScreen !== ProfessionalScreen.LOGIN;
 
   return (
     <div className="flex min-h-screen bg-gray-200 dark:bg-[#050505] justify-center transition-colors duration-300">

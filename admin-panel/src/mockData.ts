@@ -1,14 +1,14 @@
 import {
   Admin,
   Customer,
-  Partner,
+  Professional,
   Booking,
   ServiceCategory,
   Service,
   DashboardStats,
   BookingStatus,
-  PartnerStatus,
-  Vendor,
+  ProfessionalStatus,
+  Partner,
   Area,
 } from "./types";
 
@@ -19,12 +19,12 @@ export const MOCK_ADMIN: Admin = {
   role: "SUPER_ADMIN",
 };
 
-export const MOCK_VENDOR_ADMIN: Admin = {
-  id: "v_admin1",
+export const MOCK_PARTNER_ADMIN: Admin = {
+  id: "p_admin1",
   name: "Rajiv Malhotra",
   email: "rajiv@cleanforce.com",
-  role: "VENDOR",
-  vendorId: "v1",
+  role: "PARTNER",
+  partnerId: "v1",
 };
 
 export const MOCK_STATS: DashboardStats = {
@@ -32,8 +32,8 @@ export const MOCK_STATS: DashboardStats = {
   revenueChange: 12.5,
   totalBookings: 1248,
   bookingsChange: 8.3,
-  activePartners: 47,
-  partnersChange: 4.2,
+  activeProfessionals: 47,
+  professionalsChange: 4.2,
   activeUsers: 3456,
   usersChange: 15.7,
 };
@@ -91,13 +91,13 @@ export const MOCK_CUSTOMERS: Customer[] = [
   },
 ];
 
-export const MOCK_PARTNERS: Partner[] = [
+export const MOCK_PROFESSIONALS: Professional[] = [
   {
     id: "p1",
     name: "Rajesh Kumar",
     phone: "+91 98765 11111",
     email: "rajesh@email.com",
-    status: PartnerStatus.ACTIVE,
+    status: ProfessionalStatus.ACTIVE,
     rating: 4.8,
     completedJobs: 127,
     earnings: 89500,
@@ -109,7 +109,7 @@ export const MOCK_PARTNERS: Partner[] = [
     name: "Sunil Yadav",
     phone: "+91 98765 22222",
     email: "sunil@email.com",
-    status: PartnerStatus.ACTIVE,
+    status: ProfessionalStatus.ACTIVE,
     rating: 4.6,
     completedJobs: 89,
     earnings: 62300,
@@ -121,7 +121,7 @@ export const MOCK_PARTNERS: Partner[] = [
     name: "Vikram Singh",
     phone: "+91 98765 33333",
     email: "vikram@email.com",
-    status: PartnerStatus.SUSPENDED,
+    status: ProfessionalStatus.SUSPENDED,
     rating: 3.9,
     completedJobs: 45,
     earnings: 31200,
@@ -133,7 +133,7 @@ export const MOCK_PARTNERS: Partner[] = [
     name: "Arun Sharma",
     phone: "+91 98765 44444",
     email: "arun@email.com",
-    status: PartnerStatus.ONBOARDING,
+    status: ProfessionalStatus.ONBOARDING,
     rating: 0,
     completedJobs: 0,
     earnings: 0,
@@ -145,7 +145,7 @@ export const MOCK_PARTNERS: Partner[] = [
     name: "Deepak Mishra",
     phone: "+91 98765 55555",
     email: "deepak@email.com",
-    status: PartnerStatus.ACTIVE,
+    status: ProfessionalStatus.ACTIVE,
     rating: 4.9,
     completedJobs: 203,
     earnings: 142800,
@@ -159,8 +159,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     id: "BK001",
     customerId: "c1",
     customerName: "Priya Sharma",
-    partnerId: "p1",
-    partnerName: "Rajesh Kumar",
+    professionalId: "p1",
+    professionalName: "Rajesh Kumar",
     serviceName: "Deep Home Cleaning",
     amount: 1499,
     status: BookingStatus.IN_PROGRESS,
@@ -173,8 +173,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     id: "BK002",
     customerId: "c2",
     customerName: "Amit Patel",
-    partnerId: undefined,
-    partnerName: undefined,
+    professionalId: undefined,
+    professionalName: undefined,
     serviceName: "Sofa Cleaning",
     amount: 499,
     status: BookingStatus.PENDING,
@@ -187,8 +187,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     id: "BK003",
     customerId: "c4",
     customerName: "Rahul Verma",
-    partnerId: "p5",
-    partnerName: "Deepak Mishra",
+    professionalId: "p5",
+    professionalName: "Deepak Mishra",
     serviceName: "Kitchen Deep Clean",
     amount: 999,
     status: BookingStatus.CONFIRMED,
@@ -201,8 +201,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     id: "BK004",
     customerId: "c3",
     customerName: "Neha Gupta",
-    partnerId: "p2",
-    partnerName: "Sunil Yadav",
+    professionalId: "p2",
+    professionalName: "Sunil Yadav",
     serviceName: "Bathroom Polish",
     amount: 399,
     status: BookingStatus.COMPLETED,
@@ -297,7 +297,7 @@ export const RECENT_ACTIVITY = [
     time: "2 mins ago",
   },
   {
-    type: "partner",
+    type: "professional",
     message: "Arun Sharma completed onboarding",
     time: "15 mins ago",
   },
@@ -308,7 +308,7 @@ export const RECENT_ACTIVITY = [
   },
   {
     type: "alert",
-    message: "Partner Vikram Singh marked as suspended",
+    message: "Professional Vikram Singh marked as suspended",
     time: "1 hour ago",
   },
   {
@@ -318,7 +318,7 @@ export const RECENT_ACTIVITY = [
   },
 ];
 
-export const MOCK_VENDORS: Vendor[] = [
+export const MOCK_PARTNERS: Partner[] = [
   {
     id: "v1",
     name: "CleanForce Solutions",
@@ -329,7 +329,7 @@ export const MOCK_VENDORS: Vendor[] = [
     activeAreas: ["Bandra", "Juhu", "Khar"],
     isActive: true,
     commissionRate: 20,
-    partnersCount: 15,
+    professionalsCount: 15,
   },
   {
     id: "v2",
@@ -341,7 +341,7 @@ export const MOCK_VENDORS: Vendor[] = [
     activeAreas: ["Powai", "Hiranandani", "Andheri East"],
     isActive: true,
     commissionRate: 15,
-    partnersCount: 10,
+    professionalsCount: 10,
   },
   {
     id: "v3",
@@ -353,7 +353,7 @@ export const MOCK_VENDORS: Vendor[] = [
     activeAreas: ["Malad", "Kandivali", "Borivali"],
     isActive: false,
     commissionRate: 25,
-    partnersCount: 8,
+    professionalsCount: 8,
   },
 ];
 
@@ -364,7 +364,7 @@ export const MOCK_AREAS: Area[] = [
     city: "Mumbai",
     zipCodes: ["400050", "400051"],
     isActive: true,
-    vendorsCount: 2,
+    partnersCount: 2,
   },
   {
     id: "a2",
@@ -372,7 +372,7 @@ export const MOCK_AREAS: Area[] = [
     city: "Mumbai",
     zipCodes: ["400076"],
     isActive: true,
-    vendorsCount: 1,
+    partnersCount: 1,
   },
   {
     id: "a3",
@@ -380,14 +380,14 @@ export const MOCK_AREAS: Area[] = [
     city: "Mumbai",
     zipCodes: ["400049"],
     isActive: true,
-    vendorsCount: 3,
+    partnersCount: 3,
   },
   {
-    id: "a4",
+    id: "a3",
     name: "Khar",
     city: "Mumbai",
     zipCodes: ["400052"],
     isActive: false,
-    vendorsCount: 0,
+    partnersCount: 0,
   },
 ];

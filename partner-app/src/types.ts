@@ -1,4 +1,4 @@
-export enum PartnerScreen {
+export enum ProfessionalScreen {
   LOGIN = "LOGIN",
   DASHBOARD = "DASHBOARD",
   JOBS = "JOBS",
@@ -17,7 +17,7 @@ export enum JobStatus {
   CANCELLED = "CANCELLED",
 }
 
-export interface Partner {
+export interface Professional {
   id?: string;
   _id?: string;
   name: string;
@@ -51,12 +51,12 @@ export interface Job {
 }
 
 export interface NavigationProps {
-  currentScreen: PartnerScreen;
-  navigateTo: (screen: PartnerScreen) => void;
+  currentScreen: ProfessionalScreen;
+  navigateTo: (screen: ProfessionalScreen) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
-  partner: Partner | null;
-  setPartner: (partner: Partner | null) => void;
+  professional: Professional | null;
+  setProfessional: (professional: Professional | null) => void;
   jobs: Job[];
   activeJob: Job | null;
   setActiveJob: (job: Job | null) => void;

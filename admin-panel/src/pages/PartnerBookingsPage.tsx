@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { NavigationProps, Booking } from "../types";
-import { vendorService } from "../services/api";
+import { partnerService } from "../services/api";
 
-export const VendorBookingsPage: React.FC<NavigationProps> = ({ admin }) => {
+export const PartnerBookingsPage: React.FC<NavigationProps> = ({ admin }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchBookings = async () => {
-    if (admin?.vendorId) {
+    if (admin?.partnerId) {
       try {
         setLoading(true);
-        const data = await vendorService.getBookings(admin.vendorId);
+        const data = await partnerService.getBookings(admin.partnerId);
         setBookings(data);
       } catch (error) {
-        console.error("Failed to fetch vendor bookings:", error);
+        console.error("Failed to fetch partner bookings:", error);
       } finally {
         setLoading(false);
       }
@@ -23,7 +23,7 @@ export const VendorBookingsPage: React.FC<NavigationProps> = ({ admin }) => {
 
   useEffect(() => {
     fetchBookings();
-  }, [admin?.vendorId]);
+  }, [admin?.partnerId]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,7 +55,7 @@ export const VendorBookingsPage: React.FC<NavigationProps> = ({ admin }) => {
             Assigned Bookings
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Manage leads and schedules within your franchise area
+            Manage leads and schedules within your partner service area
           </p>
         </div>
       </div>

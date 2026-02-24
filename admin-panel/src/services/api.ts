@@ -28,10 +28,10 @@ export const adminService = {
     return response.data;
   },
 
-  // Partners
-  getPartners: async () => {
+  // Professionals (formerly Partners)
+  getProfessionals: async () => {
     const response = await api.get("/users");
-    return response.data.filter((u: any) => u.role === "PARTNER");
+    return response.data.filter((u: any) => u.role === "PROFESSIONAL");
   },
 
   // Bookings
@@ -43,15 +43,15 @@ export const adminService = {
     const response = await api.patch(`/bookings/${id}/status`, { status });
     return response.data;
   },
-  assignPartner: async (
+  assignProfessional: async (
     bookingId: string,
-    partnerId: string,
-    partnerName: string,
+    professionalId: string,
+    professionalName: string,
   ) => {
     const response = await api.patch(`/bookings/${bookingId}/status`, {
-      status: "PARTNER_ASSIGNED",
-      partnerId,
-      partnerName,
+      status: "PROFESSIONAL_ASSIGNED",
+      professionalId,
+      professionalName,
     });
     return response.data;
   },
@@ -110,49 +110,31 @@ export const adminService = {
     return response.data;
   },
 
-  // Vendors
-  getVendors: async () => {
-    const response = await api.get("/vendors");
+  // Partners (formerly Vendors)
+  getPartners: async () => {
+    const response = await api.get("/partners");
     return response.data;
   },
-  createVendor: async (data: any) => {
-    const response = await api.post("/vendors", data);
+  createPartner: async (data: any) => {
+    const response = await api.post("/partners", data);
     return response.data;
   },
-  updateVendor: async (id: string, data: any) => {
-    const response = await api.patch(`/vendors/${id}`, data);
+  updatePartner: async (id: string, data: any) => {
+    const response = await api.patch(`/partners/${id}`, data);
     return response.data;
   },
-  deleteVendor: async (id: string) => {
-    const response = await api.delete(`/vendors/${id}`);
-    return response.data;
-  },
-
-  // Areas
-  getAreas: async () => {
-    const response = await api.get("/areas");
-    return response.data;
-  },
-  createArea: async (data: any) => {
-    const response = await api.post("/areas", data);
-    return response.data;
-  },
-  updateArea: async (id: string, data: any) => {
-    const response = await api.patch(`/areas/${id}`, data);
-    return response.data;
-  },
-  deleteArea: async (id: string) => {
-    const response = await api.delete(`/areas/${id}`);
+  deletePartner: async (id: string) => {
+    const response = await api.delete(`/partners/${id}`);
     return response.data;
   },
 
-  // Vendor Configs
-  getVendorConfigs: async (vendorId: string) => {
-    const response = await api.get(`/vendor-configs/vendor/${vendorId}`);
+  // Partner Configs (formerly Vendor Configs)
+  getPartnerConfigs: async (partnerId: string) => {
+    const response = await api.get(`/partner-configs/partner/${partnerId}`);
     return response.data;
   },
-  updateVendorConfig: async (data: any) => {
-    const response = await api.post("/vendor-configs", data);
+  updatePartnerConfig: async (data: any) => {
+    const response = await api.post("/partner-configs", data);
     return response.data;
   },
 
@@ -167,17 +149,17 @@ export const adminService = {
   },
 };
 
-export const vendorService = {
-  getStats: async (vendorId: string) => {
-    const response = await api.get(`/vendors/${vendorId}/stats`);
+export const partnerService = {
+  getStats: async (partnerId: string) => {
+    const response = await api.get(`/partners/${partnerId}/stats`);
     return response.data;
   },
-  getBookings: async (vendorId: string) => {
-    const response = await api.get(`/vendors/${vendorId}/bookings`);
+  getBookings: async (partnerId: string) => {
+    const response = await api.get(`/partners/${partnerId}/bookings`);
     return response.data;
   },
-  getPartners: async (vendorId: string) => {
-    const response = await api.get(`/vendors/${vendorId}/partners`);
+  getProfessionals: async (partnerId: string) => {
+    const response = await api.get(`/partners/${partnerId}/professionals`);
     return response.data;
   },
 };

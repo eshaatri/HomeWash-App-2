@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IVendor extends Document {
+export interface IPartner extends Document {
   name: string;
   ownerName: string;
-  ownerId?: string; // Optional: Refers to a User with role VENDOR
+  ownerId?: string; // Optional: Refers to a User with role PARTNER
   email: string;
   phone: string;
   address: string;
@@ -12,7 +12,7 @@ export interface IVendor extends Document {
   commissionRate: number; // e.g., 20.0 for 20%
 }
 
-const VendorSchema: Schema = new Schema(
+const PartnerSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
     ownerName: { type: String, required: true },
@@ -27,4 +27,4 @@ const VendorSchema: Schema = new Schema(
   { timestamps: true },
 );
 
-export default mongoose.model<IVendor>("Vendor", VendorSchema);
+export default mongoose.model<IPartner>("Partner", PartnerSchema);

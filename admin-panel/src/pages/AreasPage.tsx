@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavigationProps, Area, Vendor } from "../types";
+import { NavigationProps, Area, Partner } from "../types";
 import { adminService } from "../services/api";
 import { Modal } from "../components/Modal";
 import MapComponent from "../components/MapComponent";
@@ -12,7 +12,7 @@ const LIBRARIES: any = ["places", "geometry", "drawing"];
 export const AreasPage: React.FC<NavigationProps> = () => {
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
-  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
@@ -26,8 +26,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     isActive: true,
     lat: 19.076,
     lng: 72.8777,
-    assignedVendorId: "",
-    assignedVendorName: "",
+    assignedPartnerId: "",
+    assignedPartnerName: "",
   });
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
 
@@ -76,12 +76,12 @@ export const AreasPage: React.FC<NavigationProps> = () => {
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const [areasData, vendorsData] = await Promise.all([
+      const [areasData, partnersData] = await Promise.all([
         adminService.getAreas(),
-        adminService.getVendors(),
+        adminService.getPartners(),
       ]);
       setAreas(areasData);
-      setVendors(vendorsData);
+      setPartners(partnersData);
     } catch (error) {
       console.error("Failed to fetch initial data:", error);
     } finally {
@@ -103,8 +103,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         isActive: area.isActive,
         lat: area.lat || 19.076,
         lng: area.lng || 72.8777,
-        assignedVendorId: area.assignedVendorId || "",
-        assignedVendorName: area.assignedVendorName || "",
+        assignedPartnerId: area.assignedPartnerId || "",
+        assignedPartnerName: area.assignedPartnerName || "",
       });
       setGeoJsonData(area.geoJson || null);
     } else {
@@ -116,8 +116,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         isActive: true,
         lat: 19.076,
         lng: 72.8777,
-        assignedVendorId: "",
-        assignedVendorName: "",
+        assignedPartnerId: "",
+        assignedPartnerName: "",
       });
       setGeoJsonData(null);
     }
@@ -472,10 +472,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                   </span>
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-orange-400">
-                      Assigned Vendor
+                      Assigned Partner
                     </p>
                     <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                      {area.assignedVendorName || "No Vendor Assigned"}
+                      {area.assignedPartnerName || "No Partner Assigned"}
                     </p>
                   </div>
                 </div>
@@ -582,29 +582,29 @@ export const AreasPage: React.FC<NavigationProps> = () => {
 
               <div>
                 <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-                  Assign Vendor
+                  Assign Partner
                 </label>
                 <select
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm"
-                  value={formData.assignedVendorId}
+                  value={formData.assignedPartnerId}
                   onChange={(e) => {
-                    const vendor = vendors.find(
-                      (v) => (v.id || (v as any)._id) === e.target.value,
+                    const partner = partners.find(
+                      (p) => (p.id || (p as any)._id) === e.target.value,
                     );
                     setFormData({
                       ...formData,
-                      assignedVendorId: e.target.value,
-                      assignedVendorName: vendor ? vendor.name : "",
+                      assignedPartnerId: e.target.value,
+                      assignedPartnerName: partner ? partner.name : "",
                     });
                   }}
                 >
-                  <option value="">Select Vendor</option>
-                  {vendors.map((vendor) => (
+                  <option value="">Select Partner</option>
+                  {partners.map((partner) => (
                     <option
-                      key={vendor.id || (vendor as any)._id}
-                      value={vendor.id || (vendor as any)._id}
+                      key={partner.id || (partner as any)._id}
+                      value={partner.id || (partner as any)._id}
                     >
-                      {vendor.name}
+                      {partner.name}
                     </option>
                   ))}
                 </select>
@@ -768,7 +768,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         <div className="p-6">
           <p className="text-gray-600 dark:text-gray-300 mb-8 font-medium">
             Are you sure you want to delete this specific operational area? This
-            will unassign any vendors operating silently within its geometry
+            will unassign any partners operating silently within its geometry
             boundaries.
           </p>
           <div className="flex gap-4">

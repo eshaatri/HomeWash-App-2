@@ -19,9 +19,9 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
       color: "blue",
     },
     {
-      label: "Active Partners",
-      value: MOCK_STATS.activePartners.toString(),
-      change: MOCK_STATS.partnersChange,
+      label: "Active Professionals",
+      value: MOCK_STATS.activeProfessionals.toString(),
+      change: MOCK_STATS.professionalsChange,
       icon: "engineering",
       color: "purple",
     },
@@ -120,7 +120,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
                 Online
               </span>
               <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">
-                12 Active Partners
+                {MOCK_STATS.activeProfessionals} Active Professionals
               </span>
             </div>
           </div>
@@ -211,7 +211,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
                   className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
                     activity.type === "booking"
                       ? "bg-blue-50 text-blue-600"
-                      : activity.type === "partner"
+                      : activity.type === "professional"
                         ? "bg-purple-50 text-purple-600"
                         : activity.type === "payment"
                           ? "bg-green-50 text-green-600"
@@ -221,7 +221,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
                   <span className="material-symbols-outlined text-sm">
                     {activity.type === "booking"
                       ? "calendar_month"
-                      : activity.type === "partner"
+                      : activity.type === "professional"
                         ? "person"
                         : activity.type === "payment"
                           ? "payments"

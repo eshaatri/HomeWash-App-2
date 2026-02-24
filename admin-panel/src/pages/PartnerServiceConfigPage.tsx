@@ -1,61 +1,61 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { NavigationProps, Vendor } from "../types";
+import { NavigationProps, Partner } from "../types";
 import { adminService } from "../services/api";
 
-interface VendorServiceConfigPageProps extends NavigationProps {
-  selectedVendorId?: string;
+interface PartnerServiceConfigPageProps extends NavigationProps {
+  selectedPartnerId?: string;
   onBack?: () => void;
 }
 
-export const VendorServiceConfigPage: React.FC<
-  VendorServiceConfigPageProps
-> = ({ selectedVendorId, onBack }) => {
-  const [vendor, setVendor] = useState<Vendor | null>(null);
+export const PartnerServiceConfigPage: React.FC<
+  PartnerServiceConfigPageProps
+> = ({ selectedPartnerId, onBack }) => {
+  const [partner, setPartner] = useState<Partner | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [subCategories, setSubCategories] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
-  const [vendorConfigs, setVendorConfigs] = useState<any[]>([]);
+  const [partnerConfigs, setPartnerConfigs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeAreaId, setActiveAreaId] = useState<string>("");
   const [areas, setAreas] = useState<any[]>([]);
 
   const fetchData = useCallback(async () => {
-    if (!selectedVendorId) return;
+    if (!selectedPartnerId) return;
     try {
       setLoading(true);
-      const [vends, cats, subCats, servs, configs, allAreas] =
+      const [parts, cats, subCats, servs, configs, allAreas] =
         await Promise.all([
-          adminService.getVendors(),
+          adminService.getPartners(),
           adminService.getCategories(),
           adminService.getSubCategories(),
           adminService.getServices(),
-          adminService.getVendorConfigs(selectedVendorId),
+          adminService.getPartnerConfigs(selectedPartnerId),
           adminService.getAreas(),
         ]);
 
-      const currentVendor = vends.find(
-        (v: any) => (v.id || v._id) === selectedVendorId,
+      const currentPartner = parts.find(
+        (p: any) => (p.id || p._id) === selectedPartnerId,
       );
-      setVendor(currentVendor);
+      setPartner(currentPartner);
       setCategories(cats);
       setSubCategories(subCats);
       setServices(servs);
-      setVendorConfigs(configs);
+      setPartnerConfigs(configs);
 
-      // Filter areas that this vendor is active in
-      const vendorAreas = allAreas.filter((a: any) =>
-        currentVendor?.activeAreas?.includes(a.name),
+      // Filter areas that this partner is active in
+      const partnerAreas = allAreas.filter((a: any) =>
+        currentPartner?.activeAreas?.includes(a.name),
       );
-      setAreas(vendorAreas);
-      if (vendorAreas.length > 0 && !activeAreaId) {
-        setActiveAreaId(vendorAreas[0]._id || vendorAreas[0].id);
+      setAreas(partnerAreas);
+      if (partnerAreas.length > 0 && !activeAreaId) {
+        setActiveAreaId(partnerAreas[0]._id || partnerAreas[0].id);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
-  }, [selectedVendorId, activeAreaId]);
+  }, [selectedPartnerId, activeAreaId]);
 
   useEffect(() => {
     fetchData();
@@ -65,14 +65,14 @@ export const VendorServiceConfigPage: React.FC<
     serviceId: string,
     currentState: boolean,
   ) => {
-    if (!activeAreaId || !selectedVendorId) return;
+    if (!activeAreaId || !selectedPartnerId) return;
     try {
-      const config = vendorConfigs.find(
+      const config = partnerConfigs.find(
         (c) => c.serviceId === serviceId && c.areaId === activeAreaId,
       );
 
-      await adminService.updateVendorConfig({
-        vendorId: selectedVendorId,
+      await adminService.updatePartnerConfig({
+        partnerId: selectedPartnerId,
         serviceId,
         areaId: activeAreaId,
         isEnabled: !currentState,
@@ -85,14 +85,14 @@ export const VendorServiceConfigPage: React.FC<
   };
 
   const handlePriceChange = async (serviceId: string, newPrice: number) => {
-    if (!activeAreaId || !selectedVendorId) return;
+    if (!activeAreaId || !selectedPartnerId) return;
     try {
-      const config = vendorConfigs.find(
+      const config = partnerConfigs.find(
         (c) => c.serviceId === serviceId && c.areaId === activeAreaId,
       );
 
-      await adminService.updateVendorConfig({
-        vendorId: selectedVendorId,
+      await adminService.updatePartnerConfig({
+        partnerId: selectedPartnerId,
         serviceId,
         areaId: activeAreaId,
         isEnabled: config ? config.isEnabled : true,
@@ -104,7 +104,7 @@ export const VendorServiceConfigPage: React.FC<
     }
   };
 
-  if (loading && !vendor) {
+  if (loading && !partner) {
     return <div className="p-6">Loading config...</div>;
   }
 
@@ -119,7 +119,7 @@ export const VendorServiceConfigPage: React.FC<
         </button>
         <div>
           <h1 className="text-2xl font-bold dark:text-white">
-            Service Pricing: {vendor?.name}
+            Service Pricing: {partner?.name}
           </h1>
           <p className="text-gray-500">
             Configure prices and availability per area
@@ -144,7 +144,7 @@ export const VendorServiceConfigPage: React.FC<
         ))}
         {areas.length === 0 && (
           <p className="p-2 text-sm text-gray-400 italic">
-            No active areas assigned to this vendor.
+            No active areas assigned to this partner.
           </p>
         )}
       </div>
@@ -181,7 +181,7 @@ export const VendorServiceConfigPage: React.FC<
                               s.subCategoryId === subCategory.originalId,
                           )
                           .map((service) => {
-                            const config = vendorConfigs.find(
+                            const config = partnerConfigs.find(
                               (c) =>
                                 c.serviceId === (service._id || service.id) &&
                                 c.areaId === activeAreaId,
