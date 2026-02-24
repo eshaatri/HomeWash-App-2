@@ -5,7 +5,7 @@ import SubCategory from "../models/SubCategory";
 import Service from "../models/Service";
 import User, { UserRole } from "../models/User";
 import Booking from "../models/Booking";
-import Vendor from "../models/Vendor";
+import Partner from "../models/Partner";
 import Area from "../models/Area";
 
 dotenv.config();
@@ -332,7 +332,7 @@ const seed = async () => {
     await Service.deleteMany({});
     await User.deleteMany({});
     await Booking.deleteMany({});
-    await Vendor.deleteMany({});
+    await Partner.deleteMany({});
     await Area.deleteMany({});
 
     console.log("Seeding areas...");
@@ -434,8 +434,8 @@ const seed = async () => {
     ];
     await User.insertMany(demoPartners);
 
-    console.log("Seeding vendors...");
-    await Vendor.create([
+    console.log("Seeding partners...");
+    await Partner.create([
       {
         name: "Luxury Cleaners PVT LTD",
         ownerName: "Rajesh Sharma",

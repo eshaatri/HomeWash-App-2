@@ -12,6 +12,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
 }) => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "active" | "inactive"
@@ -81,6 +82,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsSaving(true);
       if (editingPartner) {
         await adminService.updatePartner(
           editingPartner.id || (editingPartner as any)._id,
@@ -89,11 +91,13 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
       } else {
         await adminService.createPartner(formData);
       }
-      fetchPartners();
+      await fetchPartners();
       handleCloseModal();
     } catch (error) {
       console.error("Failed to save partner:", error);
-      alert("Failed to save partner. Please try again.");
+      alert("Failed to save partner. Please check if the backend is running.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -229,94 +233,105 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700 font-display">
-            {filteredPartners.map((partner) => (
-              <tr
-                key={partner.id || (partner as any)._id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-black text-lg">
-                      {partner.name?.charAt(0) || "?"}
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900 dark:text-white leading-none">
-                        {partner.name}
-                      </p>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-tighter mt-1 font-medium">
-                        Manager: {partner.ownerName}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-wrap gap-1">
-                    {(partner.activeAreas || []).map((area, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold uppercase"
-                      >
-                        {area}
-                      </span>
-                    ))}
-                    {(partner.activeAreas || []).length === 0 && (
-                      <span className="text-xs text-gray-400 italic">
-                        No areas
-                      </span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-black text-gray-900 dark:text-white uppercase tracking-wider">
-                    {partner.commissionRate}%
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest ${
-                      partner.isActive
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 border border-green-200 dark:border-green-800"
-                        : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800"
-                    }`}
-                  >
-                    {partner.isActive ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <button
-                      onClick={() =>
-                        onManageServices?.(partner.id || (partner as any)._id)
-                      }
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group"
-                      title="Manage Services"
-                    >
-                      <span className="material-symbols-outlined text-lg text-gray-400 group-hover:text-primary">
-                        settings_applications
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => handleOpenModal(partner)}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group"
-                    >
-                      <span className="material-symbols-outlined text-lg text-gray-400 group-hover:text-primary">
-                        edit
-                      </span>
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleDelete(partner.id || (partner as any)._id)
-                      }
-                      className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
-                    >
-                      <span className="material-symbols-outlined text-lg text-gray-400 group-hover:text-red-500">
-                        delete
-                      </span>
-                    </button>
-                  </div>
+            {filteredPartners.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-6 py-12 text-center text-gray-500 font-bold uppercase tracking-widest text-xs"
+                >
+                  No partners found matching your search.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredPartners.map((partner) => (
+                <tr
+                  key={partner.id || (partner as any)._id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-black text-lg">
+                        {partner.name?.charAt(0) || "?"}
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900 dark:text-white leading-none">
+                          {partner.name}
+                        </p>
+                        <p className="text-[10px] text-gray-400 uppercase tracking-tighter mt-1 font-medium">
+                          Manager: {partner.ownerName}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-1">
+                      {(partner.activeAreas || []).map((area, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold uppercase"
+                        >
+                          {area}
+                        </span>
+                      ))}
+                      {(partner.activeAreas || []).length === 0 && (
+                        <span className="text-xs text-gray-400 italic">
+                          No areas
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-black text-gray-900 dark:text-white uppercase tracking-wider">
+                      {partner.commissionRate}%
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest ${
+                        partner.isActive
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 border border-green-200 dark:border-green-800"
+                          : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800"
+                      }`}
+                    >
+                      {partner.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() =>
+                          onManageServices?.(partner.id || (partner as any)._id)
+                        }
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group"
+                        title="Manage Services"
+                      >
+                        <span className="material-symbols-outlined text-lg text-gray-400 group-hover:text-primary">
+                          settings_applications
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => handleOpenModal(partner)}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group"
+                      >
+                        <span className="material-symbols-outlined text-lg text-gray-400 group-hover:text-primary">
+                          edit
+                        </span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDelete(partner.id || (partner as any)._id)
+                        }
+                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
+                      >
+                        <span className="material-symbols-outlined text-lg text-gray-400 group-hover:text-red-500">
+                          delete
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -402,6 +417,19 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
                 }
               />
             </div>
+            <div className="col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                Address
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none text-sm"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+              />
+            </div>
             <div className="flex items-end pb-1 px-2">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
@@ -436,9 +464,14 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
             </button>
             <button
               type="submit"
-              className="flex-1 py-2 rounded-xl bg-primary text-white font-black uppercase tracking-widest hover:bg-primary-dim transition-colors shadow-lg shadow-primary/20"
+              disabled={isSaving}
+              className={`flex-1 py-2 rounded-xl bg-primary text-white font-black uppercase tracking-widest transition-colors shadow-lg shadow-primary/20 ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-primary-dim"}`}
             >
-              {editingPartner ? "Save Changes" : "Create Partner"}
+              {isSaving
+                ? "Saving..."
+                : editingPartner
+                  ? "Save Changes"
+                  : "Create Partner"}
             </button>
           </div>
         </form>
