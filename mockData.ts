@@ -15,6 +15,17 @@ export const MOCK_USER: User = {
   walletBalance: 2500.0,
 };
 
+export const MOCK_PARTNER: User = {
+  id: "pa1",
+  name: "Clean Home Services",
+  phone: "+91 99999 00000",
+  role: UserRole.PARTNER,
+  walletBalance: 12500.0,
+  rating: 4.8,
+  isVerified: true,
+  earningsToday: 5420.0,
+};
+
 export const MOCK_PROFESSIONAL: User = {
   id: "p1",
   name: "Rajesh Kumar",

@@ -5,24 +5,8 @@ import path from "path";
 
 const router = express.Router();
 
-let cachedMumbaiPincodes: any = null;
-const getMumbaiPincodes = () => {
-  if (cachedMumbaiPincodes) return cachedMumbaiPincodes;
-  try {
-    const filePath = path.join(
-      process.cwd(),
-      "data",
-      "mumbai_pincodes.geojson",
-    );
-    if (fs.existsSync(filePath)) {
-      const raw = fs.readFileSync(filePath, "utf-8");
-      cachedMumbaiPincodes = JSON.parse(raw);
-    }
-  } catch (err) {
-    console.warn("Failed to load local pincodes dataset:", err);
-  }
-  return cachedMumbaiPincodes;
-};
+import mongoose from "mongoose";
+import Pincode from "../models/Pincode";
 
 // Proxy for Administrative Boundaries
 router.get("/boundary", async (req, res) => {
@@ -118,30 +102,24 @@ router.get("/boundary", async (req, res) => {
       }
     }
 
-    // 2. Check local dataset (Fastest & most accurate for known India Pincodes)
+    // 2. Check Database Pincode Dataset (Fastest & Most Accurate)
     if (zipcode) {
       try {
-        const localData = getMumbaiPincodes();
-        if (localData && localData.features) {
-          const feature = localData.features.find(
-            (f: any) =>
-              String(f.properties?.pin_code) === String(zipcode) ||
-              String(f.properties?.Name) === String(zipcode) ||
-              String(f.properties?.pincode) === String(zipcode),
-          );
+        const pincodeRecord = await Pincode.findOne({
+          pincode: String(zipcode),
+        });
 
-          if (feature && feature.geometry) {
-            return res.json({
-              source: "local-dataset",
-              geojson: feature.geometry,
-              lat: location?.lat,
-              lon: location?.lng,
-              display_name: resolvedName || zipcode,
-            });
-          }
+        if (pincodeRecord && pincodeRecord.boundary) {
+          return res.json({
+            source: "local-dataset",
+            geojson: pincodeRecord.boundary,
+            lat: location?.lat,
+            lon: location?.lng,
+            display_name: resolvedName || zipcode,
+          });
         }
       } catch (err) {
-        console.warn("Error accessing local dataset:", err);
+        console.warn("Error accessing database pincodes:", err);
       }
     }
 

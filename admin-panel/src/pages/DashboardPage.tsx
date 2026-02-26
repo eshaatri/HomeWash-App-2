@@ -1,34 +1,100 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AdminPage, NavigationProps } from "../types";
-import { MOCK_STATS, MOCK_BOOKINGS, RECENT_ACTIVITY } from "../mockData";
+import { adminService } from "../services/api";
+
+interface DashboardStats {
+  totalRevenue: number;
+  totalBookings: number;
+  activeProfessionals: number;
+  activeUsers: number;
+}
 
 export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
-  const stats = [
+  const [stats, setStats] = useState<DashboardStats>({
+    totalRevenue: 0,
+    totalBookings: 0,
+    activeProfessionals: 0,
+    activeUsers: 0,
+  });
+  const [recentBookings, setRecentBookings] = useState<any[]>([]);
+  const [activity, setActivity] = useState<
+    { type: "booking" | "professional" | "payment" | "alert"; message: string; time: string }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [bookings, professionals, users] = await Promise.all([
+          adminService.getBookings(),
+          adminService.getProfessionals(),
+          adminService.getUsers(),
+        ]);
+
+        const totalRevenue = bookings.reduce(
+          (sum: number, b: any) => sum + (b.amount || 0),
+          0,
+        );
+
+        setStats({
+          totalRevenue,
+          totalBookings: bookings.length,
+          activeProfessionals: professionals.length,
+          activeUsers: users.length,
+        });
+
+        const sortedBookings = [...bookings].sort((a: any, b: any) => {
+          const aDate = new Date(a.createdAt || a.date || 0).getTime();
+          const bDate = new Date(b.createdAt || b.date || 0).getTime();
+          return bDate - aDate;
+        });
+
+        setRecentBookings(sortedBookings.slice(0, 4));
+
+        setActivity(
+          sortedBookings.slice(0, 5).map((b: any) => ({
+            type: "booking" as const,
+            message: `Booking for ${b.serviceName || "Service"} by ${
+              b.customerName || "Customer"
+            }`,
+            time: b.createdAt
+              ? new Date(b.createdAt).toLocaleString()
+              : b.date || "",
+          })),
+        );
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const statCards = [
     {
       label: "Total Revenue",
-      value: `₹${MOCK_STATS.totalRevenue.toLocaleString()}`,
-      change: MOCK_STATS.revenueChange,
+      value: `₹${stats.totalRevenue.toLocaleString()}`,
+      change: 0,
       icon: "payments",
       color: "green",
     },
     {
       label: "Total Bookings",
-      value: MOCK_STATS.totalBookings.toLocaleString(),
-      change: MOCK_STATS.bookingsChange,
+      value: stats.totalBookings.toLocaleString(),
+      change: 0,
       icon: "calendar_month",
       color: "blue",
     },
     {
       label: "Active Professionals",
-      value: MOCK_STATS.activeProfessionals.toString(),
-      change: MOCK_STATS.professionalsChange,
+      value: stats.activeProfessionals.toString(),
+      change: 0,
       icon: "engineering",
       color: "purple",
     },
     {
       label: "Active Users",
-      value: MOCK_STATS.activeUsers.toLocaleString(),
-      change: MOCK_STATS.usersChange,
+      value: stats.activeUsers.toLocaleString(),
+      change: 0,
       icon: "people",
       color: "orange",
     },
@@ -72,7 +138,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, i) => (
+        {statCards.map((stat, i) => (
           <div
             key={i}
             className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
@@ -120,7 +186,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
                 Online
               </span>
               <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">
-                {MOCK_STATS.activeProfessionals} Active Professionals
+                {stats.activeProfessionals} Active Professionals
               </span>
             </div>
           </div>
@@ -150,7 +216,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
               Latest Service Requests
             </h3>
             <div className="space-y-3">
-              {MOCK_BOOKINGS.slice(0, 4).map((booking) => (
+              {recentBookings.map((booking) => (
                 <div
                   key={booking.id}
                   className="flex items-center justify-between p-4 rounded-2xl border border-gray-50 dark:border-gray-700/50 hover:border-primary/50 hover:bg-primary/5 transition-all group"
@@ -168,7 +234,8 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
                         {booking.serviceName}
                       </p>
                       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                        {booking.customerName} • {booking.scheduledTime}
+                        {booking.customerName || "Customer"} •{" "}
+                        {booking.scheduledTime || booking.time || ""}
                       </p>
                     </div>
                   </div>
@@ -202,7 +269,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
             </h2>
           </div>
           <div className="p-4 space-y-2">
-            {RECENT_ACTIVITY.map((activity, i) => (
+            {activity.map((activity, i) => (
               <div
                 key={i}
                 className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"

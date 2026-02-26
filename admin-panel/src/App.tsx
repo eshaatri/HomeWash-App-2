@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { AdminPage, Admin, NavigationProps } from "./types";
-import { MOCK_ADMIN, MOCK_PARTNER_ADMIN } from "./mockData";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { UsersPage } from "./pages/UsersPage";
@@ -42,14 +41,17 @@ export default function App() {
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
 
   const login = async (role: "ADMIN" | "PARTNER" = "ADMIN") => {
-    // For testing roles
-    if (role === "PARTNER") {
-      setAdmin(MOCK_PARTNER_ADMIN);
-      setCurrentPage(AdminPage.PARTNER_DASHBOARD);
-    } else {
-      setAdmin(MOCK_ADMIN);
-      setCurrentPage(AdminPage.DASHBOARD);
-    }
+    // Lightweight local session without mock/demo identities.
+    const baseAdmin: Admin = {
+      id: role === "ADMIN" ? "admin" : "partner",
+      name: role === "ADMIN" ? "Admin User" : "Partner User",
+      email: "",
+      role: role,
+    };
+    setAdmin(baseAdmin);
+    setCurrentPage(
+      role === "PARTNER" ? AdminPage.PARTNER_DASHBOARD : AdminPage.DASHBOARD,
+    );
   };
 
   const logout = () => {

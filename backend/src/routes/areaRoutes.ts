@@ -1,7 +1,55 @@
 import express from "express";
 import Area from "../models/Area";
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
+import { point } from "@turf/helpers";
 
 const router = express.Router();
+
+// Check if a location is within any serviceable area
+router.get("/check-coverage", async (req, res) => {
+  const { lat, lng } = req.query;
+
+  if (!lat || !lng) {
+    return res
+      .status(400)
+      .json({ message: "Latitude and longitude are required" });
+  }
+
+  try {
+    const pt = point([Number(lng), Number(lat)]);
+    const areas = await Area.find({
+      isActive: true,
+      assignedPartnerId: { $exists: true, $ne: "" },
+      geoJson: { $exists: true, $ne: null },
+    });
+
+    for (const area of areas) {
+      if (area.geoJson) {
+        // Handle both Feature and FeatureCollection
+        const features =
+          area.geoJson.type === "FeatureCollection"
+            ? area.geoJson.features
+            : [area.geoJson];
+
+        for (const feature of features) {
+          if (booleanPointInPolygon(pt, feature)) {
+            return res.json({
+              serviceable: true,
+              areaId: area._id,
+              areaName: area.name,
+              city: area.city,
+            });
+          }
+        }
+      }
+    }
+
+    res.json({ serviceable: false });
+  } catch (error) {
+    console.error("Coverage check error:", error);
+    res.status(500).json({ message: "Error checking service coverage" });
+  }
+});
 
 // Get all areas
 router.get("/", async (req, res) => {
@@ -27,6 +75,12 @@ router.post("/", async (req, res) => {
 
 // Update an area
 router.patch("/:id", async (req, res) => {
+  console.log(
+    `Updating area ${req.params.id} with body keys:`,
+    Object.keys(req.body),
+    "Body size:",
+    JSON.stringify(req.body).length,
+  );
   try {
     const area = await Area.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

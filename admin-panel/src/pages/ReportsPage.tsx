@@ -1,58 +1,103 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationProps, BookingStatus } from "../types";
-import {
-  MOCK_SERVICES,
-  MOCK_PARTNERS,
-  MOCK_BOOKINGS,
-  MOCK_PROFESSIONALS,
-} from "../mockData";
+import { adminService } from "../services/api";
 
 export const ReportsPage: React.FC<NavigationProps> = () => {
   const [reportType, setReportType] = useState<
     "services" | "partners" | "revenue"
   >("services");
+  const [services, setServices] = useState<any[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [professionals, setProfessionals] = useState<any[]>([]);
 
-  // Calculate Service Performance Stats
-  const serviceStats = MOCK_SERVICES.map((service) => {
-    const serviceBookings = MOCK_BOOKINGS.filter(
-      (b) => b.serviceName === service.name,
-    );
-    const revenue = serviceBookings.reduce((sum, b) => sum + b.amount, 0);
-    const completed = serviceBookings.filter(
-      (b) => b.status === BookingStatus.COMPLETED,
-    ).length;
-    return {
-      name: service.name,
-      bookings: serviceBookings.length,
-      revenue,
-      successRate:
-        serviceBookings.length > 0
-          ? ((completed / serviceBookings.length) * 100).toFixed(1)
-          : "0",
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [servicesRes, partnersRes, bookingsRes, professionalsRes] =
+          await Promise.all([
+            adminService.getServices(),
+            adminService.getPartners(),
+            adminService.getBookings(),
+            adminService.getProfessionals(),
+          ]);
+        setServices(servicesRes);
+        setPartners(partnersRes);
+        setBookings(bookingsRes);
+        setProfessionals(professionalsRes);
+      } catch (error) {
+        console.error("Failed to load reports data:", error);
+      }
     };
-  }).sort((a, b) => b.revenue - a.revenue);
 
-  // Calculate Top Performing Partners
-  const partnerStatsReport = MOCK_PARTNERS.map((partner) => {
-    // In mock data, we don't have direct link between bookings and partners,
-    // but we can simulate based on their professional count or areas
-    const simulatedRevenue =
-      partner.professionalsCount * 15000 + Math.random() * 5000;
-    const simulatedBookings = Math.floor(simulatedRevenue / 800);
-    return {
-      name: partner.name,
-      owner: partner.ownerName,
-      bookings: simulatedBookings,
-      revenue: Math.floor(simulatedRevenue),
-      professionals: partner.professionalsCount,
-      rating: (4 + Math.random()).toFixed(1),
-    };
-  }).sort((a, b) => b.revenue - a.revenue);
+    fetchData();
+  }, []);
 
-  // Top Professionals Performance
-  const topProfessionalStats = MOCK_PROFESSIONALS.sort(
-    (a, b) => b.earnings - a.earnings,
-  ).slice(0, 5);
+  const serviceStats = services
+    .map((service) => {
+      const serviceBookings = bookings.filter(
+        (b) =>
+          b.serviceId === service._id ||
+          b.serviceName === service.title ||
+          b.serviceName === service.name,
+      );
+      const revenue = serviceBookings.reduce(
+        (sum: number, b: any) => sum + (b.amount || 0),
+        0,
+      );
+      const completed = serviceBookings.filter(
+        (b: any) => b.status === BookingStatus.COMPLETED,
+      ).length;
+      return {
+        name: service.title || service.name,
+        bookings: serviceBookings.length,
+        revenue,
+        successRate:
+          serviceBookings.length > 0
+            ? ((completed / serviceBookings.length) * 100).toFixed(1)
+            : "0",
+      };
+    })
+    .sort((a, b) => b.revenue - a.revenue);
+
+  const partnerStatsReport = partners
+    .map((partner) => {
+      const partnerBookings = bookings.filter(
+        (b: any) =>
+          b.partnerId === partner.id || b.partnerId === partner._id,
+      );
+      const revenue = partnerBookings.reduce(
+        (sum: number, b: any) => sum + (b.amount || 0),
+        0,
+      );
+      return {
+        name: partner.name,
+        owner: partner.ownerName,
+        bookings: partnerBookings.length,
+        revenue,
+        professionals: partner.professionalsCount || 0,
+        rating: "N/A",
+      };
+    })
+    .sort((a, b) => b.revenue - a.revenue);
+
+  const topProfessionalStats = professionals
+    .map((p) => {
+      const proBookings = bookings.filter(
+        (b: any) => b.professionalId === (p.id || p._id),
+      );
+      const earnings = proBookings.reduce(
+        (sum: number, b: any) => sum + (b.amount || 0),
+        0,
+      );
+      return {
+        name: p.name,
+        earnings,
+        rating: p.rating || "N/A",
+      };
+    })
+    .sort((a, b) => b.earnings - a.earnings)
+    .slice(0, 5);
 
   return (
     <div className="p-6">

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { AppScreen, NavigationProps } from "../types";
 import { BottomNav } from "../components/BottomNav";
 import { CATEGORIES, MOCK_BOOKINGS } from "../mockData";
+import { areaService } from "../src/services/api";
 
 export const HomeScreen: React.FC<NavigationProps> = (props) => {
   const {
@@ -15,6 +16,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
     currentLocationLabel,
     setCurrentLocation,
     setSelectedCategory,
+    selectedArea,
   } = props;
 
   const [isLocating, setIsLocating] = useState<boolean>(false);
@@ -83,7 +85,25 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                 formatted += ` ${postcode}`;
               }
 
-              setCurrentLocation(formatted, "Current Location");
+              // Check coverage via API
+              try {
+                const coverage = await areaService.checkCoverage(
+                  latitude,
+                  longitude,
+                );
+                if (coverage.serviceable) {
+                  setCurrentLocation(
+                    formatted,
+                    "Current Location",
+                    coverage.areaName,
+                  );
+                } else {
+                  setCurrentLocation(formatted, "Current Location", null);
+                }
+              } catch (e) {
+                console.error("Coverage check on mount failed:", e);
+                setCurrentLocation(formatted, "Current Location");
+              }
             } else {
               setCurrentLocation(
                 `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,

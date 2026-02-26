@@ -56,8 +56,8 @@ export const bookingService = {
     const response = await api.get(`/bookings/customer/${customerId}`);
     return response.data;
   },
-  getProfessionalBookings: async (professionalId: string) => {
-    const response = await api.get(`/bookings/professional/${professionalId}`);
+  getPartnerBookings: async (partnerId: string) => {
+    const response = await api.get(`/bookings/professional/${partnerId}`);
     return response.data;
   },
   createBooking: async (
@@ -76,6 +76,15 @@ export const pricingService = {
   resolvePrice: async (serviceId: string, areaName: string) => {
     const response = await api.get("/pricing/resolve", {
       params: { serviceId, areaName },
+    });
+    return response.data;
+  },
+};
+
+export const areaService = {
+  checkCoverage: async (lat: number, lng: number) => {
+    const response = await api.get("/areas/check-coverage", {
+      params: { lat, lng },
     });
     return response.data;
   },

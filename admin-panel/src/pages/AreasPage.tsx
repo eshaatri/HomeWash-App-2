@@ -5,6 +5,7 @@ import { Modal } from "../components/Modal";
 import MapComponent from "../components/MapComponent";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import { union } from "@turf/union";
+import booleanIntersects from "@turf/boolean-intersects";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 const LIBRARIES: any = ["places", "geometry", "drawing"];
@@ -30,6 +31,9 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     assignedPartnerName: "",
   });
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
+  const geoJsonRef = React.useRef<any>(null);
+  const [isBoundaryLoading, setIsBoundaryLoading] = useState(false);
+  const [isManualEdit, setIsManualEdit] = useState(false);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -107,6 +111,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         assignedPartnerName: area.assignedPartnerName || "",
       });
       setGeoJsonData(area.geoJson || null);
+      geoJsonRef.current = area.geoJson || null;
+      setIsManualEdit(Boolean(area.geoJson)); // If it has geoJson, treat as manual/fixed initially
     } else {
       setEditingArea(null);
       setFormData({
@@ -120,6 +126,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         assignedPartnerName: "",
       });
       setGeoJsonData(null);
+      geoJsonRef.current = null;
+      setIsManualEdit(false);
     }
     setIsModalOpen(true);
   };
@@ -139,11 +147,13 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       return;
 
     try {
-      let merged = geoJsonData.features[0];
-      for (let i = 1; i < geoJsonData.features.length; i++) {
-        merged = union(merged, geoJsonData.features[i]);
+      // Turf v7 union takes a FeatureCollection or array of features
+      const merged = union(geoJsonData);
+      if (merged) {
+        setGeoJsonData(merged);
+        geoJsonRef.current = merged;
+        setIsManualEdit(true);
       }
-      setGeoJsonData(merged);
     } catch (error) {
       console.error("Merge error:", error);
       alert("Failed to merge shapes. Ensure the boundaries overlap slightly.");
@@ -160,10 +170,42 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         .filter((z) => z !== ""),
     };
 
-    if (geoJsonData) {
-      payload.geoJson = geoJsonData;
+    // Use the latest data from the ref to avoid stale state issues during rapid saving
+    const currentGeoJson = geoJsonRef.current || geoJsonData;
+
+    if (currentGeoJson) {
+      payload.geoJson = currentGeoJson;
     } else {
       payload.geoJson = null; // Clear if empty
+    }
+
+    // Overlap validation: Prevent saving if it overlaps with an existing partner-assigned area
+    if (payload.geoJson) {
+      try {
+        const overlappingArea = areas.find((area) => {
+          // Skip if comparing against self (editing)
+          const areaId = area.id || (area as any)._id;
+          const currentId = editingArea
+            ? editingArea.id || (editingArea as any)._id
+            : null;
+          if (currentId && areaId === currentId) return false;
+
+          // Check for overlap if the existing area has an assigned partner
+          if (area.assignedPartnerId && area.geoJson) {
+            return booleanIntersects(payload.geoJson, area.geoJson);
+          }
+          return false;
+        });
+
+        if (overlappingArea) {
+          alert(
+            `OVERLAP DETECTED: This area overlaps with "${overlappingArea.name}", which is already assigned to a partner (${overlappingArea.assignedPartnerName}). Please adjust the boundaries to avoid overlap.`,
+          );
+          return;
+        }
+      } catch (err) {
+        console.warn("Overlap check failed (likely invalid geometry):", err);
+      }
     }
 
     try {
@@ -219,6 +261,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     let isCurrentRequest = true;
 
     const fetchOverlay = async () => {
+      // DON'T fetch if the user has manually drawn or edited the shape
+      if (isManualEdit) return;
       const currentZipQuery = formData.zipCodes
         ? formData.zipCodes.split(",")[0].trim()
         : "";
@@ -240,6 +284,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       }
 
       try {
+        setIsBoundaryLoading(true);
         const data = await adminService.getBoundary({
           zipcode: currentZipQuery,
           city: formData.city,
@@ -276,6 +321,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       } catch (error) {
         console.error("Failed to fetch boundary via proxy:", error);
         if (isCurrentRequest) setGeoJsonData(null);
+      } finally {
+        if (isCurrentRequest) setIsBoundaryLoading(false);
       }
     };
 
@@ -708,7 +755,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                     )}
                   <button
                     type="button"
-                    onClick={() => setGeoJsonData(null)}
+                    onClick={() => {
+                      setGeoJsonData(null);
+                      setIsManualEdit(false);
+                    }}
                     className="bg-red-500 hover:bg-red-600 text-white shadow-xl px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 h-fit"
                   >
                     <span className="material-symbols-outlined text-sm">
@@ -716,6 +766,15 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                     </span>
                     Clear Shape
                   </button>
+                </div>
+              )}
+
+              {isBoundaryLoading && (
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+                    Fetching Boundary...
+                  </span>
                 </div>
               )}
             </div>
@@ -731,7 +790,11 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                 formData.zipCodes ? formData.zipCodes.split(",")[0].trim() : ""
               }
               isEditable={true}
-              onGeoJsonChange={setGeoJsonData}
+              onGeoJsonChange={(data) => {
+                setGeoJsonData(data);
+                geoJsonRef.current = data;
+              }}
+              onManualEdit={() => setIsManualEdit(true)}
               markers={[
                 {
                   id: "temp",

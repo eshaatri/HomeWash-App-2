@@ -4,7 +4,6 @@ import {
   MarkerF,
   InfoWindow,
   useLoadScript,
-  DrawingManagerF,
 } from "@react-google-maps/api";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
@@ -28,6 +27,7 @@ interface MapComponentProps {
   pincode?: string;
   isEditable?: boolean;
   onGeoJsonChange?: (geoJson: any) => void;
+  onManualEdit?: () => void;
 }
 
 const containerStyle = {
@@ -44,6 +44,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   pincode,
   isEditable = false,
   onGeoJsonChange,
+  onManualEdit,
 }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -57,25 +58,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     position: google.maps.LatLng;
     feature: google.maps.Data.Feature;
   } | null>(null);
-
-  const drawingOptions = React.useMemo(() => {
-    if (!isLoaded || !window.google) return undefined;
-    return {
-      drawingControl: true,
-      drawingControlOptions: {
-        position: window.google.maps.ControlPosition.TOP_CENTER,
-        drawingModes: [window.google.maps.drawing.OverlayType.POLYGON],
-      },
-      polygonOptions: {
-        fillColor: "#f97316",
-        fillOpacity: 0.25,
-        strokeColor: "#f97316",
-        strokeWeight: 3,
-        editable: true,
-        clickable: true,
-      },
-    };
-  }, [isLoaded]);
 
   const onLoad = useCallback((mapInstance: google.maps.Map) => {
     setMap(mapInstance);
@@ -142,6 +124,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // Handle GeoJSON data overlay
   const prevGeoJsonStr = useRef<string | null>(null);
+  const isInternalUpdateRef = useRef(false);
 
   useEffect(() => {
     if (!map) return;
@@ -156,6 +139,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     // Standardize comparison if it's identical
     if (currentStr === prevGeoJsonStr.current) return;
     prevGeoJsonStr.current = currentStr;
+    isInternalUpdateRef.current = true;
 
     // Map changed externally, clear existing features
     map.data.forEach((feature) => {
@@ -203,8 +187,14 @@ const MapComponent: React.FC<MapComponentProps> = ({
           left: 40,
         });
       }
+
+      // Let listeners trigger, then reset the flag
+      setTimeout(() => {
+        isInternalUpdateRef.current = false;
+      }, 0);
     } catch (err) {
       console.error("Failed to render GeoJSON on Google Maps:", err);
+      isInternalUpdateRef.current = false;
     }
   }, [map, geoJsonData]);
 
@@ -213,19 +203,34 @@ const MapComponent: React.FC<MapComponentProps> = ({
     if (!map || !onGeoJsonChange || !isEditable) return;
 
     let debounceTimer: any;
-    const triggerChange = () => {
+    const syncToParent = () => {
+      map.data.toGeoJson((geoJson: any) => {
+        if (geoJson.features && geoJson.features.length > 0) {
+          prevGeoJsonStr.current = JSON.stringify(geoJson);
+          onGeoJsonChange(geoJson);
+        } else {
+          onGeoJsonChange(null);
+        }
+      });
+    };
+
+    const triggerChange = (event: any) => {
+      if (onManualEdit && event && !isInternalUpdateRef.current) {
+        onManualEdit();
+      }
+
+      // If it's a structural change, sync immediately
+      if (
+        event &&
+        (event.type === "addfeature" || event.type === "removefeature")
+      ) {
+        syncToParent();
+        return;
+      }
+
+      // If it's a geometry change (vertex move), debounce it
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        map.data.toGeoJson((geoJson: any) => {
-          if (geoJson.features && geoJson.features.length > 0) {
-            // Let's pass back just the geometry bounds if it's one feature for simplicity, or the whole FeatureCollection
-            prevGeoJsonStr.current = JSON.stringify(geoJson); // Prevent loop
-            onGeoJsonChange(geoJson);
-          } else {
-            onGeoJsonChange(null);
-          }
-        });
-      }, 500);
+      debounceTimer = setTimeout(syncToParent, 100);
     };
 
     const handleFeatureClick = (e: any) => {
@@ -264,7 +269,57 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
     map.data.addGeoJson(feature);
     polygon.setMap(null); // Remove raw polygon overlay since it's now in map.data
+
+    if (onManualEdit) onManualEdit();
   };
+
+  // Manual Drawing Manager lifecycle management to prevent duplication (zombie toolbars)
+  const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!map || !isEditable || !window.google?.maps?.drawing) return;
+
+    // cleanup any existing manager just in case
+    if (drawingManagerRef.current) {
+      drawingManagerRef.current.setMap(null);
+      drawingManagerRef.current = null;
+    }
+
+    const dm = new google.maps.drawing.DrawingManager({
+      drawingControl: true,
+      drawingControlOptions: {
+        position: google.maps.ControlPosition.TOP_CENTER,
+        drawingModes: [google.maps.drawing.OverlayType.POLYGON],
+      },
+      polygonOptions: {
+        fillColor: "#f97316",
+        fillOpacity: 0.25,
+        strokeColor: "#f97316",
+        strokeWeight: 3,
+        editable: true,
+        clickable: true,
+      },
+    });
+
+    dm.setMap(map);
+    drawingManagerRef.current = dm;
+
+    const listener = google.maps.event.addListener(
+      dm,
+      "polygoncomplete",
+      (polygon: google.maps.Polygon) => {
+        onPolygonComplete(polygon);
+      },
+    );
+
+    return () => {
+      google.maps.event.removeListener(listener);
+      dm.setMap(null);
+      drawingManagerRef.current = null;
+    };
+  }, [map, isEditable]);
 
   if (loadError) {
     return (
@@ -313,12 +368,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
         onClick={handleMapClick}
         options={mapOptions}
       >
-        {isEditable && drawingOptions && (
-          <DrawingManagerF
-            onPolygonComplete={onPolygonComplete}
-            options={drawingOptions}
-          />
-        )}
         {markers.map((marker) => (
           <MarkerF
             key={marker.id}
@@ -347,7 +396,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
             position={selectedFeature.position}
             onCloseClick={() => setSelectedFeature(null)}
           >
-            <div className="p-1">
+            <div className="flex items-center justify-center p-0">
               <button
                 type="button"
                 onClick={() => {
@@ -356,12 +405,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
                     setSelectedFeature(null);
                   }
                 }}
-                className="bg-red-500 hover:bg-red-600 text-white shadow-md px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-1"
+                className="bg-red-500 hover:bg-red-600 text-white p-1 rounded-lg transition-colors shadow-sm flex items-center justify-center active:scale-90"
+                title="Delete Shape"
               >
-                <span className="material-symbols-outlined text-[16px]">
+                <span className="material-symbols-outlined text-[18px]">
                   delete
                 </span>
-                Delete Shape
               </button>
             </div>
           </InfoWindow>

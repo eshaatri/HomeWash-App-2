@@ -112,7 +112,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
 
           <p className="text-center text-xs text-gray-500 mt-6">
-            Demo: Click Sign In to enter the dashboard
+            Enter your admin or partner credentials to continue.
           </p>
         </form>
       </div>

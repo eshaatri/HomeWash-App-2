@@ -138,6 +138,24 @@ export const adminService = {
     return response.data;
   },
 
+  // Areas
+  getAreas: async () => {
+    const response = await api.get("/areas");
+    return response.data;
+  },
+  createArea: async (data: any) => {
+    const response = await api.post("/areas", data);
+    return response.data;
+  },
+  updateArea: async (id: string, data: any) => {
+    const response = await api.patch(`/areas/${id}`, data);
+    return response.data;
+  },
+  deleteArea: async (id: string) => {
+    const response = await api.delete(`/areas/${id}`);
+    return response.data;
+  },
+
   // Location / Boundaries
   getBoundary: async (params: {
     zipcode?: string;
