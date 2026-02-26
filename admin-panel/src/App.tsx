@@ -12,6 +12,7 @@ import { PartnerDashboardPage } from "./pages/PartnerDashboardPage";
 import { PartnerBookingsPage } from "./pages/PartnerBookingsPage";
 import { PartnerProfessionalsPage } from "./pages/PartnerProfessionalsPage";
 import { PartnerServiceConfigPage } from "./pages/PartnerServiceConfigPage";
+import { PartnerProfilePage } from "./pages/PartnerProfilePage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { Sidebar } from "./components/Sidebar";
@@ -93,6 +94,10 @@ export default function App() {
         return (
           <PartnersPage
             {...commonProps}
+            onViewProfile={(id: string) => {
+              setSelectedPartnerId(id);
+              navigateTo(AdminPage.PARTNER_PROFILE);
+            }}
             onManageServices={(id: string) => {
               setSelectedPartnerId(id);
               navigateTo(AdminPage.PARTNER_SERVICE_CONFIG);
@@ -108,6 +113,14 @@ export default function App() {
       case AdminPage.PARTNER_SERVICE_CONFIG:
         return (
           <PartnerServiceConfigPage
+            {...commonProps}
+            selectedPartnerId={selectedPartnerId}
+            onBack={() => navigateTo(AdminPage.PARTNERS)}
+          />
+        );
+      case AdminPage.PARTNER_PROFILE:
+        return (
+          <PartnerProfilePage
             {...commonProps}
             selectedPartnerId={selectedPartnerId}
             onBack={() => navigateTo(AdminPage.PARTNERS)}

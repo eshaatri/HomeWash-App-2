@@ -4,13 +4,16 @@ import { adminService } from "../services/api";
 import { Modal } from "../components/Modal";
 
 interface PartnersPageProps extends NavigationProps {
+  onViewProfile?: (id: string) => void;
   onManageServices?: (id: string) => void;
 }
 
 export const PartnersPage: React.FC<PartnersPageProps> = ({
+  onViewProfile,
   onManageServices,
 }) => {
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [areas, setAreas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,11 +34,15 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
     isActive: true,
   });
 
-  const fetchPartners = async () => {
+  const fetchPartnersAndAreas = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getPartners();
-      setPartners(data);
+      const [partnersRes, areasRes] = await Promise.all([
+        adminService.getPartners(),
+        adminService.getAreas(),
+      ]);
+      setPartners(partnersRes);
+      setAreas(areasRes);
     } catch (error) {
       console.error("Failed to fetch partners:", error);
     } finally {
@@ -44,7 +51,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
   };
 
   useEffect(() => {
-    fetchPartners();
+    fetchPartnersAndAreas();
   }, []);
 
   const handleOpenModal = (partner?: Partner) => {
@@ -91,7 +98,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
       } else {
         await adminService.createPartner(formData);
       }
-      await fetchPartners();
+      await fetchPartnersAndAreas();
       handleCloseModal();
     } catch (error) {
       console.error("Failed to save partner:", error);
@@ -105,7 +112,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
     if (window.confirm("Are you sure you want to delete this partner?")) {
       try {
         await adminService.deletePartner(id);
-        fetchPartners();
+        fetchPartnersAndAreas();
       } catch (error) {
         console.error("Failed to delete partner:", error);
         alert("Failed to delete partner.");
@@ -254,9 +261,15 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
                         {partner.name?.charAt(0) || "?"}
                       </div>
                       <div>
-                        <p className="font-bold text-gray-900 dark:text-white leading-none">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onViewProfile?.(partner.id || (partner as any)._id)
+                          }
+                          className="font-bold text-gray-900 dark:text-white leading-none text-left hover:text-primary hover:underline focus:outline-none focus:underline"
+                        >
                           {partner.name}
-                        </p>
+                        </button>
                         <p className="text-[10px] text-gray-400 uppercase tracking-tighter mt-1 font-medium">
                           Manager: {partner.ownerName}
                         </p>
@@ -265,15 +278,26 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
-                      {(partner.activeAreas || []).map((area, idx) => (
-                        <span
-                          key={idx}
-                          className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold uppercase"
-                        >
-                          {area}
-                        </span>
-                      ))}
-                      {(partner.activeAreas || []).length === 0 && (
+                      {areas
+                        .filter(
+                          (area) =>
+                            area.assignedPartnerId ===
+                              (partner.id || (partner as any)._id) &&
+                            area.isActive,
+                        )
+                        .map((area) => (
+                          <span
+                            key={area.id || (area as any)._id}
+                            className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold uppercase"
+                          >
+                            {area.name}
+                          </span>
+                        ))}
+                      {areas.filter(
+                        (area) =>
+                          area.assignedPartnerId ===
+                          (partner.id || (partner as any)._id),
+                      ).length === 0 && (
                         <span className="text-xs text-gray-400 italic">
                           No areas
                         </span>

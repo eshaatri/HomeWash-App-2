@@ -337,7 +337,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     formData.city,
     isModalOpen,
     editingArea,
-    initialModalZip, // Added dependency
+    initialModalZip,
+    isManualEdit,
   ]);
 
   const filteredAreas = areas.filter(
@@ -345,6 +346,77 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (a.zipCodes || []).some((z) => z.includes(searchTerm)),
   );
+
+  // Combined GeoJSON for map tab (all filtered areas with geometry)
+  const combinedGeoJson = React.useMemo(() => {
+    const features: any[] = [];
+
+    filteredAreas.forEach((area) => {
+      if (!area.geoJson || !area.assignedPartnerId) return;
+      const g: any = area.geoJson;
+
+      const addFeature = (f: any) => {
+        if (!f || !f.geometry) return;
+        features.push({
+          type: "Feature",
+          geometry: f.geometry,
+          properties: {
+            ...(f.properties || {}),
+            areaName: area.name,
+            areaId: area.id || (area as any)._id,
+          },
+        });
+      };
+
+      if (g.type === "FeatureCollection" && Array.isArray(g.features)) {
+        g.features.forEach(addFeature);
+      } else if (g.type === "Feature") {
+        addFeature(g);
+      } else if (g.type) {
+        addFeature({ geometry: g });
+      }
+    });
+
+    if (features.length === 0) return null;
+    return { type: "FeatureCollection", features };
+  }, [filteredAreas]);
+
+  // Reference GeoJSON for modal map: all other assigned areas, to avoid overlaps
+  const referenceAreasGeoJson = React.useMemo(() => {
+    const features: any[] = [];
+    areas.forEach((area) => {
+      if (!area.geoJson || !area.assignedPartnerId) return;
+      const g: any = area.geoJson;
+      const areaId = area.id || (area as any)._id;
+      const currentId = editingArea
+        ? editingArea.id || (editingArea as any)._id
+        : null;
+      if (currentId && areaId === currentId) return;
+
+      const addFeature = (f: any) => {
+        if (!f || !f.geometry) return;
+        features.push({
+          type: "Feature",
+          geometry: f.geometry,
+          properties: {
+            ...(f.properties || {}),
+            areaName: area.name,
+          },
+        });
+      };
+
+      if (g.type === "FeatureCollection" && Array.isArray(g.features)) {
+        g.features.forEach(addFeature);
+      } else if (g.type === "Feature") {
+        addFeature(g);
+      } else if (g.type) {
+        addFeature({ geometry: g });
+      }
+    });
+
+    if (features.length === 0) return null;
+    return { type: "FeatureCollection", features };
+  }, [areas, editingArea]);
 
   if (loading && areas.length === 0) {
     return (
@@ -449,6 +521,8 @@ export const AreasPage: React.FC<NavigationProps> = () => {
               title: a.name,
               details: `${a.zipCodes?.length || 0} Zip Codes served in ${a.city}`,
             }))}
+            geoJsonData={combinedGeoJson}
+            isEditable={false}
           />
         </div>
       )}
@@ -672,14 +746,20 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                 />
               </div>
 
-              <div className="flex items-center gap-2 cursor-pointer group py-2">
+              <div
+                className="flex items-center gap-2 cursor-pointer group py-2"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isActive: !prev.isActive,
+                  }))
+                }
+              >
                 <input
                   type="checkbox"
                   className="hidden"
                   checked={formData.isActive}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isActive: e.target.checked })
-                  }
+                  readOnly
                 />
                 <div
                   className={`w-10 h-5 rounded-full p-1 transition-colors ${formData.isActive ? "bg-primary" : "bg-gray-300"}`}
@@ -769,7 +849,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                 </div>
               )}
 
-              {isBoundaryLoading && (
+              {isBoundaryLoading && !isManualEdit && (
                 <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 flex items-center gap-3">
                   <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">
@@ -786,6 +866,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                 lng: formData.lng || 72.8777,
               }}
               geoJsonData={geoJsonData}
+              referenceGeoJsonData={referenceAreasGeoJson}
               pincode={
                 formData.zipCodes ? formData.zipCodes.split(",")[0].trim() : ""
               }
@@ -794,7 +875,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                 setGeoJsonData(data);
                 geoJsonRef.current = data;
               }}
-              onManualEdit={() => setIsManualEdit(true)}
+              onManualEdit={() => {
+                setIsManualEdit(true);
+                setIsBoundaryLoading(false);
+              }}
               markers={[
                 {
                   id: "temp",

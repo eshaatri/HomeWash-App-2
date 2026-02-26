@@ -28,6 +28,8 @@ interface MapComponentProps {
   isEditable?: boolean;
   onGeoJsonChange?: (geoJson: any) => void;
   onManualEdit?: () => void;
+  // Optional: reference GeoJSON for read-only context (e.g., other areas)
+  referenceGeoJsonData?: any;
 }
 
 const containerStyle = {
@@ -45,6 +47,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   isEditable = false,
   onGeoJsonChange,
   onManualEdit,
+  referenceGeoJsonData,
 }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -125,6 +128,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   // Handle GeoJSON data overlay
   const prevGeoJsonStr = useRef<string | null>(null);
   const isInternalUpdateRef = useRef(false);
+  const referenceLayerRef = useRef<google.maps.Data | null>(null);
 
   useEffect(() => {
     if (!map) return;
@@ -197,6 +201,56 @@ const MapComponent: React.FC<MapComponentProps> = ({
       isInternalUpdateRef.current = false;
     }
   }, [map, geoJsonData]);
+
+  // Render read-only reference GeoJSON in a separate Data layer
+  useEffect(() => {
+    if (!map) return;
+
+    // Clear previous reference layer
+    if (referenceLayerRef.current) {
+      referenceLayerRef.current.setMap(null);
+      referenceLayerRef.current = null;
+    }
+
+    if (!referenceGeoJsonData) return;
+
+    try {
+      const refLayer = new google.maps.Data({ map });
+
+      let featureCollection: any;
+      const g = referenceGeoJsonData;
+
+      if (g.type === "FeatureCollection") {
+        featureCollection = g;
+      } else if (g.type === "Feature") {
+        featureCollection = { type: "FeatureCollection", features: [g] };
+      } else {
+        featureCollection = {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              geometry: g,
+              properties: {},
+            },
+          ],
+        };
+      }
+
+      refLayer.addGeoJson(featureCollection);
+      refLayer.setStyle({
+        fillColor: "#0ea5e9",
+        fillOpacity: 0.12,
+        strokeColor: "#0ea5e9",
+        strokeWeight: 2,
+        clickable: false,
+      });
+
+      referenceLayerRef.current = refLayer;
+    } catch (err) {
+      console.error("Failed to render reference GeoJSON on Google Maps:", err);
+    }
+  }, [map, referenceGeoJsonData]);
 
   // Listen to edits and inform parent
   useEffect(() => {
