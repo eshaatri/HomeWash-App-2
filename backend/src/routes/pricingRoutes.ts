@@ -1,6 +1,6 @@
 import express from "express";
 import Service from "../models/Service";
-import VendorConfig from "../models/VendorConfig";
+import PartnerConfig from "../models/PartnerConfig";
 import Area from "../models/Area";
 
 const router = express.Router();
@@ -28,10 +28,10 @@ router.get("/resolve", async (req, res) => {
       return res.status(404).json({ message: "Service not found" });
     }
 
-    // 3. Check for any VendorConfig that overrides the price in this area
-    // For now, we'll pick the first active vendor config for this service + area.
+    // 3. Check for any PartnerConfig that overrides the price in this area
+    // For now, we'll pick the first active partner config for this service + area.
     // In a mature system, this would involve distribution logic.
-    const config = await VendorConfig.findOne({
+    const config = await PartnerConfig.findOne({
       serviceId: serviceId as string,
       areaId: (area._id as any).toString(),
       isEnabled: true,
@@ -41,14 +41,14 @@ router.get("/resolve", async (req, res) => {
       config && config.customPrice !== undefined
         ? config.customPrice
         : service.price;
-    const vendorId =
-      config && config.vendorId ? config.vendorId.toString() : null;
+    const partnerId =
+      config && config.partnerId ? config.partnerId.toString() : null;
 
     res.json({
       serviceId,
       basePrice: service.price,
       finalPrice,
-      vendorId,
+      partnerId,
       areaId: (area._id as any).toString(),
       isOverride: !!(config && config.customPrice !== undefined),
     });

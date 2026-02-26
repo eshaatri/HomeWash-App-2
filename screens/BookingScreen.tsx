@@ -17,8 +17,8 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
       return [
         BookingStatus.PENDING,
         BookingStatus.CONFIRMED,
-        BookingStatus.PARTNER_ASSIGNED,
-        BookingStatus.PARTNER_EN_ROUTE,
+        BookingStatus.PROFESSIONAL_ASSIGNED,
+        BookingStatus.PROFESSIONAL_EN_ROUTE,
         BookingStatus.IN_PROGRESS,
       ].includes(b.status);
     } else if (activeTab === "HISTORY") {
@@ -30,7 +30,7 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
 
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {
-      case BookingStatus.PARTNER_EN_ROUTE:
+      case BookingStatus.PROFESSIONAL_EN_ROUTE:
         return "text-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400";
       case BookingStatus.CONFIRMED:
         return "text-purple-500 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400";
@@ -180,8 +180,8 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
                   <p
                     className={`text-sm font-bold mb-5 leading-tight ${isPremium ? "text-black/70" : "text-black/50"}`}
                   >
-                    {heroBooking.status === BookingStatus.PARTNER_EN_ROUTE
-                      ? "Partner is arriving in 5 mins"
+                    {heroBooking.status === BookingStatus.PROFESSIONAL_EN_ROUTE
+                      ? "Professional is arriving in 5 mins"
                       : `${heroBooking.date} • ${heroBooking.time}`}
                   </p>
 
@@ -190,15 +190,16 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
                       <div
                         className={`h-10 w-10 rounded-full border-2 flex items-center justify-center bg-primary/10 text-primary font-bold overflow-hidden backdrop-blur-sm shadow-inner ${isPremium ? "border-black/30" : "border-black/10"}`}
                       >
-                        {heroBooking.partnerName
-                          ? heroBooking.partnerName.charAt(0).toUpperCase()
+                        {heroBooking.professionalName
+                          ? heroBooking.professionalName.charAt(0).toUpperCase()
                           : "P"}
                       </div>
                       <div>
                         <p
                           className={`text-xs font-black ${isPremium ? "text-black" : "text-black/80"}`}
                         >
-                          {heroBooking.partnerName || "Assigning Partner"}
+                          {heroBooking.professionalName ||
+                            "Assigning Professional"}
                         </p>
                         <div
                           className={`flex items-center text-[10px] gap-1 font-black ${isPremium ? "text-black/70" : "text-black/50"}`}
@@ -273,15 +274,15 @@ export const BookingScreen: React.FC<BookingScreenProps> = (props) => {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {booking.partnerName && (
+                      {booking.professionalName && (
                         <>
                           <div className="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold overflow-hidden">
-                            {booking.partnerName
-                              ? booking.partnerName.charAt(0).toUpperCase()
+                            {booking.professionalName
+                              ? booking.professionalName.charAt(0).toUpperCase()
                               : "P"}
                           </div>
                           <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                            {booking.partnerName}
+                            {booking.professionalName}
                           </span>
                         </>
                       )}

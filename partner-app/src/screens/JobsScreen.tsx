@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { PartnerScreen, NavigationProps, JobStatus } from "../types";
+import { ProfessionalScreen, NavigationProps, JobStatus } from "../types";
 
 export const JobsScreen: React.FC<NavigationProps> = ({
   navigateTo,
   jobs,
-  activeJob,
   acceptJob,
+  rejectJob,
   setActiveJob,
+  refreshJobs,
 }) => {
   const [filter, setFilter] = useState<"available" | "accepted" | "history">(
     "available",
@@ -33,8 +34,16 @@ export const JobsScreen: React.FC<NavigationProps> = ({
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#121212] pb-20">
       {/* Header */}
-      <header className="bg-white dark:bg-[#1a1a1a] px-4 py-4 border-b border-gray-100 dark:border-white/5 sticky top-0 z-30">
+      <header className="bg-white dark:bg-[#1a1a1a] px-4 py-4 border-b border-gray-100 dark:border-white/5 sticky top-0 z-30 flex items-center justify-between">
         <h1 className="text-xl font-bold">Jobs</h1>
+        <button
+          onClick={refreshJobs}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
+        >
+          <span className="material-symbols-outlined text-primary">
+            refresh
+          </span>
+        </button>
       </header>
 
       {/* Filter Tabs */}
@@ -119,11 +128,14 @@ export const JobsScreen: React.FC<NavigationProps> = ({
 
             {filter === "available" && (
               <div className="flex gap-2">
-                <button className="flex-1 border border-gray-200 dark:border-white/20 py-3 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                <button
+                  onClick={() => rejectJob(job.id || job._id || "")}
+                  className="flex-1 border border-gray-200 dark:border-white/20 py-3 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                >
                   Reject
                 </button>
                 <button
-                  onClick={() => acceptJob(job.id)}
+                  onClick={() => acceptJob(job.id || job._id || "")}
                   className="flex-1 bg-green-500 text-white py-3 rounded-lg text-sm font-bold shadow-lg shadow-green-500/20 hover:bg-green-600 transition-colors"
                 >
                   Accept
@@ -135,7 +147,7 @@ export const JobsScreen: React.FC<NavigationProps> = ({
               <button
                 onClick={() => {
                   setActiveJob(job);
-                  navigateTo(PartnerScreen.ACTIVE_JOB);
+                  navigateTo(ProfessionalScreen.ACTIVE_JOB);
                 }}
                 className="w-full bg-primary text-black py-3 rounded-lg text-sm font-bold hover:bg-primary-dim transition-colors"
               >

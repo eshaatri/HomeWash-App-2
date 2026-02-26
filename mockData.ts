@@ -15,11 +15,11 @@ export const MOCK_USER: User = {
   walletBalance: 2500.0,
 };
 
-export const MOCK_PARTNER: User = {
+export const MOCK_PROFESSIONAL: User = {
   id: "p1",
   name: "Rajesh Kumar",
   phone: "+91 99887 76655",
-  role: UserRole.PARTNER,
+  role: UserRole.PROFESSIONAL,
   walletBalance: 4500.5,
   rating: 4.9,
   isVerified: true,
@@ -82,12 +82,20 @@ export const SUB_CATEGORIES_DB: Record<
         title: "Select Property Type",
         items: [
           {
-            id: "apartment",
-            name: "Apartment",
+            id: "furnished_apartment",
+            name: "Furnished Apartment",
             icon: "apartment",
             color: "bg-blue-50 text-blue-600",
             image:
               "https://images.unsplash.com/photo-1502005229762-cf1e253c96bd?q=80&w=200&auto=format&fit=crop",
+          },
+          {
+            id: "unfurnished_apartment",
+            name: "Unfurnished Apartment",
+            icon: "home_work",
+            color: "bg-orange-50 text-orange-600",
+            image:
+              "https://images.unsplash.com/photo-1560416313-2d126435f308?auto=format&fit=crop&q=80&w=200",
           },
           {
             id: "bungalow",
@@ -242,15 +250,16 @@ export const SUB_CATEGORIES_DB: Record<
 };
 
 export const SERVICES: ExtendedService[] = [
+  // Furnished Apartment Services
   {
-    id: "s1",
-    title: "Furnished Apartment",
+    id: "s1_1bhk",
+    title: "1 BHK",
     categoryId: "c1",
-    subCategoryId: "apartment",
+    subCategoryId: "furnished_apartment",
     price: 3499,
     originalPrice: 3999,
-    duration: "3 hrs 45 mins",
-    description: "Complete top-to-bottom restoration for your furnished space.",
+    duration: "4 hrs",
+    description: "Deep cleaning for 1 BHK Furnished Apartment.",
     rating: 4.82,
     reviews: "380K reviews",
     reviewCount: 380000,
@@ -263,10 +272,87 @@ export const SERVICES: ExtendedService[] = [
     ],
   },
   {
-    id: "s1_un",
-    title: "Unfurnished Apartment",
+    id: "s1_2bhk",
+    title: "2 BHK",
     categoryId: "c1",
-    subCategoryId: "apartment",
+    subCategoryId: "furnished_apartment",
+    price: 3899,
+    originalPrice: 4499,
+    duration: "5 hrs",
+    description: "Deep cleaning for 2 BHK Furnished Apartment.",
+    rating: 4.82,
+    reviews: "380K reviews",
+    reviewCount: 380000,
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5c6hvQ269iGoWpfvLQDj7bmbtgQqliAJq7BfBgfU8BHSZcE672IWwFIUyJwLcXTmRxl-d_6CJGFY8mrBW_yYweVNb0Z8pwQMyLnSDTo0OkDBx3H2C6kv7t6i8CmM--y6OgboO4_hRAVdAPLhRcmW5Iwf_tTuBbeplYcIo5l2upmHCwrLpjiX4GjFVevtkalgAkoM7Zmx65Lz5m_wtRsf-iJCLDXu9twEi1DRlqL1TtgrE-tHdbGkjNlYM0C2O5h4WFVNfyD4uPNY",
+    inclusions: [
+      "Cleaning & stain removal from rooms, kitchen, bathroom & balcony",
+      "Machine floor scrubbing & dusting of walls & ceilings",
+    ],
+  },
+  {
+    id: "s1_3bhk",
+    title: "3 BHK",
+    categoryId: "c1",
+    subCategoryId: "furnished_apartment",
+    price: 4799,
+    originalPrice: 5399,
+    duration: "6 hrs",
+    description: "Deep cleaning for 3 BHK Furnished Apartment.",
+    rating: 4.82,
+    reviews: "380K reviews",
+    reviewCount: 380000,
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5c6hvQ269iGoWpfvLQDj7bmbtgQqliAJq7BfBgfU8BHSZcE672IWwFIUyJwLcXTmRxl-d_6CJGFY8mrBW_yYweVNb0Z8pwQMyLnSDTo0OkDBx3H2C6kv7t6i8CmM--y6OgboO4_hRAVdAPLhRcmW5Iwf_tTuBbeplYcIo5l2upmHCwrLpjiX4GjFVevtkalgAkoM7Zmx65Lz5m_wtRsf-iJCLDXu9twEi1DRlqL1TtgrE-tHdbGkjNlYM0C2O5h4WFVNfyD4uPNY",
+    inclusions: [
+      "Cleaning & stain removal from rooms, kitchen, bathroom & balcony",
+      "Machine floor scrubbing & dusting of walls & ceilings",
+    ],
+  },
+  {
+    id: "s1_4bhk",
+    title: "4 BHK",
+    categoryId: "c1",
+    subCategoryId: "furnished_apartment",
+    price: 5699,
+    originalPrice: 6299,
+    duration: "7 hrs",
+    description: "Deep cleaning for 4 BHK Furnished Apartment.",
+    rating: 4.82,
+    reviews: "380K reviews",
+    reviewCount: 380000,
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5c6hvQ269iGoWpfvLQDj7bmbtgQqliAJq7BfBgfU8BHSZcE672IWwFIUyJwLcXTmRxl-d_6CJGFY8mrBW_yYweVNb0Z8pwQMyLnSDTo0OkDBx3H2C6kv7t6i8CmM--y6OgboO4_hRAVdAPLhRcmW5Iwf_tTuBbeplYcIo5l2upmHCwrLpjiX4GjFVevtkalgAkoM7Zmx65Lz5m_wtRsf-iJCLDXu9twEi1DRlqL1TtgrE-tHdbGkjNlYM0C2O5h4WFVNfyD4uPNY",
+    inclusions: [
+      "Cleaning & stain removal from rooms, kitchen, bathroom & balcony",
+      "Machine floor scrubbing & dusting of walls & ceilings",
+    ],
+  },
+  {
+    id: "s1_5bhk",
+    title: "5 BHK",
+    categoryId: "c1",
+    subCategoryId: "furnished_apartment",
+    price: 6599,
+    originalPrice: 7199,
+    duration: "8 hrs",
+    description: "Deep cleaning for 5 BHK Furnished Apartment.",
+    rating: 4.82,
+    reviews: "380K reviews",
+    reviewCount: 380000,
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5c6hvQ269iGoWpfvLQDj7bmbtgQqliAJq7BfBgfU8BHSZcE672IWwFIUyJwLcXTmRxl-d_6CJGFY8mrBW_yYweVNb0Z8pwQMyLnSDTo0OkDBx3H2C6kv7t6i8CmM--y6OgboO4_hRAVdAPLhRcmW5Iwf_tTuBbeplYcIo5l2upmHCwrLpjiX4GjFVevtkalgAkoM7Zmx65Lz5m_wtRsf-iJCLDXu9twEi1DRlqL1TtgrE-tHdbGkjNlYM0C2O5h4WFVNfyD4uPNY",
+    inclusions: [
+      "Cleaning & stain removal from rooms, kitchen, bathroom & balcony",
+      "Machine floor scrubbing & dusting of walls & ceilings",
+    ],
+  },
+  // Unfurnished Apartment Services
+  {
+    id: "s1_un_service",
+    title: "Unfurnished Apartment Cleaning",
+    categoryId: "c1",
+    subCategoryId: "unfurnished_apartment",
     price: 3199,
     duration: "3 hrs",
     description:
@@ -314,7 +400,7 @@ export const SERVICES: ExtendedService[] = [
     bestseller: true,
     offerTag: "Add more & save up to 13%",
     image:
-      "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=300", // Using a placeholder that fits the clean aesthetic
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=300",
     inclusions: [
       "Floor & tile cleaning with scrubbing machine",
       "Recommended for deep-cleaning and tough stains",
@@ -361,7 +447,6 @@ export const SERVICES: ExtendedService[] = [
       "Does not include appliance cleaning inside",
     ],
   },
-  // Kitchen Mini Services
   {
     id: "kitchen_mini_cabinet",
     title: "Cabinet Cleaning",
@@ -422,7 +507,6 @@ export const SERVICES: ExtendedService[] = [
       "https://plus.unsplash.com/premium_photo-1678733357597-29314417d45e?auto=format&fit=crop&q=80&w=300",
     inclusions: ["Blade wiping", "Motor cleaning"],
   },
-  // Water Tank Services
   {
     id: "tank_plastic",
     title: "Plastic Tank Cleaning",
@@ -465,7 +549,6 @@ export const SERVICES: ExtendedService[] = [
       "Anti-bacterial spray",
     ],
   },
-  // Book by Room Services
   {
     id: "room_bedroom",
     title: "Bedroom cleaning",
@@ -535,7 +618,6 @@ export const SERVICES: ExtendedService[] = [
       "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&q=80&w=300",
     inclusions: ["Dry and wet mopping", "Railing cleaning"],
   },
-  // Added Mini Services
   {
     id: "mini_sofa",
     title: "Sofa Cleaning",
@@ -611,7 +693,6 @@ export const SERVICES: ExtendedService[] = [
       "https://plus.unsplash.com/premium_photo-1678733357597-29314417d45e?auto=format&fit=crop&q=80&w=300",
     inclusions: ["Blade wiping", "Motor cleaning", "Ladder provided"],
   },
-  // Sofa Mini Services
   {
     id: "sofa_mini_cushions",
     title: "Cushions Cleaning",
@@ -642,7 +723,6 @@ export const SERVICES: ExtendedService[] = [
       "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?auto=format&fit=crop&q=80&w=300",
     inclusions: ["Dusting", "Wet wiping", "Glass cleaning", "Polishing"],
   },
-  // Sofa Cleaning Service
   {
     id: "sofa_shampoo",
     title: "Sofa Cleaning",
@@ -683,7 +763,6 @@ export const SERVICES: ExtendedService[] = [
       "Stain removal",
     ],
   },
-  // Mattress Cleaning Service
   {
     id: "mattress_shampoo",
     title: "Mattress Cleaning",
@@ -704,7 +783,6 @@ export const SERVICES: ExtendedService[] = [
       "Stain removal",
     ],
   },
-  // Blinds Cleaning Service
   {
     id: "blinds_cleaning",
     title: "Blinds",
@@ -720,7 +798,6 @@ export const SERVICES: ExtendedService[] = [
       "https://images.unsplash.com/photo-1505691938895-1cd1027d1a58?auto=format&fit=crop&q=80&w=300",
     inclusions: ["Dusting", "Wet wiping", "Stain removal"],
   },
-  // Chair Cleaning Service
   {
     id: "chair_shampoo",
     title: "Chair",
@@ -736,7 +813,6 @@ export const SERVICES: ExtendedService[] = [
       "https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&q=80&w=300",
     inclusions: ["Vacuuming", "Shampooing", "Stain removal"],
   },
-  // Car Wash Services
   {
     id: "car_interior",
     title: "Interior deep clean",
@@ -783,12 +859,12 @@ export const MOCK_BOOKINGS: Booking[] = [
   {
     id: "b1",
     serviceName: "Furnished Apartment Cleaning",
-    status: BookingStatus.PARTNER_EN_ROUTE,
+    status: BookingStatus.PROFESSIONAL_EN_ROUTE,
     date: "Today",
     time: "2:00 PM",
     amount: 3499.0,
-    partnerName: "Rajesh Kumar",
-    partnerImage:
+    professionalName: "Rajesh Kumar",
+    professionalImage:
       "https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=200&h=200",
     otp: "4492",
   },

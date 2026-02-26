@@ -32,18 +32,19 @@ router.get("/customer/:customerId", async (req, res) => {
   }
 });
 
-router.get("/partner/:partnerId", async (req, res) => {
+router.get("/professional/:professionalId", async (req, res) => {
   try {
-    const partner = await User.findById(req.params.partnerId);
-    if (!partner) return res.status(404).json({ message: "Partner not found" });
+    const professional = await User.findById(req.params.professionalId);
+    if (!professional)
+      return res.status(404).json({ message: "Professional not found" });
 
     const bookings = await Booking.find({
       $or: [
-        { partnerId: req.params.partnerId },
+        { professionalId: req.params.professionalId },
         {
           status: "PENDING",
-          serviceArea: partner.serviceArea,
-          partnerId: { $exists: false },
+          serviceArea: professional.serviceArea,
+          professionalId: { $exists: false },
         },
       ],
     }).sort({ createdAt: -1 });
@@ -53,7 +54,7 @@ router.get("/partner/:partnerId", async (req, res) => {
       message:
         error instanceof Error
           ? error.message
-          : "Error fetching partner bookings",
+          : "Error fetching professional bookings",
     });
   }
 });

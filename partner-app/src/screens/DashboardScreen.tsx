@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PartnerScreen, NavigationProps, JobStatus } from "../types";
+import { ProfessionalScreen, NavigationProps, JobStatus } from "../types";
 
 interface DashboardScreenProps extends NavigationProps {
   onLogout: () => void;
@@ -7,10 +7,10 @@ interface DashboardScreenProps extends NavigationProps {
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   navigateTo,
-  partner,
+  professional,
   activeJob,
   jobs,
-  onLogout,
+  refreshJobs,
 }) => {
   const [isOnline, setIsOnline] = useState(true);
   const pendingJobs = jobs.filter((j) => j.status === JobStatus.PENDING);
@@ -22,11 +22,11 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-full flex items-center justify-center bg-primary/20 text-primary font-bold overflow-hidden ring-2 ring-primary/50">
-              {partner?.name.charAt(0).toUpperCase()}
+              {professional?.name.charAt(0).toUpperCase()}
             </div>
             <div>
               <h2 className="font-bold text-lg">
-                Hi, {partner?.name.split(" ")[0]}
+                Hi, {professional?.name.split(" ")[0]}
               </h2>
               <div className="flex items-center gap-1">
                 <span
@@ -36,7 +36,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                   star
                 </span>
                 <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                  {partner?.rating} • {partner?.tier}
+                  {professional?.rating} • {professional?.tier}
                 </span>
               </div>
             </div>
@@ -61,14 +61,16 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             Today's Earnings
           </p>
           <p className="text-2xl font-black mt-1 text-green-600">
-            ₹{partner?.earningsToday}
+            ₹{professional?.earningsToday}
           </p>
         </div>
         <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl shadow-sm border border-gray-100 dark:border-white/5">
           <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">
             Completed
           </p>
-          <p className="text-2xl font-black mt-1">{partner?.completedJobs}</p>
+          <p className="text-2xl font-black mt-1">
+            {professional?.completedJobs}
+          </p>
         </div>
       </div>
 
@@ -79,7 +81,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             Active Job
           </h3>
           <div
-            onClick={() => navigateTo(PartnerScreen.ACTIVE_JOB)}
+            onClick={() => navigateTo(ProfessionalScreen.ACTIVE_JOB)}
             className="bg-primary text-black rounded-xl p-5 shadow-lg cursor-pointer relative overflow-hidden hover:scale-[1.02] transition-transform"
           >
             <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -123,13 +125,18 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500">
               New Leads ({pendingJobs.length})
             </h3>
-            <button className="text-primary text-xs font-bold">Refresh</button>
+            <button
+              onClick={refreshJobs}
+              className="text-primary text-xs font-bold hover:opacity-70 transition-opacity"
+            >
+              Refresh
+            </button>
           </div>
           <div className="space-y-3">
             {pendingJobs.slice(0, 3).map((job) => (
               <div
                 key={job.id}
-                onClick={() => navigateTo(PartnerScreen.JOBS)}
+                onClick={() => navigateTo(ProfessionalScreen.JOBS)}
                 className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-gray-100 dark:border-white/5 cursor-pointer hover:border-primary/50 transition-colors"
               >
                 <div className="flex justify-between items-start mb-2">

@@ -30,7 +30,17 @@ const ServiceSchema: Schema = new Schema(
     subCategoryId: { type: String },
     offerTag: { type: String },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret: any) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
+  },
 );
 
 export default mongoose.model<IService>("Service", ServiceSchema);

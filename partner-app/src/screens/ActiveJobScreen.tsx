@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { PartnerScreen, NavigationProps, JobStatus } from "../types";
-import MapComponent from "../components/MapComponent";
+import { ProfessionalScreen, NavigationProps, JobStatus } from "../types";
 
 export const ActiveJobScreen: React.FC<NavigationProps> = ({
   navigateTo,
@@ -18,7 +17,7 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
         </span>
         <p className="text-gray-500">No active job</p>
         <button
-          onClick={() => navigateTo(PartnerScreen.JOBS)}
+          onClick={() => navigateTo(ProfessionalScreen.JOBS)}
           className="mt-4 text-primary font-bold"
         >
           View Available Jobs
@@ -62,13 +61,16 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
     if (nextStatus === JobStatus.IN_PROGRESS) {
       setShowOtpModal(true);
     } else if (nextStatus) {
-      updateJobStatus(activeJob.id, nextStatus);
+      updateJobStatus(activeJob.id || activeJob._id || "", nextStatus);
     }
   };
 
   const handleOtpVerify = () => {
     if (otpInput === activeJob.otpStart) {
-      updateJobStatus(activeJob.id, JobStatus.IN_PROGRESS);
+      updateJobStatus(
+        activeJob.id || activeJob._id || "",
+        JobStatus.IN_PROGRESS,
+      );
       setShowOtpModal(false);
       setOtpInput("");
     }
@@ -96,14 +98,16 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
       <header className="bg-white dark:bg-[#1a1a1a] px-4 py-4 border-b border-gray-100 dark:border-white/5 sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigateTo(PartnerScreen.DASHBOARD)}
+            onClick={() => navigateTo(ProfessionalScreen.DASHBOARD)}
             className="p-2 -ml-2"
           >
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div>
             <h1 className="font-bold">Active Job</h1>
-            <p className="text-xs text-gray-500">#{activeJob.id}</p>
+            <p className="text-xs text-gray-500">
+              #{activeJob.id || activeJob._id}
+            </p>
           </div>
         </div>
       </header>
@@ -191,12 +195,18 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
               <p className="text-sm text-gray-500">{activeJob.customerPhone}</p>
             </div>
             <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center">
+              <a
+                href={`tel:${activeJob.customerPhone}`}
+                className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center transition-transform active:scale-90"
+              >
                 <span className="material-symbols-outlined">call</span>
-              </button>
-              <button className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+              </a>
+              <a
+                href={`sms:${activeJob.customerPhone}`}
+                className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center transition-transform active:scale-90"
+              >
                 <span className="material-symbols-outlined">chat</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -215,12 +225,19 @@ export const ActiveJobScreen: React.FC<NavigationProps> = ({
               <p className="text-sm text-gray-500">{activeJob.addressLine2}</p>
             </div>
           </div>
-          <div className="h-48 w-full mt-4 rounded-xl overflow-hidden shadow-sm">
-            <MapComponent
-              destLat={activeJob.lat || 19.076}
-              destLng={activeJob.lng || 72.8777}
-            />
-          </div>
+          {activeJob.status === JobStatus.EN_ROUTE && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                activeJob.address + " " + activeJob.addressLine2,
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+            >
+              <span className="material-symbols-outlined">map</span>
+              Open in Maps
+            </a>
+          )}
         </div>
       </div>
 

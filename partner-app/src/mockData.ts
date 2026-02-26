@@ -1,6 +1,6 @@
-import { Partner, Job, JobStatus } from "./types";
+import { Professional, Job, JobStatus } from "./types";
 
-export const MOCK_PARTNER: Partner = {
+export const MOCK_PROFESSIONAL: Professional = {
   id: "p1",
   name: "Rajesh Kumar",
   phone: "+91 98765 43210",

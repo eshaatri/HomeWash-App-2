@@ -2,8 +2,8 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export enum UserRole {
   CUSTOMER = "CUSTOMER",
+  PROFESSIONAL = "PROFESSIONAL",
   PARTNER = "PARTNER",
-  VENDOR = "VENDOR",
   ADMIN = "ADMIN",
 }
 
@@ -16,7 +16,7 @@ export interface IUser extends Document {
   rating?: number;
   isVerified?: boolean;
   earningsToday?: number;
-  vendorId?: string;
+  partnerId?: string;
   serviceArea?: string;
   city?: string;
 }
@@ -31,11 +31,21 @@ const UserSchema: Schema = new Schema(
     rating: { type: Number },
     isVerified: { type: Boolean },
     earningsToday: { type: Number },
-    vendorId: { type: String },
+    partnerId: { type: String },
     serviceArea: { type: String },
     city: { type: String },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret: any) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
+  },
 );
 
 export default mongoose.model<IUser>("User", UserSchema);

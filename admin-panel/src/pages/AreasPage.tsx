@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { NavigationProps, Area } from "../types";
+import { NavigationProps, Area, Partner } from "../types";
 import { adminService } from "../services/api";
 import { Modal } from "../components/Modal";
 import MapComponent from "../components/MapComponent";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+import { union } from "@turf/union";
+
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+const LIBRARIES: any = ["places", "geometry", "drawing"];
 
 export const AreasPage: React.FC<NavigationProps> = () => {
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
@@ -20,22 +26,71 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     isActive: true,
     lat: 19.076,
     lng: 72.8777,
+    assignedPartnerId: "",
+    assignedPartnerName: "",
+  });
+  const [geoJsonData, setGeoJsonData] = useState<any>(null);
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: LIBRARIES,
   });
 
-  const fetchAreas = async () => {
+  const [autocomplete, setAutocomplete] =
+    useState<google.maps.places.Autocomplete | null>(null);
+
+  const onLoadAutocomplete = (
+    autocompleteInst: google.maps.places.Autocomplete,
+  ) => {
+    setAutocomplete(autocompleteInst);
+  };
+
+  const onPlaceChanged = () => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+
+      let newCity = formData.city;
+      let newZip = formData.zipCodes;
+
+      const cityComp = place.address_components?.find((c: any) =>
+        c.types.includes("locality"),
+      );
+      if (cityComp) newCity = cityComp.long_name;
+
+      const zipComp = place.address_components?.find((c: any) =>
+        c.types.includes("postal_code"),
+      );
+      if (zipComp) newZip = zipComp.long_name;
+
+      setFormData({
+        ...formData,
+        name: place.name || formData.name,
+        city: newCity,
+        zipCodes: newZip,
+        lat: place.geometry?.location?.lat() || formData.lat,
+        lng: place.geometry?.location?.lng() || formData.lng,
+      });
+    }
+  };
+
+  const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getAreas();
-      setAreas(data);
+      const [areasData, partnersData] = await Promise.all([
+        adminService.getAreas(),
+        adminService.getPartners(),
+      ]);
+      setAreas(areasData);
+      setPartners(partnersData);
     } catch (error) {
-      console.error("Failed to fetch areas:", error);
+      console.error("Failed to fetch initial data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAreas();
+    fetchInitialData();
   }, []);
 
   const handleOpenModal = (area?: Area) => {
@@ -48,7 +103,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         isActive: area.isActive,
         lat: area.lat || 19.076,
         lng: area.lng || 72.8777,
+        assignedPartnerId: area.assignedPartnerId || "",
+        assignedPartnerName: area.assignedPartnerName || "",
       });
+      setGeoJsonData(area.geoJson || null);
     } else {
       setEditingArea(null);
       setFormData({
@@ -58,7 +116,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
         isActive: true,
         lat: 19.076,
         lng: 72.8777,
+        assignedPartnerId: "",
+        assignedPartnerName: "",
       });
+      setGeoJsonData(null);
     }
     setIsModalOpen(true);
   };
@@ -68,15 +129,42 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     setEditingArea(null);
   };
 
+  const handleMergeShapes = () => {
+    if (
+      !geoJsonData ||
+      geoJsonData.type !== "FeatureCollection" ||
+      !geoJsonData.features ||
+      geoJsonData.features.length < 2
+    )
+      return;
+
+    try {
+      let merged = geoJsonData.features[0];
+      for (let i = 1; i < geoJsonData.features.length; i++) {
+        merged = union(merged, geoJsonData.features[i]);
+      }
+      setGeoJsonData(merged);
+    } catch (error) {
+      console.error("Merge error:", error);
+      alert("Failed to merge shapes. Ensure the boundaries overlap slightly.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
+    const payload: any = {
       ...formData,
       zipCodes: formData.zipCodes
         .split(",")
         .map((z) => z.trim())
         .filter((z) => z !== ""),
     };
+
+    if (geoJsonData) {
+      payload.geoJson = geoJsonData;
+    } else {
+      payload.geoJson = null; // Clear if empty
+    }
 
     try {
       if (editingArea) {
@@ -87,7 +175,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       } else {
         await adminService.createArea(payload);
       }
-      fetchAreas();
+      fetchInitialData();
       handleCloseModal();
     } catch (error) {
       console.error("Failed to save area:", error);
@@ -95,21 +183,115 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this area? This might affect existing vendor associations.",
-      )
-    ) {
-      try {
-        await adminService.deleteArea(id);
-        fetchAreas();
-      } catch (error) {
-        console.error("Failed to delete area:", error);
-        alert("Failed to delete area.");
-      }
+  const [areaToDelete, setAreaToDelete] = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (!areaToDelete) return;
+    try {
+      await adminService.deleteArea(areaToDelete);
+      fetchInitialData();
+      setAreaToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete area:", error);
+      alert("Failed to delete area.");
+      setAreaToDelete(null);
     }
   };
+
+  const handleDelete = (id: string) => {
+    setAreaToDelete(id);
+  };
+
+  // Debounced effect to fetch GeoJSON overlay
+  const [initialModalZip, setInitialModalZip] = useState("");
+
+  useEffect(() => {
+    if (isModalOpen) {
+      setInitialModalZip(
+        formData.zipCodes ? formData.zipCodes.split(",")[0].trim() : "",
+      );
+    }
+  }, [isModalOpen, editingArea]);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    let isCurrentRequest = true;
+
+    const fetchOverlay = async () => {
+      const currentZipQuery = formData.zipCodes
+        ? formData.zipCodes.split(",")[0].trim()
+        : "";
+      const query = currentZipQuery || formData.name;
+
+      if (!query || query.length < 3) {
+        if (isCurrentRequest) setGeoJsonData(null);
+        return;
+      }
+
+      // Skip fetching if this is an editing area and zip hasn't changed,
+      // preserving their custom drawn geometry.
+      if (
+        editingArea &&
+        editingArea.geoJson &&
+        currentZipQuery === initialModalZip
+      ) {
+        return;
+      }
+
+      try {
+        const data = await adminService.getBoundary({
+          zipcode: currentZipQuery,
+          city: formData.city,
+          name: formData.name,
+        });
+
+        if (!isCurrentRequest) return;
+
+        if (data && data.source) {
+          if (data.geojson) {
+            console.log(
+              `Boundary Match Found via ${data.source}:`,
+              data.display_name || query,
+            );
+            setGeoJsonData(data.geojson);
+          } else {
+            console.log(
+              `No boundary geometry found. Panning to ${data.source}:`,
+              data.display_name || query,
+            );
+            setGeoJsonData(null);
+          }
+
+          if (!editingArea && data.lat && data.lon) {
+            setFormData((prev) => ({
+              ...prev,
+              lat: parseFloat(data.lat),
+              lng: parseFloat(data.lon),
+            }));
+          }
+        } else {
+          setGeoJsonData(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch boundary via proxy:", error);
+        if (isCurrentRequest) setGeoJsonData(null);
+      }
+    };
+
+    const timer = setTimeout(fetchOverlay, 1000);
+    return () => {
+      isCurrentRequest = false;
+      clearTimeout(timer);
+    };
+  }, [
+    formData.name,
+    formData.zipCodes,
+    formData.city,
+    isModalOpen,
+    editingArea,
+    initialModalZip, // Added dependency
+  ]);
 
   const filteredAreas = areas.filter(
     (a) =>
@@ -284,16 +466,28 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                    <span className="material-symbols-outlined text-sm">
-                      storefront
-                    </span>
-                    <span>{area.vendorsCount || 0} Vendors</span>
+                <div className="flex items-center gap-2 py-2 px-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/30">
+                  <span className="material-symbols-outlined text-orange-500 text-sm">
+                    storefront
+                  </span>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-orange-400">
+                      Assigned Partner
+                    </p>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                      {area.assignedPartnerName || "No Partner Assigned"}
+                    </p>
                   </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <div />
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleOpenModal(area)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenModal(area);
+                      }}
                       className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-primary transition-colors"
                     >
                       <span className="material-symbols-outlined text-lg">
@@ -301,7 +495,10 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                       </span>
                     </button>
                     <button
-                      onClick={() => handleDelete(area.id || (area as any)._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(area.id || (area as any)._id);
+                      }}
                       className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <span className="material-symbols-outlined text-lg">
@@ -320,141 +517,275 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title={editingArea ? "Edit Area" : "Add New Area"}
+        fullScreen={true}
+        title={editingArea ? "Edit Area Details" : "Create New Service Area"}
       >
-        <form onSubmit={handleSubmit} className="space-y-4 font-display">
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              Area Name
-            </label>
-            <input
-              required
-              type="text"
-              placeholder="e.g. Bandra West"
-              className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              City
-            </label>
-            <input
-              required
-              type="text"
-              className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, city: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              Select Center on Map
-            </label>
-            <div className="h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mb-2">
-              <MapComponent
-                zoom={14}
-                markers={[
-                  {
-                    id: "temp",
-                    lat: formData.lat || 19.076,
-                    lng: formData.lng || 72.8777,
-                    title: "Selected Center",
-                  },
-                ]}
-                onMapClick={(lat, lng) =>
-                  setFormData({ ...formData, lat, lng })
-                }
-              />
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col lg:flex-row h-full min-h-[500px] font-display"
+        >
+          {/* Left Column: Form Details */}
+          <div className="w-full lg:w-[400px] p-8 space-y-6 border-r border-gray-100 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm overflow-y-auto">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  Area Name
+                </label>
+                {isLoaded ? (
+                  <Autocomplete
+                    onLoad={onLoadAutocomplete}
+                    onPlaceChanged={onPlaceChanged}
+                    options={{
+                      types: ["(regions)"],
+                      componentRestrictions: { country: "in" },
+                    }}
+                  >
+                    <input
+                      required
+                      type="text"
+                      placeholder="e.g. Bandra West"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                    />
+                  </Autocomplete>
+                ) : (
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. Bandra West"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold placeholder:font-normal"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                  />
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  City
+                </label>
                 <input
-                  type="number"
-                  step="any"
-                  className="w-full px-3 py-1 text-xs rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none"
-                  value={formData.lat}
+                  required
+                  type="text"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold"
+                  value={formData.city}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      lat: parseFloat(e.target.value),
-                    })
+                    setFormData({ ...formData, city: e.target.value })
                   }
                 />
               </div>
-              <div className="flex-1">
-                <input
-                  type="number"
-                  step="any"
-                  className="w-full px-3 py-1 text-xs rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:outline-none"
-                  value={formData.lng}
-                  onChange={(e) =>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  Assign Partner
+                </label>
+                <select
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm"
+                  value={formData.assignedPartnerId}
+                  onChange={(e) => {
+                    const partner = partners.find(
+                      (p) => (p.id || (p as any)._id) === e.target.value,
+                    );
                     setFormData({
                       ...formData,
-                      lng: parseFloat(e.target.value),
-                    })
+                      assignedPartnerId: e.target.value,
+                      assignedPartnerName: partner ? partner.name : "",
+                    });
+                  }}
+                >
+                  <option value="">Select Partner</option>
+                  {partners.map((partner) => (
+                    <option
+                      key={partner.id || (partner as any)._id}
+                      value={partner.id || (partner as any)._id}
+                    >
+                      {partner.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  Zip Codes (Comma separated)
+                </label>
+                <textarea
+                  placeholder="400050, 400051 (Optional if drawing area)"
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm placeholder:font-normal"
+                  value={formData.zipCodes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, zipCodes: e.target.value })
                   }
                 />
               </div>
+
+              <div className="flex items-center gap-2 cursor-pointer group py-2">
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={formData.isActive}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isActive: e.target.checked })
+                  }
+                />
+                <div
+                  className={`w-10 h-5 rounded-full p-1 transition-colors ${formData.isActive ? "bg-primary" : "bg-gray-300"}`}
+                >
+                  <div
+                    className={`w-3 h-3 bg-white rounded-full transition-transform ${formData.isActive ? "translate-x-5" : "translate-x-0"}`}
+                  ></div>
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400">
+                  {formData.isActive ? "Operational" : "Paused"}
+                </span>
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">
-              Zip Codes (Comma separated)
-            </label>
-            <textarea
-              required
-              placeholder="400050, 400051"
-              rows={3}
-              className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:border-primary focus:outline-none font-bold text-sm placeholder:font-normal"
-              value={formData.zipCodes}
-              onChange={(e) =>
-                setFormData({ ...formData, zipCodes: e.target.value })
-              }
-            />
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer group py-2">
-            <input
-              type="checkbox"
-              className="hidden"
-              checked={formData.isActive}
-              onChange={(e) =>
-                setFormData({ ...formData, isActive: e.target.checked })
-              }
-            />
-            <div
-              className={`w-10 h-5 rounded-full p-1 transition-colors ${formData.isActive ? "bg-primary" : "bg-gray-300"}`}
-            >
-              <div
-                className={`w-3 h-3 bg-white rounded-full transition-transform ${formData.isActive ? "translate-x-5" : "translate-x-0"}`}
-              ></div>
+
+            <div className="pt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 py-3 rounded-xl bg-primary text-white font-black uppercase tracking-widest hover:bg-primary-dim transition-colors shadow-lg shadow-primary/20"
+              >
+                {editingArea ? "Save" : "Create"}
+              </button>
             </div>
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400">
-              {formData.isActive ? "Operational" : "Paused"}
-            </span>
           </div>
 
-          <div className="pt-4 flex gap-3">
+          {/* Right Column: Large Interactive Map */}
+          <div className="flex-1 min-h-[400px] relative bg-gray-100 dark:bg-black/20 overflow-hidden">
+            <div className="absolute top-4 left-4 z-[1000] flex gap-2 items-center">
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">
+                  Pinning Area
+                </p>
+                <div className="flex gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">
+                      LATITUDE
+                    </span>
+                    <span className="text-sm font-black text-gray-900 dark:text-white">
+                      {formData.lat.toFixed(6)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">
+                      LONGITUDE
+                    </span>
+                    <span className="text-sm font-black text-gray-900 dark:text-white">
+                      {formData.lng.toFixed(6)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {geoJsonData && (
+                <div className="flex gap-2">
+                  {geoJsonData.type === "FeatureCollection" &&
+                    geoJsonData.features?.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={handleMergeShapes}
+                        className="bg-indigo-500 hover:bg-indigo-600 text-white shadow-xl px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 h-fit"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          merge
+                        </span>
+                        Merge Shapes
+                      </button>
+                    )}
+                  <button
+                    type="button"
+                    onClick={() => setGeoJsonData(null)}
+                    className="bg-red-500 hover:bg-red-600 text-white shadow-xl px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 h-fit"
+                  >
+                    <span className="material-symbols-outlined text-sm">
+                      delete
+                    </span>
+                    Clear Shape
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <MapComponent
+              zoom={14}
+              center={{
+                lat: formData.lat || 19.076,
+                lng: formData.lng || 72.8777,
+              }}
+              geoJsonData={geoJsonData}
+              pincode={
+                formData.zipCodes ? formData.zipCodes.split(",")[0].trim() : ""
+              }
+              isEditable={true}
+              onGeoJsonChange={setGeoJsonData}
+              markers={[
+                {
+                  id: "temp",
+                  lat: formData.lat || 19.076,
+                  lng: formData.lng || 72.8777,
+                  title: formData.name || "Selected Center",
+                  details:
+                    "Drag this pin to manually adjust the center coordinate.",
+                  draggable: true,
+                  onDragEnd: (lat, lng) =>
+                    setFormData({ ...formData, lat, lng }),
+                },
+              ]}
+            />
+
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-black/60 backdrop-blur-md text-white px-6 py-2.5 rounded-full border border-white/10 shadow-2xl pointer-events-none">
+              <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm text-primary">
+                  pan_tool
+                </span>
+                Drag the pin to adjust area center
+              </p>
+            </div>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!areaToDelete}
+        onClose={() => setAreaToDelete(null)}
+        title="Delete Area"
+      >
+        <div className="p-6">
+          <p className="text-gray-600 dark:text-gray-300 mb-8 font-medium">
+            Are you sure you want to delete this specific operational area? This
+            will unassign any partners operating silently within its geometry
+            boundaries.
+          </p>
+          <div className="flex gap-4">
             <button
-              type="button"
-              onClick={handleCloseModal}
+              onClick={() => setAreaToDelete(null)}
               className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               Cancel
             </button>
             <button
-              type="submit"
-              className="flex-1 py-3 rounded-xl bg-primary text-white font-black uppercase tracking-widest hover:bg-primary-dim transition-colors shadow-lg shadow-primary/20"
+              onClick={confirmDelete}
+              className="flex-1 py-3 rounded-xl bg-red-500 text-white font-black uppercase tracking-widest hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
             >
-              {editingArea ? "Save Area" : "Create Area"}
+              Confirm Deletion
             </button>
           </div>
-        </form>
+        </div>
       </Modal>
     </div>
   );

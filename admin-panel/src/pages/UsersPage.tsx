@@ -2,30 +2,13 @@ import React, { useState, useEffect } from "react";
 import { NavigationProps } from "../types";
 import { adminService } from "../services/api";
 
-interface User {
-  _id: string;
-  name: string;
-  phone: string;
-  role: 'ADMIN' | 'PARTNER' | 'CUSTOMER' | 'VENDOR';
-  walletBalance: number;
-  totalBookings?: number;
-  totalSpent?: number;
-  lastActive?: string;
-  isActive?: boolean;
-  createdAt: string;
-}
-
 export const UsersPage: React.FC<NavigationProps> = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [customers, setCustomers] = useState<User[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeActionId, setActiveActionId] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const data = await adminService.getUsers();
       setCustomers(data.filter((u: any) => u.role === "CUSTOMER"));
@@ -36,53 +19,77 @@ export const UsersPage: React.FC<NavigationProps> = () => {
     }
   };
 
-  const handleEdit = (customer: User) => {
-    // TODO: Implement Edit Modal
-    alert(`Edit ${customer.name}`);
-    setActiveActionId(null);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleExport = () => {
+    const headers = ["ID", "Name", "Phone", "Bookings", "Spent", "Joined Date"];
+    const csvData = filteredCustomers.map((c) =>
+      [
+        c.id || c._id,
+        c.name,
+        c.phone,
+        c.totalBookings || 0,
+        c.totalSpent || 0,
+        c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "N/A",
+      ].join(","),
+    );
+
+    const csvContent = [headers.join(","), ...csvData].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `customers_export_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
   };
 
-  const handleViewBookings = (customer: User) => {
-    // TODO: Navigate to bookings
-    alert(`View bookings for ${customer.name}`);
-    setActiveActionId(null);
-  };
-
-  const handleBlock = async (customer: User) => {
-    // TODO: Implement Block API
-    if (confirm(`Are you sure you want to ${customer.isActive === false ? 'unblock' : 'block'} ${customer.name}?`)) {
+  const handleAddCustomer = async () => {
+    const name = prompt("Enter customer name:");
+    const phone = prompt("Enter customer phone:");
+    if (name && phone) {
       try {
-        await adminService.updateUser(customer._id, { isActive: !customer.isActive });
+        await adminService.createUser({ name, phone, role: "CUSTOMER" });
+        alert("Customer added successfully!");
         fetchUsers();
-      } catch (e) {
-        console.error(e);
-        alert("Failed to update status");
+      } catch (error) {
+        alert("Failed to add customer.");
       }
     }
-    setActiveActionId(null);
   };
 
-  const handleDelete = async (customer: User) => {
-    if (confirm(`Are you sure you want to delete ${customer.name}? This action cannot be undone.`)) {
+  const handleDeleteCustomer = async (id: string, name: string) => {
+    if (confirm(`Are you sure you want to delete customer ${name}?`)) {
       try {
-        await adminService.deleteUser(customer._id);
+        await adminService.deleteUser(id);
+        alert("Customer deleted successfully!");
         fetchUsers();
-      } catch (e) {
-        console.error(e);
-        alert("Failed to delete user");
+      } catch (error) {
+        alert("Failed to delete customer.");
       }
     }
-    setActiveActionId(null);
   };
 
-  const filteredCustomers = customers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.phone.includes(searchTerm),
-  );
+  const filteredCustomers = customers.filter((c) => {
+    const name = c.name || "";
+    const phone = c.phone || "";
+    return (
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      phone.includes(searchTerm)
+    );
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6" onClick={() => setActiveActionId(null)}>
+    <div className="p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -93,10 +100,22 @@ export const UsersPage: React.FC<NavigationProps> = () => {
             Manage your customer base
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dim transition-colors">
-          <span className="material-symbols-outlined text-lg">add</span>
-          Add Customer
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 border border-gray-200 dark:border-gray-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <span className="material-symbols-outlined text-lg">download</span>
+            Export
+          </button>
+          <button
+            onClick={handleAddCustomer}
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dim transition-colors"
+          >
+            <span className="material-symbols-outlined text-lg">add</span>
+            Add Customer
+          </button>
+        </div>
       </div>
 
       {/* Search & Filters */}
@@ -124,26 +143,23 @@ export const UsersPage: React.FC<NavigationProps> = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden" style={{ minHeight: '400px' }}>
-        <table className="w-full text-left">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-700/50">
             <tr>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Customer
               </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Contact
               </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Bookings
               </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Total Spent
               </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                Status
-              </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Last Active
               </th>
               <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
@@ -152,77 +168,87 @@ export const UsersPage: React.FC<NavigationProps> = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredCustomers.map((customer) => (
-              <tr
-                key={customer._id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                      {customer.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-medium">{customer.name}</p>
-                      <p className="text-xs text-gray-500">
-                        Since{" "}
-                        {customer.createdAt
-                          ? new Date(customer.createdAt).toLocaleDateString()
-                          : "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <p className="text-sm">{customer.phone}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-medium">
-                    {customer.totalBookings || 0}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-medium text-green-600">
-                    ₹{(customer.totalSpent || 0).toLocaleString()}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${customer.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {customer.isActive !== false ? 'Active' : 'Blocked'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  {customer.lastActive || "N/A"}
-                </td>
-                <td className="px-6 py-4 text-right relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveActionId(activeActionId === customer._id ? null : customer._id);
-                    }}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                  >
-                    <span className="material-symbols-outlined">more_vert</span>
-                  </button>
-                  {activeActionId === customer._id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10 overflow-hidden">
-                      <button onClick={() => handleEdit(customer)} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm">edit</span> Edit Details
-                      </button>
-                      <button onClick={() => handleViewBookings(customer)} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm">visibility</span> View Bookings
-                      </button>
-                      <button onClick={() => handleBlock(customer)} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-orange-600">
-                        <span className="material-symbols-outlined text-sm">block</span> {customer.isActive !== false ? 'Block' : 'Unblock'}
-                      </button>
-                      <button onClick={() => handleDelete(customer)} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600">
-                        <span className="material-symbols-outlined text-sm">delete</span> Delete
-                      </button>
-                    </div>
-                  )}
+            {filteredCustomers.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-6 py-12 text-center text-gray-500"
+                >
+                  No customers found matching your search.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredCustomers.map((customer) => (
+                <tr
+                  key={customer.id || customer._id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        {(customer.name || "?").charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium">
+                          {customer.name || "Unknown"}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Since{" "}
+                          {customer.createdAt
+                            ? new Date(customer.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <p className="text-sm">{customer.phone || "N/A"}</p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-medium">
+                      {customer.totalBookings || 0}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-medium text-green-600">
+                      ₹{(customer.totalSpent || 0).toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {customer.lastActive || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() =>
+                          alert(
+                            `Customer: ${customer.name}\nPhone: ${customer.phone}\nRole: CUSTOMER`,
+                          )
+                        }
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          visibility
+                        </span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDeleteCustomer(
+                            customer.id || customer._id,
+                            customer.name,
+                          )
+                        }
+                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 rounded-lg transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          delete
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -16,15 +16,16 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
   const [showProfilePopup, setShowProfilePopup] = React.useState(false);
   const [showGatewayPopup, setShowGatewayPopup] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const [selectedGateway, setSelectedGateway] = React.useState<
-    "razorpay" | "easebuzz" | null
-  >(null);
+  const [selectedGateway, setSelectedGateway] = React.useState<string | null>(
+    null,
+  );
 
   const [userName, setUserName] = React.useState(
     user?.name === "New User" ? "" : user?.name || "",
   );
   const [userEmail, setUserEmail] = React.useState(user?.email || "");
   const [profileError, setProfileError] = React.useState("");
+  const [coverageError, setCoverageError] = React.useState("");
 
   // If cart is empty, navigate back to home
   React.useEffect(() => {
@@ -397,12 +398,33 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
             256-bit SSL Encrypted Transaction
           </p>
         </div>
+        {coverageError && (
+          <div className="mb-4 flex items-center gap-3 rounded-xl bg-red-50 dark:bg-red-500/10 p-4 border border-red-100 dark:border-red-500/20 animate-in slide-in-from-top-2">
+            <span className="material-symbols-outlined text-red-500">
+              warning
+            </span>
+            <p className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-tight">
+              {coverageError}
+            </p>
+          </div>
+        )}
         <button
           onClick={() => {
+            if (!selectedArea) {
+              setCoverageError(
+                "Area not covered. We don't serve this location yet.",
+              );
+              return;
+            }
+            setCoverageError("");
             if (!userName || userName === "New User") {
               setShowProfilePopup(true);
             } else {
-              setShowGatewayPopup(true);
+              setIsProcessing(true);
+              setTimeout(() => {
+                setIsProcessing(false);
+                onPaymentComplete({ name: userName, email: userEmail });
+              }, 2000);
             }
           }}
           disabled={isCustomError || isProcessing}
@@ -476,12 +498,20 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
 
               <button
                 onClick={() => {
+                  if (!selectedArea) {
+                    setProfileError("Area not covered. Please change address.");
+                    return;
+                  }
                   if (!userName.trim()) {
                     setProfileError("Full name is mandatory");
                     return;
                   }
                   setShowProfilePopup(false);
-                  setShowGatewayPopup(true);
+                  setIsProcessing(true);
+                  setTimeout(() => {
+                    setIsProcessing(false);
+                    onPaymentComplete({ name: userName, email: userEmail });
+                  }, 2000);
                 }}
                 className="w-full h-12 bg-black dark:bg-white text-white dark:text-onyx font-bold rounded-xl active:scale-95 transition-transform"
               >
@@ -498,75 +528,7 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
         </div>
       )}
 
-      {/* Payment Gateway Selection */}
-      {showGatewayPopup && (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="w-full max-w-md bg-white dark:bg-onyx rounded-t-[32px] p-8 animate-in slide-in-from-bottom duration-500">
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-onyx dark:text-white">
-                Choose Payment Method
-              </h3>
-              <p className="text-sm text-gray-400 mt-1">
-                You will be redirected to the secure gateway.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => setSelectedGateway("razorpay")}
-                className={`w-full p-4 rounded-xl border-2 flex items-center justify-between transition-all ${selectedGateway === "razorpay" ? "border-primary bg-primary/5" : "border-gray-100 dark:border-white/5"}`}
-              >
-                <span className="font-bold text-onyx dark:text-white">
-                  Razorpay
-                </span>
-                <div
-                  className={`h-5 w-5 rounded-full border-2 ${selectedGateway === "razorpay" ? "border-primary bg-primary" : "border-gray-300"}`}
-                >
-                  {selectedGateway === "razorpay" && (
-                    <div className="h-full w-full flex items-center justify-center text-[12px] text-white">
-                      ✓
-                    </div>
-                  )}
-                </div>
-              </button>
-
-              <button
-                onClick={() => setSelectedGateway("easebuzz")}
-                className={`w-full p-4 rounded-xl border-2 flex items-center justify-between transition-all ${selectedGateway === "easebuzz" ? "border-primary bg-primary/5" : "border-gray-100 dark:border-white/5"}`}
-              >
-                <span className="font-bold text-onyx dark:text-white">
-                  Easebuzz
-                </span>
-                <div
-                  className={`h-5 w-5 rounded-full border-2 ${selectedGateway === "easebuzz" ? "border-primary bg-primary" : "border-gray-300"}`}
-                >
-                  {selectedGateway === "easebuzz" && (
-                    <div className="h-full w-full flex items-center justify-center text-[12px] text-white">
-                      ✓
-                    </div>
-                  )}
-                </div>
-              </button>
-
-              <button
-                disabled={!selectedGateway}
-                onClick={() => {
-                  setShowGatewayPopup(false);
-                  setIsProcessing(true);
-                  // Simulate payment gateway redirect and success after 2 seconds
-                  setTimeout(() => {
-                    setIsProcessing(false);
-                    onPaymentComplete({ name: userName, email: userEmail });
-                  }, 2000);
-                }}
-                className={`w-full h-12 mt-4 font-bold rounded-xl active:scale-95 transition-all ${selectedGateway ? "bg-black dark:bg-white text-white dark:text-onyx" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
-              >
-                Proceed to Pay ₹{payableNow.toFixed(2)}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Removed Gateway Popup as per user request */}
 
       {/* Processing Overlay */}
       {isProcessing && (
@@ -580,7 +542,7 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
             </div>
           </div>
           <h3 className="text-xl font-bold dark:text-white">
-            Securely redirecting to {selectedGateway}...
+            Securely processing your payment...
           </h3>
           <p className="text-gray-500 mt-2">
             Please do not refresh or press back button

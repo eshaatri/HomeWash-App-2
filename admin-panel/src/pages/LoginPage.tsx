@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { NavigationProps } from "../types";
 
 interface LoginPageProps extends NavigationProps {
-  onLogin: (role: "ADMIN" | "VENDOR") => void;
+  onLogin: (role: "ADMIN" | "PARTNER") => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"ADMIN" | "VENDOR">("ADMIN");
+  const [role, setRole] = useState<"ADMIN" | "PARTNER">("ADMIN");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,14 +53,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </button>
             <button
               type="button"
-              onClick={() => setRole("VENDOR")}
+              onClick={() => setRole("PARTNER")}
               className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
-                role === "VENDOR"
+                role === "PARTNER"
                   ? "bg-white dark:bg-gray-600 text-primary shadow-sm"
                   : "text-gray-500"
               }`}
             >
-              Vendor Portal
+              Partner Portal
             </button>
           </div>
           <div className="space-y-5">

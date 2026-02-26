@@ -1,5 +1,5 @@
 import React from "react";
-import { PartnerScreen, NavigationProps } from "../types";
+import { ProfessionalScreen, NavigationProps } from "../types";
 
 export const BottomNav: React.FC<NavigationProps> = ({
   currentScreen,
@@ -7,17 +7,18 @@ export const BottomNav: React.FC<NavigationProps> = ({
   activeJob,
 }) => {
   const tabs = [
-    { screen: PartnerScreen.DASHBOARD, icon: "dashboard", label: "Home" },
-    { screen: PartnerScreen.JOBS, icon: "work", label: "Jobs" },
-    { screen: PartnerScreen.WALLET, icon: "payments", label: "Wallet" },
-    { screen: PartnerScreen.PROFILE, icon: "person", label: "Profile" },
+    { screen: ProfessionalScreen.DASHBOARD, icon: "dashboard", label: "Home" },
+    { screen: ProfessionalScreen.JOBS, icon: "work", label: "Jobs" },
+    { screen: ProfessionalScreen.WALLET, icon: "payments", label: "Wallet" },
+    { screen: ProfessionalScreen.PROFILE, icon: "person", label: "Profile" },
   ];
 
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white dark:bg-[#1a1a1a] border-t border-gray-100 dark:border-white/5 p-2 flex justify-around z-50">
       {tabs.map((tab) => {
         const isActive = currentScreen === tab.screen;
-        const hasActiveJob = tab.screen === PartnerScreen.JOBS && activeJob;
+        const hasActiveJob =
+          tab.screen === ProfessionalScreen.JOBS && activeJob;
 
         return (
           <button

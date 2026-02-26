@@ -19,9 +19,9 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
       color: "blue",
     },
     {
-      label: "Active Partners",
-      value: MOCK_STATS.activePartners.toString(),
-      change: MOCK_STATS.partnersChange,
+      label: "Active Professionals",
+      value: MOCK_STATS.activeProfessionals.toString(),
+      change: MOCK_STATS.professionalsChange,
       icon: "engineering",
       color: "purple",
     },
@@ -52,13 +52,22 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Dashboard
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          Welcome back! Here's what's happening today.
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+            System Overview
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            Real-time platform status and key performance indicators.
+          </p>
+        </div>
+        <button
+          onClick={() => navigateTo(AdminPage.REPORTS)}
+          className="bg-primary text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition-all"
+        >
+          <span className="material-symbols-outlined text-sm">analytics</span>
+          Detailed Reports
+        </button>
       </div>
 
       {/* Stats Grid */}
@@ -66,7 +75,7 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
         {stats.map((stat, i) => (
           <div
             key={i}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
           >
             <div className="flex items-center justify-between mb-4">
               <div
@@ -89,10 +98,10 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
                 {stat.change}%
               </span>
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-black text-gray-900 dark:text-white">
               {stat.value}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
               {stat.label}
             </p>
           </div>
@@ -100,70 +109,119 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Bookings */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <h2 className="text-lg font-bold">Recent Bookings</h2>
+        {/* Quick Snapshot / Recent Sales */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="p-6 border-b border-gray-50 dark:border-gray-700 flex items-center justify-between">
+            <h2 className="text-lg font-black uppercase tracking-tighter">
+              Today's Performance
+            </h2>
+            <div className="flex gap-2">
+              <span className="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">
+                Online
+              </span>
+              <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-black uppercase tracking-wider shadow-sm">
+                {MOCK_STATS.activeProfessionals} Active Professionals
+              </span>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">
+                  Avg. Response
+                </p>
+                <p className="text-xl font-black">14.2 min</p>
+              </div>
+              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">
+                  Conversion
+                </p>
+                <p className="text-xl font-black">8.4%</p>
+              </div>
+              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">
+                  Retention
+                </p>
+                <p className="text-xl font-black">32%</p>
+              </div>
+            </div>
+
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-4 italic">
+              Latest Service Requests
+            </h3>
+            <div className="space-y-3">
+              {MOCK_BOOKINGS.slice(0, 4).map((booking) => (
+                <div
+                  key={booking.id}
+                  className="flex items-center justify-between p-4 rounded-2xl border border-gray-50 dark:border-gray-700/50 hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <span className="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">
+                        {booking.serviceName.toLowerCase().includes("clean")
+                          ? "cleaning_services"
+                          : "home_repair_service"}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm tracking-tight">
+                        {booking.serviceName}
+                      </p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                        {booking.customerName} • {booking.scheduledTime}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-gray-900 dark:text-white">
+                      ₹{booking.amount}
+                    </p>
+                    <span
+                      className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest ${getStatusColor(booking.status)}`}
+                    >
+                      {booking.status.replace("_", " ")}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
             <button
               onClick={() => navigateTo(AdminPage.BOOKINGS)}
-              className="text-primary text-sm font-medium hover:underline"
+              className="w-full mt-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all border border-transparent hover:shadow-lg"
             >
-              View All
+              Access All Bookings
             </button>
-          </div>
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {MOCK_BOOKINGS.slice(0, 5).map((booking) => (
-              <div
-                key={booking.id}
-                className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-mono text-gray-500">
-                      #{booking.id}
-                    </span>
-                    <span className="font-medium">{booking.serviceName}</span>
-                  </div>
-                  <span
-                    className={`text-xs font-bold px-2 py-1 rounded ${getStatusColor(booking.status)}`}
-                  >
-                    {booking.status.replace("_", " ")}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                  <span>{booking.customerName}</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    ₹{booking.amount}
-                  </span>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
         {/* Activity Feed */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-bold">Recent Activity</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden h-fit">
+          <div className="p-6 border-b border-gray-50 dark:border-gray-700">
+            <h2 className="text-lg font-black uppercase tracking-tighter text-gray-400">
+              Live Activity
+            </h2>
           </div>
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-2">
             {RECENT_ACTIVITY.map((activity, i) => (
-              <div key={i} className="flex items-start gap-3">
+              <div
+                key={i}
+                className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
                     activity.type === "booking"
-                      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600"
-                      : activity.type === "partner"
-                        ? "bg-purple-100 dark:bg-purple-900/30 text-purple-600"
+                      ? "bg-blue-50 text-blue-600"
+                      : activity.type === "professional"
+                        ? "bg-purple-50 text-purple-600"
                         : activity.type === "payment"
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-600"
-                          : "bg-red-100 dark:bg-red-900/30 text-red-600"
+                          ? "bg-green-50 text-green-600"
+                          : "bg-red-50 text-red-600"
                   }`}
                 >
                   <span className="material-symbols-outlined text-sm">
                     {activity.type === "booking"
                       ? "calendar_month"
-                      : activity.type === "partner"
+                      : activity.type === "professional"
                         ? "person"
                         : activity.type === "payment"
                           ? "payments"
@@ -171,8 +229,12 @@ export const DashboardPage: React.FC<NavigationProps> = ({ navigateTo }) => {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm">{activity.message}</p>
-                  <p className="text-xs text-gray-500">{activity.time}</p>
+                  <p className="text-xs font-bold leading-relaxed">
+                    {activity.message}
+                  </p>
+                  <p className="text-[10px] font-black uppercase text-gray-400 mt-1 tracking-wider">
+                    {activity.time}
+                  </p>
                 </div>
               </div>
             ))}
