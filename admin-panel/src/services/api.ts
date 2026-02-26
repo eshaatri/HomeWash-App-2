@@ -27,8 +27,32 @@ export const adminService = {
     const response = await api.get("/services");
     return response.data;
   },
+  createService: async (serviceData: any) => {
+    const response = await api.post("/services", serviceData);
+    return response.data;
+  },
+  updateService: async (id: string, serviceData: any) => {
+    const response = await api.put(`/services/${id}`, serviceData);
+    return response.data;
+  },
+  deleteService: async (id: string) => {
+    const response = await api.delete(`/services/${id}`);
+    return response.data;
+  },
   getCategories: async () => {
     const response = await api.get("/categories");
+    return response.data;
+  },
+  createCategory: async (categoryData: any) => {
+    const response = await api.post("/categories", categoryData);
+    return response.data;
+  },
+  updateCategory: async (id: string, categoryData: any) => {
+    const response = await api.put(`/categories/${id}`, categoryData);
+    return response.data;
+  },
+  deleteCategory: async (id: string) => {
+    const response = await api.delete(`/categories/${id}`);
     return response.data;
   },
   getVendors: async () => {
