@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { NavigationProps, ProfessionalStatus } from "../types";
+import { NavigationProps, ProfessionalStatus, Partner } from "../types";
 import { adminService } from "../services/api";
+import { Modal } from "../components/Modal";
 
 export const ProfessionalsPage: React.FC<NavigationProps> = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [professionals, setProfessionals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+   const [partners, setPartners] = useState<Partner[]>([]);
+   const [isModalOpen, setIsModalOpen] = useState(false);
+   const [isSaving, setIsSaving] = useState(false);
+   const [formData, setFormData] = useState<{
+     name: string;
+     phone: string;
+     partnerId: string;
+   }>({
+     name: "",
+     phone: "",
+     partnerId: "",
+   });
 
   const fetchProfessionals = async () => {
     setLoading(true);
@@ -20,22 +33,30 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
     }
   };
 
+  const fetchPartners = async () => {
+    try {
+      const data = await adminService.getPartners();
+      setPartners(data);
+    } catch (error) {
+      console.error("Failed to fetch partners for professionals:", error);
+    }
+  };
+
   useEffect(() => {
     fetchProfessionals();
+    fetchPartners();
   }, []);
 
   const handleAddProfessional = async () => {
-    const name = prompt("Enter professional name:");
-    const phone = prompt("Enter professional phone:");
-    if (name && phone) {
-      try {
-        await adminService.createUser({ name, phone, role: "PROFESSIONAL" });
-        alert("Professional added successfully!");
-        fetchProfessionals();
-      } catch (error) {
-        alert("Failed to add professional.");
-      }
-    }
+    setFormData({
+      name: "",
+      phone: "",
+      partnerId:
+        partners.length > 0
+          ? (partners[0].id || (partners[0] as any)._id) ?? ""
+          : "",
+    });
+    setIsModalOpen(true);
   };
 
   const handleDeleteProfessional = async (id: string, name: string) => {
@@ -206,6 +227,9 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                 Professional
               </th>
               <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                Partner
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
@@ -259,6 +283,17 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                         </p>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {(() => {
+                        const partner = partners.find(
+                          (p) =>
+                            (p.id || (p as any)._id) === professional.partnerId,
+                        );
+                        return partner?.name || "Unassigned";
+                      })()}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     <span
@@ -332,6 +367,111 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Add Professional"
+      >
+        <form
+          className="space-y-4"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!formData.name || !formData.phone) {
+              alert("Please enter name and phone.");
+              return;
+            }
+            if (!formData.partnerId) {
+              alert("Please select a partner.");
+              return;
+            }
+            try {
+              setIsSaving(true);
+              await adminService.createUser({
+                name: formData.name,
+                phone: formData.phone,
+                role: "PROFESSIONAL",
+                partnerId: formData.partnerId,
+              });
+              setIsModalOpen(false);
+              await fetchProfessionals();
+            } catch (error) {
+              console.error("Failed to add professional:", error);
+              alert("Failed to add professional.");
+            } finally {
+              setIsSaving(false);
+            }
+          }}
+        >
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+              Name
+            </label>
+            <input
+              type="text"
+              className="w-full h-10 px-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-primary"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+              Phone
+            </label>
+            <input
+              type="tel"
+              className="w-full h-10 px-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-primary"
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, phone: e.target.value }))
+              }
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+              Partner
+            </label>
+            <select
+              className="w-full h-10 px-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-primary"
+              value={formData.partnerId}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, partnerId: e.target.value }))
+              }
+              required
+            >
+              <option value="">Select a partner</option>
+              {partners.map((partner) => (
+                <option
+                  key={partner.id || (partner as any)._id}
+                  value={partner.id || (partner as any)._id}
+                >
+                  {partner.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-end gap-2 pt-4">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dim disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSaving ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
