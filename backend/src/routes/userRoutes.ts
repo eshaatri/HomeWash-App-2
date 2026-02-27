@@ -15,16 +15,23 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { phone, role, name } = req.body;
+  const { phone, role, name, partnerId } = req.body;
   try {
     let user = await User.findOne({ phone });
     if (!user) {
-      user = await User.create({
+      const payload: any = {
         phone,
         role,
         name: name || "New User",
         walletBalance: 0,
-      });
+      };
+      if (partnerId) {
+        payload.partnerId = partnerId;
+      }
+      user = await User.create(payload);
+    } else if (partnerId && role === "PROFESSIONAL" && !user.partnerId) {
+      user.partnerId = partnerId;
+      await user.save();
     }
     res.json(user);
   } catch (error) {
