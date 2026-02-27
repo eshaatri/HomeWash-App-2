@@ -410,12 +410,6 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
         )}
         <button
           onClick={() => {
-            if (!selectedArea) {
-              setCoverageError(
-                "Area not covered. We don't serve this location yet.",
-              );
-              return;
-            }
             setCoverageError("");
             if (!userName || userName === "New User") {
               setShowProfilePopup(true);
@@ -498,10 +492,6 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
 
               <button
                 onClick={() => {
-                  if (!selectedArea) {
-                    setProfileError("Area not covered. Please change address.");
-                    return;
-                  }
                   if (!userName.trim()) {
                     setProfileError("Full name is mandatory");
                     return;

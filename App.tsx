@@ -88,10 +88,17 @@ export default function App() {
     if (user) {
       const fetchBookings = async () => {
         try {
+          const baseId = (user as any).id || (user as any)._id || user.phone;
+          if (!baseId) {
+            console.error(
+              "Cannot fetch bookings: user has no id or phone identifier.",
+            );
+            return;
+          }
           const data =
             user.role === UserRole.CUSTOMER
-              ? await bookingService.getCustomerBookings(user.id)
-              : await bookingService.getPartnerBookings(user.id);
+              ? await bookingService.getCustomerBookings(baseId)
+              : await bookingService.getPartnerBookings(baseId);
           setBookings(data);
         } catch (error) {
           console.error("Failed to fetch bookings:", error);
@@ -211,13 +218,33 @@ export default function App() {
   }) => {
     if (!user) return;
 
+    // Prefer explicit id / _id, but fall back to phone as stable identifier
+    const mongoUserId = (user as any).id || (user as any)._id;
+    const customerKey = mongoUserId || (user as any).phone;
+    if (!customerKey) {
+      console.error(
+        "Cannot complete payment: user has no id or phone identifier.",
+      );
+      return;
+    }
+
+    let effectiveCustomerId: string = customerKey;
+
     try {
-      if (profileUpdate) {
+      // Only attempt profile update when we have a Mongo id to patch
+      if (profileUpdate && mongoUserId) {
         const updatedUser = await userService.updateProfile(
-          user.id,
+          mongoUserId,
           profileUpdate,
         );
-        setUser({ ...updatedUser, id: updatedUser._id });
+        const finalId =
+          (updatedUser as any)._id || (updatedUser as any).id || mongoUserId;
+        setUser({ ...updatedUser, id: finalId });
+        effectiveCustomerId = finalId;
+      } else if (profileUpdate && !mongoUserId) {
+        console.warn(
+          "Skipping profile update during payment: no Mongo user id, using phone only.",
+        );
       }
 
       // Create bookings.
@@ -228,21 +255,22 @@ export default function App() {
         };
 
         return bookingService.createBooking({
-          customerId: user.id,
+          customerId: effectiveCustomerId,
           serviceId: item.service.id,
           serviceName: item.service.title,
           status: BookingStatus.PENDING,
           date: slot.date,
           time: slot.time,
           amount: item.service.price,
-          serviceArea: selectedArea || undefined,
+          serviceArea: selectedArea || currentLocationLabel || undefined,
         });
       });
 
       await Promise.all(promises);
 
       // Refresh bookings
-      const updatedBookings = await bookingService.getCustomerBookings(user.id);
+      const updatedBookings =
+        await bookingService.getCustomerBookings(effectiveCustomerId);
       setBookings(updatedBookings);
 
       setCart([]); // Clear cart
@@ -255,9 +283,18 @@ export default function App() {
 
   const updateProfile = async (update: { name: string; email?: string }) => {
     if (!user) return;
+    const baseUserId = (user as any).id || (user as any)._id;
+    if (!baseUserId) {
+      console.error(
+        "Cannot update profile: user Mongo id is missing. Skipping update.",
+      );
+      return;
+    }
     try {
-      const updatedUser = await userService.updateProfile(user.id, update);
-      setUser({ ...updatedUser, id: updatedUser._id });
+      const updatedUser = await userService.updateProfile(baseUserId, update);
+      const finalId =
+        (updatedUser as any)._id || (updatedUser as any).id || baseUserId;
+      setUser({ ...updatedUser, id: finalId });
     } catch (error) {
       console.error("Failed to update profile:", error);
       throw error;
