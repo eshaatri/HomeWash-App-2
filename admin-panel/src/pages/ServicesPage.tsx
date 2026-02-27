@@ -63,6 +63,7 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
       fetchData();
     } catch (error) {
       console.error("Failed to save category", error);
+      alert("Failed to save category. Please ensure the backend server is running.");
     }
   };
 
@@ -73,6 +74,7 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
         fetchData();
       } catch (error) {
         console.error("Failed to delete category", error);
+        alert("Failed to delete category. Please ensure the backend server is running.");
       }
     }
   };
@@ -105,6 +107,7 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
       fetchData();
     } catch (error) {
       console.error("Failed to save service", error);
+      alert("Failed to save service. Please ensure the backend server is running.");
     }
   };
 
@@ -115,6 +118,7 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
         fetchData();
       } catch (error) {
         console.error("Failed to delete service", error);
+        alert("Failed to delete service. Please ensure the backend server is running.");
       }
     }
   };
