@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/User";
+import Area from "../models/Area";
 
 const router = express.Router();
 
@@ -33,6 +34,23 @@ router.post("/login", async (req, res) => {
       user.partnerId = partnerId;
       await user.save();
     }
+
+    // For professionals, ensure serviceArea string is set for partner app display (from serviceAreaIds if needed)
+    if (user && user.role === "PROFESSIONAL") {
+      let serviceAreaDisplay = user.serviceArea?.trim();
+      if (!serviceAreaDisplay && (user.serviceAreaIds?.length ?? 0) > 0) {
+        const areas = await Area.find({
+          _id: { $in: user.serviceAreaIds },
+        }).select("name");
+        serviceAreaDisplay = areas.map((a) => a.name).filter(Boolean).join(", ");
+      }
+      const out: Record<string, unknown> = user.toObject
+        ? user.toObject()
+        : { ...(user as any) };
+      if (out._id && !out.id) out.id = String(out._id);
+      if (serviceAreaDisplay) out.serviceArea = serviceAreaDisplay;
+      return res.json(out);
+    }
     res.json(user);
   } catch (error) {
     res.status(500).json({
@@ -58,6 +76,21 @@ router.patch("/:id", async (req, res) => {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+    if (user && user.role === "PROFESSIONAL" && req.body.status != null) {
+      const io = req.app.get("io");
+      if (io) {
+        io.emit("professional:status", {
+          id: String(user._id),
+          status: user.status,
+        });
+        if (user.status === "SUSPENDED") {
+          io.emit("professional:online", {
+            id: String(user._id),
+            isOnline: false,
+          });
+        }
+      }
+    }
     res.json(user);
   } catch (error) {
     res.status(500).json({

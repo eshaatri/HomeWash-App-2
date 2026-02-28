@@ -28,12 +28,16 @@ export interface Professional {
   earningsToday: number;
   walletBalance: number;
   tier: "SILVER" | "GOLD" | "PLATINUM";
+  status?: string; // ACTIVE | ONBOARDING | SUSPENDED – when SUSPENDED, cannot go online or see new bookings
+  serviceArea?: string; // area(s) assigned to this professional
+  serviceAreaIds?: string[];
 }
 
 export interface Job {
   id?: string;
   _id?: string;
   serviceName: string;
+  serviceArea?: string;
   customerName: string;
   customerPhone: string;
   address: string;
@@ -64,4 +68,17 @@ export interface NavigationProps {
   rejectJob: (jobId: string) => void;
   updateJobStatus: (jobId: string, status: JobStatus) => void;
   refreshJobs: () => void;
+  isProfessionalOnline: boolean;
+  setProfessionalOnline: (online: boolean) => void;
+  // Temporary for testing booking flow – remove when using live location
+  testAddress?: string;
+  testAddressLine2?: string;
+  testLat?: number;
+  testLng?: number;
+  setTestAddress?: (
+    address: string,
+    addressLine2?: string,
+    lat?: number,
+    lng?: number,
+  ) => void;
 }

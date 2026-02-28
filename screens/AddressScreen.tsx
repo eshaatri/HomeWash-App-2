@@ -18,7 +18,18 @@ export const AddressScreen: React.FC<NavigationProps> = ({
   setCurrentLocation,
   cart,
 }) => {
-  const [addresses, setAddresses] = useState<AddressItem[]>([]);
+  const [addresses, setAddresses] = useState<AddressItem[]>(() => {
+    try {
+      const raw = localStorage.getItem("hw_saved_addresses_v1");
+      if (raw) {
+        const parsed = JSON.parse(raw) as AddressItem[];
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn("Failed to load saved addresses from storage:", e);
+    }
+    return [];
+  });
 
   const [isAdding, setIsAdding] = useState(false);
   const [newAddress, setNewAddress] = useState("");
@@ -468,7 +479,7 @@ export const AddressScreen: React.FC<NavigationProps> = ({
                 ? "WORK"
                 : "OTHER",
         };
-        setAddresses([...addresses, newItem]);
+        setAddresses((prev) => [...prev, newItem]);
         setIsAdding(false);
         setNewAddress("");
       } catch (err) {
@@ -485,24 +496,10 @@ export const AddressScreen: React.FC<NavigationProps> = ({
   };
 
   const handleDelete = (id: string) => {
-    setAddresses(addresses.filter((a) => a.id !== id));
+    setAddresses((prev) => prev.filter((a) => a.id !== id));
   };
 
-  // Persist addresses in localStorage so they survive page reloads
-  React.useEffect(() => {
-    try {
-      const raw = localStorage.getItem("hw_saved_addresses_v1");
-      if (raw) {
-        const parsed = JSON.parse(raw) as AddressItem[];
-        if (Array.isArray(parsed)) {
-          setAddresses(parsed);
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to load saved addresses from storage:", e);
-    }
-  }, []);
-
+  // Persist addresses in localStorage whenever they change
   React.useEffect(() => {
     try {
       localStorage.setItem(

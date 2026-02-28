@@ -18,7 +18,13 @@ export interface IUser extends Document {
   earningsToday?: number;
   partnerId?: string;
   serviceArea?: string;
+  serviceAreaIds?: string[]; // area IDs this professional serves
+  address?: string;
   city?: string;
+  status?: string; // e.g. ONBOARDING | ACTIVE | SUSPENDED for professionals
+  lastKnownLat?: number;
+  lastKnownLng?: number;
+  lastLocationAt?: Date;
 }
 
 const UserSchema: Schema = new Schema(
@@ -33,7 +39,13 @@ const UserSchema: Schema = new Schema(
     earningsToday: { type: Number },
     partnerId: { type: String },
     serviceArea: { type: String },
+    serviceAreaIds: [{ type: String }],
+    address: { type: String },
     city: { type: String },
+    status: { type: String },
+    lastKnownLat: { type: Number },
+    lastKnownLng: { type: Number },
+    lastLocationAt: { type: Date },
   },
   {
     timestamps: true,

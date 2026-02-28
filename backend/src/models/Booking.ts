@@ -18,6 +18,7 @@ export interface IBooking extends Document {
   date: string;
   time: string;
   amount: number;
+  address?: string;
   professionalId?: string;
   professionalName?: string;
   professionalImage?: string;
@@ -41,6 +42,7 @@ const BookingSchema: Schema = new Schema(
     date: { type: String, required: true },
     time: { type: String, required: true },
     amount: { type: Number, required: true },
+    address: { type: String },
     professionalId: { type: String },
     professionalName: { type: String },
     professionalImage: { type: String },

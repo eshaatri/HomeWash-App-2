@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { io, Socket } from "socket.io-client";
 import {
   ProfessionalScreen,
   Professional,
@@ -23,6 +24,144 @@ export default function App() {
   const [professional, setProfessional] = useState<Professional | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
+  const socketRef = useRef<Socket | null>(null);
+  const locationWatchIdRef = useRef<number | null>(null);
+  const lastLocationSentRef = useRef<number>(0);
+  const LOCATION_THROTTLE_MS = 10000; // send at most every 10s
+
+  const [isProfessionalOnline, setIsProfessionalOnline] = useState(true);
+
+  const setProfessionalOnline = (online: boolean) => {
+    setIsProfessionalOnline(online);
+    if (socketRef.current) {
+      socketRef.current.emit("professional:setOnline", { isOnline: online });
+    }
+  };
+
+  // When online, send realtime GPS to backend for booking assignment
+  useEffect(() => {
+    if (!isProfessionalOnline || !professional) {
+      if (locationWatchIdRef.current != null) {
+        navigator.geolocation.clearWatch(locationWatchIdRef.current);
+        locationWatchIdRef.current = null;
+      }
+      return;
+    }
+    if (!navigator.geolocation) return;
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const now = Date.now();
+        if (now - lastLocationSentRef.current < LOCATION_THROTTLE_MS) return;
+        lastLocationSentRef.current = now;
+        const { latitude, longitude } = position.coords;
+        if (socketRef.current) {
+          socketRef.current.emit("professional:location", {
+            lat: latitude,
+            lng: longitude,
+          });
+        }
+      },
+      (err) => {
+        console.warn("Geolocation error:", err.message);
+      },
+      { enableHighAccuracy: true, maximumAge: 30000, timeout: 10000 },
+    );
+    locationWatchIdRef.current = watchId;
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+      locationWatchIdRef.current = null;
+    };
+  }, [isProfessionalOnline, professional]);
+
+  // Temporary: set address for testing booking flow (persisted; remove when using live location)
+  const [testAddress, setTestAddressState] = useState<string>(() => {
+    try {
+      return localStorage.getItem("partner_app_test_address") || "";
+    } catch {
+      return "";
+    }
+  });
+  const [testAddressLine2, setTestAddressLine2State] = useState<string>(() => {
+    try {
+      return localStorage.getItem("partner_app_test_address_line2") || "";
+    } catch {
+      return "";
+    }
+  });
+  const [testLat, setTestLat] = useState<number | undefined>(() => {
+    try {
+      const v = localStorage.getItem("partner_app_test_lat");
+      return v ? parseFloat(v) : undefined;
+    } catch {
+      return undefined;
+    }
+  });
+  const [testLng, setTestLng] = useState<number | undefined>(() => {
+    try {
+      const v = localStorage.getItem("partner_app_test_lng");
+      return v ? parseFloat(v) : undefined;
+    } catch {
+      return undefined;
+    }
+  });
+  const setTestAddress = (
+    address: string,
+    addressLine2?: string,
+    lat?: number,
+    lng?: number,
+  ) => {
+    setTestAddressState(address);
+    setTestAddressLine2State(addressLine2 ?? "");
+    setTestLat(lat);
+    setTestLng(lng);
+    try {
+      localStorage.setItem("partner_app_test_address", address);
+      localStorage.setItem("partner_app_test_address_line2", addressLine2 ?? "");
+      if (lat != null) localStorage.setItem("partner_app_test_lat", String(lat));
+      if (lng != null) localStorage.setItem("partner_app_test_lng", String(lng));
+    } catch (_) {}
+  };
+
+  // Realtime: connect as professional so admin sees online status
+  useEffect(() => {
+    const id = professional?.id || (professional as any)?._id;
+    if (!id) {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      return;
+    }
+    const socket = io("http://localhost:5000", { transports: ["websocket", "polling"] });
+    socketRef.current = socket;
+    socket.emit("professional:identify", { professionalId: id });
+    socket.emit("professional:setOnline", { isOnline: isProfessionalOnline });
+
+    socket.on("professional:suspended", () => {
+      setIsProfessionalOnline(false);
+      setProfessional((prev) =>
+        prev ? { ...prev, status: "SUSPENDED" } : null,
+      );
+    });
+
+    socket.on("professional:status", (payload: { id: string; status: string }) => {
+      const myId = professional?.id || (professional as any)?._id;
+      if (payload?.id === myId && payload?.status === "SUSPENDED") {
+        setIsProfessionalOnline(false);
+        setProfessional((prev) =>
+          prev ? { ...prev, status: "SUSPENDED" } : null,
+        );
+      }
+    });
+
+    return () => {
+      socket.off("professional:suspended");
+      socket.off("professional:status");
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [professional]);
 
   const fetchJobs = async () => {
     if (!professional) return;
@@ -76,10 +215,25 @@ export default function App() {
   const login = async (phone: string) => {
     try {
       const userData = await professionalService.login(phone);
-      setProfessional(userData);
+      const status = userData.status || "ACTIVE";
+      setProfessional({
+        ...userData,
+        id: userData.id || userData._id,
+        rating: userData.rating ?? 0,
+        completedJobs: userData.completedJobs ?? 0,
+        walletBalance: userData.walletBalance ?? 0,
+        earningsToday: userData.earningsToday ?? 0,
+        tier: userData.tier || "SILVER",
+        status,
+      });
+      setIsProfessionalOnline(status !== "SUSPENDED");
       setCurrentScreen(ProfessionalScreen.DASHBOARD);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
+      const message =
+        error.response?.data?.message ||
+        "Login failed. This phone may not be registered as a professional.";
+      alert(message);
     }
   };
 
@@ -170,6 +324,13 @@ export default function App() {
     rejectJob,
     updateJobStatus,
     refreshJobs,
+    isProfessionalOnline,
+    setProfessionalOnline,
+    testAddress,
+    testAddressLine2,
+    testLat,
+    testLng,
+    setTestAddress,
   };
 
   const renderScreen = () => {

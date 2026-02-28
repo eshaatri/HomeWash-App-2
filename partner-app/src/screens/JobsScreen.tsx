@@ -100,7 +100,7 @@ export const JobsScreen: React.FC<NavigationProps> = ({
                 location_on
               </span>
               <div>
-                <p>{job.address}</p>
+                <p>{job.address || job.serviceArea || "Address not available"}</p>
                 <p className="text-xs">{job.addressLine2}</p>
               </div>
             </div>

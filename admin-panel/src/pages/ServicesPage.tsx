@@ -25,8 +25,19 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
         adminService.getCategories(),
         adminService.getServices(),
       ]);
-      setCategories(cats);
-      setServices(servs);
+      // Normalise IDs from backend (which exposes `id` in toJSON)
+      setCategories(
+        cats.map((c: any) => ({
+          ...c,
+          _id: c._id || c.id,
+        })),
+      );
+      setServices(
+        servs.map((s: any) => ({
+          ...s,
+          _id: s._id || s.id,
+        })),
+      );
     } catch (error) {
       console.error("Failed to fetch services data:", error);
     } finally {
@@ -162,7 +173,7 @@ export const ServicesPage: React.FC<NavigationProps> = () => {
       </div>
 
       {/* Tree View */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         {categories.length === 0 ? (
           <div className="p-6 text-center text-gray-500">No categories found. Create one to get started.</div>
         ) : (

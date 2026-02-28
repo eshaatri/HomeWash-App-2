@@ -135,7 +135,8 @@ export default function App() {
   const login = async (phone: string, role: UserRole) => {
     try {
       const userData = await userService.login(phone, role);
-      setUser({ ...userData, id: userData._id });
+      const finalId = (userData as any).id || (userData as any)._id;
+      setUser({ ...userData, id: finalId });
       if (role === UserRole.PARTNER) {
         setCurrentScreen(AppScreen.PARTNER_DASHBOARD);
       } else {
@@ -262,6 +263,7 @@ export default function App() {
           date: slot.date,
           time: slot.time,
           amount: item.service.price,
+          address: currentLocation,
           serviceArea: selectedArea || currentLocationLabel || undefined,
         });
       });

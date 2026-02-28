@@ -75,6 +75,7 @@ export interface Booking {
   date: string;
   time: string;
   amount: number;
+   address?: string;
   professionalName?: string;
   professionalImage?: string;
   otp?: string;

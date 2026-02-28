@@ -2,29 +2,40 @@ import React, { useState, useEffect } from "react";
 import { NavigationProps, ProfessionalStatus, Partner } from "../types";
 import { adminService } from "../services/api";
 import { Modal } from "../components/Modal";
+import { io, Socket } from "socket.io-client";
 
 export const ProfessionalsPage: React.FC<NavigationProps> = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [professionals, setProfessionals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-   const [partners, setPartners] = useState<Partner[]>([]);
-   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [isSaving, setIsSaving] = useState(false);
-   const [formData, setFormData] = useState<{
-     name: string;
-     phone: string;
-     partnerId: string;
-   }>({
-     name: "",
-     phone: "",
-     partnerId: "",
-   });
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editingProfessionalId, setEditingProfessionalId] = useState<
+    string | null
+  >(null);
+  const [areas, setAreas] = useState<any[]>([]);
+  const [formData, setFormData] = useState<{
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    partnerId: string;
+    serviceAreaIds: string[];
+  }>({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    partnerId: "",
+    serviceAreaIds: [],
+  });
 
   const fetchProfessionals = async () => {
     setLoading(true);
     try {
-      const data = await adminService.getProfessionals(); // Corrected to fetch professionals
+      const data = await adminService.getProfessionals();
       setProfessionals(data);
     } catch (error) {
       console.error("Failed to fetch professionals:", error);
@@ -42,19 +53,82 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
     }
   };
 
+  const fetchAreas = async () => {
+    try {
+      const data = await adminService.getAreas();
+      setAreas(data);
+    } catch (error) {
+      console.error("Failed to fetch areas:", error);
+    }
+  };
+
   useEffect(() => {
     fetchProfessionals();
     fetchPartners();
+    fetchAreas();
   }, []);
 
+  // Realtime status/online updates from backend via WebSocket
+  useEffect(() => {
+    const socket: Socket = io("http://localhost:5000", {
+      transports: ["websocket"],
+    });
+
+    socket.on("professional:online", (payload: any) => {
+      setProfessionals((prev) =>
+        prev.map((p) =>
+          (p.id || p._id) === payload.id
+            ? { ...p, isOnline: payload.isOnline }
+            : p,
+        ),
+      );
+    });
+
+    socket.on("professional:status", (payload: any) => {
+      setProfessionals((prev) =>
+        prev.map((p) =>
+          (p.id || p._id) === payload.id ? { ...p, status: payload.status } : p,
+        ),
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const partnerAreas = areas.filter(
+    (a) =>
+      (a.assignedPartnerId || a.assignedPartner) === formData.partnerId &&
+      a.isActive !== false,
+  );
+
   const handleAddProfessional = async () => {
+    setEditingProfessionalId(null);
     setFormData({
       name: "",
       phone: "",
+      email: "",
+      address: "",
       partnerId:
         partners.length > 0
           ? (partners[0].id || (partners[0] as any)._id) ?? ""
           : "",
+      serviceAreaIds: [],
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleEditProfessional = (professional: any) => {
+    const id = professional.id || professional._id;
+    setEditingProfessionalId(id);
+    setFormData({
+      name: professional.name || "",
+      phone: professional.phone || "",
+      email: professional.email || "",
+      address: professional.address || "",
+      partnerId: professional.partnerId || "",
+      serviceAreaIds: professional.serviceAreaIds || [],
     });
     setIsModalOpen(true);
   };
@@ -104,17 +178,6 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
       </div>
     );
   }
-
-  const getStatusBadge = (status: ProfessionalStatus) => {
-    switch (status) {
-      case ProfessionalStatus.ACTIVE:
-        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
-      case ProfessionalStatus.SUSPENDED:
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
-      case ProfessionalStatus.ONBOARDING:
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
-    }
-  };
 
   const getTierBadge = (tier: string) => {
     switch (tier) {
@@ -227,10 +290,19 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                 Professional
               </th>
               <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                Phone
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Partner
               </th>
               <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                Areas
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                Active
               </th>
               <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Rating
@@ -250,7 +322,7 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
             {filteredProfessionals.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={9}
                   className="px-6 py-12 text-center text-gray-500"
                 >
                   No professionals found matching your search.
@@ -278,11 +350,13 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                             {professional.tier || "N/A"}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500">
-                          {professional.phone || "N/A"}
-                        </p>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {professional.phone || "—"}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -296,11 +370,66 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-1">
+                      {(professional.serviceAreaIds || []).length > 0 ? (
+                        (professional.serviceAreaIds || []).map((aid: string) => {
+                          const area = areas.find(
+                            (a) => (a.id || a._id) === aid,
+                          );
+                          return area ? (
+                            <span
+                              key={aid}
+                              className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold"
+                            >
+                              {area.name}
+                            </span>
+                          ) : null;
+                        })
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">
+                          —
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
                     <span
-                      className={`text-xs font-bold px-2 py-1 rounded ${getStatusBadge(professional.status)}`}
+                      className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wide ${
+                        professional.isOnline
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                          : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                      }`}
                     >
-                      {professional.status || "UNKNOWN"}
+                      {professional.isOnline ? "Online" : "Offline"}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={
+                        professional.status === ProfessionalStatus.ACTIVE
+                      }
+                      title={
+                        professional.status === ProfessionalStatus.ACTIVE
+                          ? "Active (click to deactivate)"
+                          : "Inactive (click to activate)"
+                      }
+                      onClick={() => handleToggleStatus(professional)}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                        professional.status === ProfessionalStatus.ACTIVE
+                          ? "bg-primary"
+                          : "bg-gray-200 dark:bg-gray-600"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                          professional.status === ProfessionalStatus.ACTIVE
+                            ? "translate-x-6"
+                            : "translate-x-1"
+                        }`}
+                      />
+                    </button>
                   </td>
                   <td className="px-6 py-4">
                     {(professional.rating || 0) > 0 ? (
@@ -332,18 +461,12 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
                       <button
-                        onClick={() => handleToggleStatus(professional)}
+                        onClick={() => handleEditProfessional(professional)}
                         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                        title={
-                          professional.status === ProfessionalStatus.ACTIVE
-                            ? "Suspend"
-                            : "Activate"
-                        }
+                        title="Edit"
                       >
-                        <span className="material-symbols-outlined text-sm">
-                          {professional.status === ProfessionalStatus.ACTIVE
-                            ? "block"
-                            : "check_circle"}
+                        <span className="material-symbols-outlined text-sm text-gray-400 group-hover:text-primary">
+                          edit
                         </span>
                       </button>
                       <button
@@ -370,8 +493,11 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Add Professional"
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingProfessionalId(null);
+        }}
+        title={editingProfessionalId ? "Edit Professional" : "Add Professional"}
       >
         <form
           className="space-y-4"
@@ -387,17 +513,62 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
             }
             try {
               setIsSaving(true);
-              await adminService.createUser({
-                name: formData.name,
-                phone: formData.phone,
-                role: "PROFESSIONAL",
-                partnerId: formData.partnerId,
-              });
+              const serviceAreaNames =
+                formData.serviceAreaIds.length > 0
+                  ? formData.serviceAreaIds
+                      .map(
+                        (id) =>
+                          areas.find(
+                            (a) => (a.id || a._id) === id,
+                          )?.name,
+                      )
+                      .filter(Boolean)
+                      .join(", ")
+                  : undefined;
+
+              if (editingProfessionalId) {
+                await adminService.updateUser(editingProfessionalId, {
+                  name: formData.name,
+                  phone: formData.phone,
+                  email: formData.email || undefined,
+                  address: formData.address || undefined,
+                  partnerId: formData.partnerId,
+                  serviceArea: serviceAreaNames,
+                  serviceAreaIds:
+                    formData.serviceAreaIds.length > 0
+                      ? formData.serviceAreaIds
+                      : undefined,
+                });
+              } else {
+                await adminService.createUser({
+                  name: formData.name,
+                  phone: formData.phone,
+                  email: formData.email || undefined,
+                  address: formData.address || undefined,
+                  role: "PROFESSIONAL",
+                  partnerId: formData.partnerId,
+                  serviceArea: serviceAreaNames,
+                  serviceAreaIds:
+                    formData.serviceAreaIds.length > 0
+                      ? formData.serviceAreaIds
+                      : undefined,
+                });
+              }
               setIsModalOpen(false);
+              setEditingProfessionalId(null);
               await fetchProfessionals();
             } catch (error) {
-              console.error("Failed to add professional:", error);
-              alert("Failed to add professional.");
+              console.error(
+                editingProfessionalId
+                  ? "Failed to update professional."
+                  : "Failed to add professional.",
+                error,
+              );
+              alert(
+                editingProfessionalId
+                  ? "Failed to update professional."
+                  : "Failed to add professional.",
+              );
             } finally {
               setIsSaving(false);
             }
@@ -433,13 +604,45 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              className="w-full h-10 px-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-primary"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, email: e.target.value }))
+              }
+              placeholder="optional"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+              Address
+            </label>
+            <input
+              type="text"
+              className="w-full h-10 px-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-primary"
+              value={formData.address}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, address: e.target.value }))
+              }
+              placeholder="optional"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
               Partner
             </label>
             <select
               className="w-full h-10 px-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-primary"
               value={formData.partnerId}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, partnerId: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  partnerId: e.target.value,
+                  serviceAreaIds: [],
+                }))
               }
               required
             >
@@ -454,6 +657,61 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
               ))}
             </select>
           </div>
+          {formData.partnerId && (
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
+                Assign areas (from partner&apos;s service areas)
+              </label>
+              {partnerAreas.length === 0 ? (
+                <p className="text-sm text-gray-500 italic">
+                  No areas assigned to this partner. Assign areas in Service
+                  Areas first.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                  {partnerAreas.map((area) => {
+                    const aid = area.id || area._id;
+                    const checked = formData.serviceAreaIds.includes(aid);
+                    return (
+                      <label
+                        key={aid}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer text-sm font-medium transition-colors ${
+                          checked
+                            ? "bg-primary/20 text-primary border border-primary/40"
+                            : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                serviceAreaIds: [
+                                  ...prev.serviceAreaIds,
+                                  aid,
+                                ],
+                              }));
+                            } else {
+                              setFormData((prev) => ({
+                                ...prev,
+                                serviceAreaIds: prev.serviceAreaIds.filter(
+                                  (id) => id !== aid,
+                                ),
+                              }));
+                            }
+                          }}
+                          className="sr-only"
+                        />
+                        {area.name}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
           <div className="flex justify-end gap-2 pt-4">
             <button
               type="button"
@@ -467,7 +725,11 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
               disabled={isSaving}
               className="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dim disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving
+                ? "Saving..."
+                : editingProfessionalId
+                  ? "Update"
+                  : "Save"}
             </button>
           </div>
         </form>

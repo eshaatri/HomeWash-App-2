@@ -38,16 +38,22 @@ router.get("/professional/:professionalId", async (req, res) => {
     if (!professional)
       return res.status(404).json({ message: "Professional not found" });
 
-    const bookings = await Booking.find({
-      $or: [
-        { professionalId: req.params.professionalId },
-        {
-          status: "PENDING",
-          serviceArea: professional.serviceArea,
-          professionalId: { $exists: false },
-        },
-      ],
-    }).sort({ createdAt: -1 });
+    const isSuspended = professional.status === "SUSPENDED";
+
+    const query = isSuspended
+      ? { professionalId: req.params.professionalId }
+      : {
+          $or: [
+            { professionalId: req.params.professionalId },
+            {
+              status: "PENDING",
+              serviceArea: professional.serviceArea,
+              professionalId: { $exists: false },
+            },
+          ],
+        };
+
+    const bookings = await Booking.find(query).sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
     res.status(500).json({

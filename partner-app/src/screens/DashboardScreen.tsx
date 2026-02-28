@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ProfessionalScreen, NavigationProps, JobStatus } from "../types";
+import { TestAddressMapWithSearch } from "../components/TestAddressMapWithSearch";
 
 interface DashboardScreenProps extends NavigationProps {
   onLogout: () => void;
@@ -11,9 +12,31 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   activeJob,
   jobs,
   refreshJobs,
+  testAddress = "",
+  testAddressLine2 = "",
+  testLat,
+  testLng,
+  setTestAddress,
+  isProfessionalOnline = true,
+  setProfessionalOnline,
 }) => {
-  const [isOnline, setIsOnline] = useState(true);
+  const [showTestAddress, setShowTestAddress] = useState(false);
   const pendingJobs = jobs.filter((j) => j.status === JobStatus.PENDING);
+  const isSuspended = professional?.status === "SUSPENDED";
+  const showAsOffline = isSuspended || !isProfessionalOnline;
+
+  const handlePlaceSelect = (
+    address: string,
+    addressLine2: string,
+    lat: number,
+    lng: number,
+  ) => {
+    setTestAddress?.(address, addressLine2, lat, lng);
+  };
+
+  const handleClearTestAddress = () => {
+    setTestAddress?.("", "", undefined, undefined);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#121212] pb-20">
@@ -27,6 +50,12 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             <div>
               <h2 className="font-bold text-lg">
                 Hi, {professional?.name.split(" ")[0]}
+                {professional?.serviceArea ? (
+                  <span className="font-medium text-gray-500 dark:text-gray-400">
+                    {" "}
+                    · {professional.serviceArea}
+                  </span>
+                ) : null}
               </h2>
               <div className="flex items-center gap-1">
                 <span
@@ -41,16 +70,26 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
               </div>
             </div>
           </div>
-          <button
-            onClick={() => setIsOnline(!isOnline)}
-            className={`text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full transition-all ${
-              isOnline
-                ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
-                : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-            }`}
-          >
-            {isOnline ? "Online" : "Offline"}
-          </button>
+          <div className="flex flex-col items-end gap-0.5">
+            {isSuspended && (
+              <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                Account suspended
+              </span>
+            )}
+            <button
+              onClick={() => !isSuspended && setProfessionalOnline?.(!isProfessionalOnline)}
+              disabled={isSuspended}
+              className={`text-xs font-bold uppercase tracking-wide px-4 py-2 rounded-full transition-all ${
+                isSuspended
+                  ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed"
+                  : showAsOffline
+                    ? "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                    : "bg-green-500 text-white shadow-lg shadow-green-500/30"
+              }`}
+            >
+              {showAsOffline ? "Offline" : "Online"}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -72,6 +111,63 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             {professional?.completedJobs}
           </p>
         </div>
+      </div>
+
+      {/* Temporary: Set address for testing booking flow – remove when using live location */}
+      <div className="px-4 mb-4">
+        <button
+          type="button"
+          onClick={() => setShowTestAddress((v) => !v)}
+          className="w-full flex items-center justify-between bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/40 rounded-xl px-4 py-3 text-left"
+        >
+          <span className="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+            Testing: Set address
+          </span>
+          <span className="material-symbols-outlined text-amber-600 dark:text-amber-400">
+            {showTestAddress ? "expand_less" : "expand_more"}
+          </span>
+        </button>
+        {showTestAddress && (
+          <div className="mt-2 p-4 rounded-xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/30 space-y-3">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+              Search or tap on map to set location. Remove in production (live location).
+            </p>
+            <TestAddressMapWithSearch
+              key={testAddress || "empty"}
+              initialAddress={testAddress}
+              initialAddressLine2={testAddressLine2}
+              initialLat={testLat}
+              initialLng={testLng}
+              onPlaceSelect={handlePlaceSelect}
+            />
+            <div className="flex items-center justify-between gap-2">
+              {testAddress ? (
+                <p className="text-xs text-gray-600 dark:text-gray-400 flex-1 min-w-0 truncate">
+                  {testAddress}
+                  {testAddressLine2 ? `, ${testAddressLine2}` : ""}
+                </p>
+              ) : (
+                <p className="text-xs text-gray-400 italic flex-1">No address set</p>
+              )}
+              {testAddress ? (
+                <button
+                  type="button"
+                  onClick={handleClearTestAddress}
+                  className="shrink-0 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline"
+                >
+                  Clear
+                </button>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowTestAddress(false)}
+              className="w-full py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium"
+            >
+              Done
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Active Job Card */}
@@ -98,7 +194,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                   <h2 className="text-xl font-bold mt-2">
                     {activeJob.serviceName}
                   </h2>
-                  <p className="text-sm opacity-80">{activeJob.address}</p>
+                  <p className="text-sm opacity-80">
+                    {activeJob.address || activeJob.serviceArea || "Address not available"}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-xl font-bold">₹{activeJob.amount}</p>
