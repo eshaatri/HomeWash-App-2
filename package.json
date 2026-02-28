@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev --prefix admin-panel\" \"npm run dev --prefix partner-app\" \"npm run dev --prefix backend\"",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "install:all": "npm install && npm install --prefix admin-panel && npm install --prefix partner-app && npm install --prefix backend"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.8",
@@ -21,6 +23,7 @@
     "@types/google.maps": "^3.58.1",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.1",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }

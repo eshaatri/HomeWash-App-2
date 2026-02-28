@@ -39,19 +39,22 @@ import {
 } from "./services/onlineProfessionalStore";
 import { assignPendingBookingToProfessional } from "./services/bookingAssignmentService";
 
-io.on("connection", (socket) => {
-  socket.on("professional:identify", async (payload: { professionalId: string }) => {
-    const id = payload?.professionalId;
-    if (!id) return;
-    socketToProfessionalId.set(socket.id, id);
+io.on("connection", (socket: any) => {
+  socket.on(
+    "professional:identify",
+    async (payload: { professionalId: string }) => {
+      const id = payload?.professionalId;
+      if (!id) return;
+      socketToProfessionalId.set(socket.id, id);
 
-    const User = (await import("./models/User")).default;
-    const user = await User.findById(id).select("status").lean();
-    const isOnline = user?.status !== "SUSPENDED";
+      const User = (await import("./models/User")).default;
+      const user = await User.findById(id).select("status").lean();
+      const isOnline = user?.status !== "SUSPENDED";
 
-    io.emit("professional:online", { id, isOnline });
-    if (!isOnline) socket.emit("professional:suspended");
-  });
+      io.emit("professional:online", { id, isOnline });
+      if (!isOnline) socket.emit("professional:suspended");
+    },
+  );
 
   socket.on(
     "professional:setOnline",
@@ -147,8 +150,7 @@ app.get("/", (req, res) => {
 // Health check: verify API and database connection
 app.get("/api/health", async (req, res) => {
   const mongoose = await import("mongoose");
-  const mongoOk =
-    mongoose.connection.readyState === 1; /* 1 = connected */
+  const mongoOk = mongoose.connection.readyState === 1; /* 1 = connected */
   res.status(mongoOk ? 200 : 503).json({
     ok: mongoOk,
     mongo: mongoOk ? "connected" : "disconnected",
