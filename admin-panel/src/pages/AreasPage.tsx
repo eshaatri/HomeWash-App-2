@@ -381,11 +381,11 @@ export const AreasPage: React.FC<NavigationProps> = () => {
     return { type: "FeatureCollection", features };
   }, [filteredAreas]);
 
-  // Reference GeoJSON for modal map: all other assigned areas, to avoid overlaps
+  // Reference GeoJSON for modal map: all other saved areas with geometry (so new draws don't overlap)
   const referenceAreasGeoJson = React.useMemo(() => {
     const features: any[] = [];
     areas.forEach((area) => {
-      if (!area.geoJson || !area.assignedPartnerId) return;
+      if (!area.geoJson) return;
       const g: any = area.geoJson;
       const areaId = area.id || (area as any)._id;
       const currentId = editingArea
@@ -401,6 +401,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
           properties: {
             ...(f.properties || {}),
             areaName: area.name,
+            assignedPartnerName: area.assignedPartnerName || "Unassigned",
           },
         });
       };
@@ -793,7 +794,16 @@ export const AreasPage: React.FC<NavigationProps> = () => {
 
           {/* Right Column: Large Interactive Map */}
           <div className="flex-1 min-h-[400px] relative bg-gray-100 dark:bg-black/20 overflow-hidden">
-            <div className="absolute top-4 left-4 z-[1000] flex gap-2 items-center">
+            <div className="absolute top-4 left-4 z-[1000] flex flex-col gap-2">
+              {referenceAreasGeoJson && (
+                <div className="bg-sky-500/20 dark:bg-sky-500/10 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-sky-400/40 flex items-center gap-2">
+                  <div className="w-4 h-4 rounded border-2 border-sky-500" style={{ backgroundColor: "rgba(14,165,233,0.12)" }} />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">
+                    Existing areas (avoid overlap)
+                  </p>
+                </div>
+              )}
+              <div className="flex gap-2 items-center">
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
                 <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">
                   Pinning Area
@@ -857,6 +867,7 @@ export const AreasPage: React.FC<NavigationProps> = () => {
                   </span>
                 </div>
               )}
+            </div>
             </div>
 
             <MapComponent

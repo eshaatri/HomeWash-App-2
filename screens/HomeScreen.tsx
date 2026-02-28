@@ -96,24 +96,32 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     formatted,
                     "Current Location",
                     coverage.areaName,
+                    latitude,
+                    longitude,
                   );
                 } else {
-                  setCurrentLocation(formatted, "Current Location", null);
+                  setCurrentLocation(formatted, "Current Location", null, latitude, longitude);
                 }
               } catch (e) {
                 console.error("Coverage check on mount failed:", e);
-                setCurrentLocation(formatted, "Current Location");
+                setCurrentLocation(formatted, "Current Location", undefined, latitude, longitude);
               }
             } else {
               setCurrentLocation(
                 `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
                 "Current Location",
+                undefined,
+                latitude,
+                longitude,
               );
             }
           } catch (error) {
             setCurrentLocation(
               `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
               "Current Location",
+              undefined,
+              latitude,
+              longitude,
             );
           } finally {
             setIsLocating(false);

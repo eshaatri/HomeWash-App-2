@@ -1,6 +1,7 @@
 import express from "express";
 import Booking from "../models/Booking";
 import User from "../models/User";
+import { tryAssignBookingToClosestOnline } from "../services/bookingAssignmentService";
 
 const router = express.Router();
 
@@ -68,7 +69,9 @@ router.get("/professional/:professionalId", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const booking = await Booking.create(req.body);
-    res.status(201).json(booking);
+    const assigned = await tryAssignBookingToClosestOnline(booking);
+    const result = assigned ?? booking;
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({
       message:

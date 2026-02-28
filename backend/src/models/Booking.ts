@@ -27,6 +27,8 @@ export interface IBooking extends Document {
   remainingAmount?: number;
   partnerId?: string;
   serviceArea?: string;
+  customerLat?: number;
+  customerLng?: number;
 }
 
 const BookingSchema: Schema = new Schema(
@@ -51,6 +53,8 @@ const BookingSchema: Schema = new Schema(
     remainingAmount: { type: Number },
     partnerId: { type: String },
     serviceArea: { type: String },
+    customerLat: { type: Number },
+    customerLng: { type: Number },
   },
   {
     timestamps: true,

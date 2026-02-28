@@ -32,17 +32,10 @@ export const professionalService = {
     });
     return response.data;
   },
-  getWalletHistory: async (professionalId: string) => {
-    // Currently returns mock data as backend doesn't have a transaction model yet
-    return [
-      { date: "Feb 5, 2024", jobs: 4, amount: 2450 },
-      { date: "Feb 4, 2024", jobs: 3, amount: 1800 },
-      { date: "Feb 3, 2024", jobs: 5, amount: 3100 },
-    ];
+  getWalletHistory: async (_professionalId: string) => {
+    return [];
   },
-  withdrawFunds: async (professionalId: string, amount: number) => {
-    // Mock withdrawal request
-    console.log(`Withdrawal requested for ${professionalId}: ₹${amount}`);
+  withdrawFunds: async (_professionalId: string, amount: number) => {
     return { success: true, message: "Withdrawal request submitted" };
   },
 };

@@ -82,6 +82,8 @@ export interface Booking {
   paidAmount?: number;
   remainingAmount?: number;
   serviceArea?: string;
+  customerLat?: number;
+  customerLng?: number;
 }
 
 export interface CartItem {
@@ -104,7 +106,15 @@ export interface NavigationProps {
   currentLocation: string;
   currentLocationLabel: string;
   selectedArea: string | null;
-  setCurrentLocation: (location: string, label?: string, area?: string) => void;
+  currentLat?: number;
+  currentLng?: number;
+  setCurrentLocation: (
+    location: string,
+    label?: string,
+    area?: string | null,
+    lat?: number,
+    lng?: number,
+  ) => void;
 
   // Data State
   bookings: Booking[];

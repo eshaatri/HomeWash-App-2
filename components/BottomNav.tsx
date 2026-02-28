@@ -1,9 +1,12 @@
 import React from 'react';
 import { AppScreen, NavigationProps } from '../types';
 
-export const BottomNav: React.FC<NavigationProps> = ({ currentScreen, navigateTo, isPremium }) => {
+export const BottomNav: React.FC<NavigationProps> = ({ currentScreen, navigateTo, isPremium, cart = [] }) => {
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
   const navItems = [
     { icon: 'home', label: 'Home', screen: AppScreen.HOME },
+    { icon: 'shopping_cart', label: 'Cart', screen: AppScreen.CART, badge: cartCount },
     { icon: 'calendar_month', label: 'Bookings', screen: AppScreen.BOOKING },
     { icon: isPremium ? 'star' : 'upgrade', label: isPremium ? 'Gold' : 'Upgrade', screen: AppScreen.MEMBERSHIP, isGold: true },
     { icon: 'support_agent', label: 'Support', screen: AppScreen.SUPPORT },
@@ -26,13 +29,20 @@ export const BottomNav: React.FC<NavigationProps> = ({ currentScreen, navigateTo
             <button
               key={item.label}
               onClick={() => navigateTo(item.screen)}
-              className={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${colorClass}`}
+              className={`relative flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${colorClass}`}
             >
-              <span 
-                className="material-symbols-outlined text-[24px]" 
-                style={{ fontVariationSettings: `'FILL' ${iconFill}` }}
-              >
-                {item.icon}
+              <span className="relative inline-block">
+                <span 
+                  className="material-symbols-outlined text-[24px]" 
+                  style={{ fontVariationSettings: `'FILL' ${iconFill}` }}
+                >
+                  {item.icon}
+                </span>
+                {item.badge != null && item.badge > 0 && (
+                  <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-primary text-black text-[10px] font-black px-1">
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                )}
               </span>
               <span className={`text-[10px] ${isActive ? 'font-medium' : 'font-medium'}`}>
                 {item.label}

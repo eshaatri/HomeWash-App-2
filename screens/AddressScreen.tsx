@@ -8,6 +8,8 @@ interface AddressItem {
   label: string;
   address: string;
   areaName?: string;
+  lat?: number;
+  lng?: number;
   icon: string;
   type: "HOME" | "WORK" | "OTHER";
 }
@@ -35,6 +37,7 @@ export const AddressScreen: React.FC<NavigationProps> = ({
   const [newAddress, setNewAddress] = useState("");
   const [newLabel, setNewLabel] = useState("Home");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [coords, setCoords] = useState({ lat: 19.076, lng: 72.8777 });
 
@@ -434,7 +437,7 @@ export const AddressScreen: React.FC<NavigationProps> = ({
 
   const handleSelectAddress = (item: AddressItem) => {
     if (!editingId) {
-      setCurrentLocation(item.address, item.label, item.areaName);
+      setCurrentLocation(item.address, item.label, item.areaName, item.lat, item.lng);
       if (cart && cart.length > 0) {
         navigateTo(AppScreen.CHECKOUT);
       } else {
@@ -466,6 +469,8 @@ export const AddressScreen: React.FC<NavigationProps> = ({
           label: newLabel,
           address: newAddress,
           areaName: coverage.areaName || (window as any)._pendingAreaName,
+          lat: coords.lat,
+          lng: coords.lng,
           icon:
             newLabel === "Home"
               ? "home"
@@ -497,6 +502,67 @@ export const AddressScreen: React.FC<NavigationProps> = ({
 
   const handleDelete = (id: string) => {
     setAddresses((prev) => prev.filter((a) => a.id !== id));
+    setDeleteConfirmId(null);
+    setEditingId(null);
+  };
+
+  const handleStartEdit = (item: AddressItem) => {
+    setEditingId(item.id);
+    setNewAddress(item.address);
+    const labels = ["Home", "Office", "Other", "Partner", "Gym"];
+    setNewLabel(labels.includes(item.label) ? item.label : "Other");
+    setCoords({ lat: item.lat ?? 19.076, lng: item.lng ?? 72.8777 });
+    setShowConfirmSuggestions(false);
+    setConfirmSuggestions([]);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setNewAddress("");
+    setNewLabel("Home");
+    setCoords({ lat: 19.076, lng: 72.8777 });
+  };
+
+  const handleUpdateAddress = async () => {
+    const item = addresses.find((a) => a.id === editingId);
+    if (!item || !newAddress.trim()) return;
+    setIsLocating(true);
+    try {
+      const coverage = await areaService.checkCoverage(coords.lat, coords.lng);
+      if (!coverage.serviceable) {
+        setErrorData({
+          title: "Area Not Serviceable",
+          message: "The address is outside our service area.",
+          help: "Please try a different address.",
+        });
+        setIsLocating(false);
+        return;
+      }
+      setAddresses((prev) =>
+        prev.map((a) =>
+          a.id === editingId
+            ? {
+                ...a,
+                address: newAddress,
+                label: newLabel,
+                areaName: coverage.areaName || (window as any)._pendingAreaName,
+                lat: coords.lat,
+                lng: coords.lng,
+              }
+            : a,
+        ),
+      );
+      handleCancelEdit();
+    } catch (err) {
+      console.error("Coverage check failed:", err);
+      setErrorData({
+        title: "Service Check Failed",
+        message: "Unable to verify service area.",
+        help: "Please try again.",
+      });
+    } finally {
+      setIsLocating(false);
+    }
   };
 
   // Persist addresses in localStorage whenever they change
@@ -679,7 +745,7 @@ export const AddressScreen: React.FC<NavigationProps> = ({
             <div
               key={item.id}
               className="group relative bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-200 dark:border-white/5 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.99] cursor-pointer"
-              onClick={() => handleSelectAddress(item)}
+              onClick={() => editingId !== item.id && deleteConfirmId !== item.id && handleSelectAddress(item)}
             >
               <div className="flex items-start gap-4">
                 {/* Icon */}
@@ -700,42 +766,32 @@ export const AddressScreen: React.FC<NavigationProps> = ({
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center mb-0.5">
-                    <h3 className="text-sm font-bold text-onyx dark:text-white flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-onyx dark:text-white">
                       {item.label}
-                      {editingId === item.id && (
-                        <span className="text-[9px] bg-red-100 text-red-600 px-1.5 rounded">
-                          Editing
-                        </span>
-                      )}
                     </h3>
-                    {/* Action Buttons */}
+                    {/* Edit & Delete Buttons */}
                     <div
-                      className="flex items-center"
+                      className="flex items-center gap-1"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {editingId === item.id ? (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="text-xs text-red-500 font-bold px-2 py-1 rounded bg-red-50 dark:bg-red-900/20"
-                          >
-                            Delete
-                          </button>
-                          <button
-                            onClick={() => setEditingId(null)}
-                            className="text-xs text-gray-500 font-bold px-2 py-1 rounded bg-gray-100 dark:bg-white/10"
-                          >
-                            Done
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setEditingId(item.id)}
-                          className="text-primary text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wide"
-                        >
-                          Edit
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleStartEdit(item)}
+                        className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-primary transition-colors"
+                        title="Edit address"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          edit
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirmId(item.id)}
+                        className="p-2 rounded-lg text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors"
+                        title="Delete address"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          delete
+                        </span>
+                      </button>
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed truncate pr-4">
@@ -747,8 +803,102 @@ export const AddressScreen: React.FC<NavigationProps> = ({
           ))}
         </div>
 
-        {/* Add New Address Form / Button */}
-        {isAdding ? (
+        {/* Edit Address Form */}
+        {editingId ? (
+          <div className="bg-white dark:bg-[#1a1a1a] rounded-xl border border-primary p-4 shadow-lg animate-in fade-in zoom-in-95 duration-200 mt-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3">
+              Edit Address
+            </h3>
+            <div className="h-48 w-full mb-4 rounded-xl overflow-hidden shadow-inner">
+              <MapComponent
+                center={coords}
+                onLocationSelect={(lat, lng) => setCoords({ lat, lng })}
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="relative">
+                <input
+                  autoFocus
+                  value={newAddress}
+                  onChange={(e) => handleConfirmSearchChange(e.target.value)}
+                  onFocus={() =>
+                    confirmSuggestions.length > 0 &&
+                    setShowConfirmSuggestions(true)
+                  }
+                  placeholder="Enter complete address"
+                  className="w-full p-3 bg-gray-50 dark:bg.black/20 rounded-lg text-sm border border-transparent focus:border-primary focus:outline-none pr-8"
+                />
+                {isConfirmSearching && (
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm animate-spin">
+                    progress_activity
+                  </span>
+                )}
+
+                {showConfirmSuggestions && confirmSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                    {confirmSuggestions.map((s, i) => (
+                      <button
+                        key={s.placeId}
+                        onClick={() => handleSelectConfirmSuggestion(s)}
+                        className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors ${
+                          i < confirmSuggestions.length - 1
+                            ? "border-b border-gray-100 dark:border-white/5"
+                            : ""
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-primary mt-0.5 text-lg flex-shrink-0">
+                          location_on
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-onyx dark:text-white truncate">
+                            {s.mainText}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {s.secondaryText}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                    <div className="px-4 py-2 bg-gray-50 dark:bg.black/20 flex items-center justify-end gap-1">
+                      <span className="text-[9px] text-gray-400">Powered by</span>
+                      <span className="text-[9px] font-bold text-gray-500">Google</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                {["Home", "Office", "Other", "Partner", "Gym"].map((lbl) => (
+                  <button
+                    key={lbl}
+                    onClick={() => setNewLabel(lbl)}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border transition-colors ${
+                      newLabel === lbl
+                        ? "bg-primary border-primary text-black"
+                        : "bg-transparent border-gray-200 dark:border-white/10 text-gray-500"
+                    }`}
+                  >
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-3 mt-2">
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex-1 py-2.5 rounded-lg text-xs font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateAddress}
+                  disabled={!newAddress.trim() || isLocating}
+                  className="flex-1 py-2.5 rounded-lg text-xs font-bold bg-black dark:bg-white text-white dark:text-black shadow-md disabled:opacity-50"
+                >
+                  {isLocating ? "Verifying..." : "Update Address"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : isAdding ? (
           <div className="bg-white dark:bg-[#1a1a1a] rounded-xl border border-primary p-4 shadow-lg animate-in fade-in zoom-in-95 duration-200 mt-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3">
               Confirm Location
@@ -859,6 +1009,37 @@ export const AddressScreen: React.FC<NavigationProps> = ({
           </button>
         )}
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1a1a1a] w-full max-w-xs rounded-2xl p-6 shadow-2xl border border-gray-100 dark:border-white/10">
+            <div className="h-12 w-12 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-4 text-red-500 mx-auto">
+              <span className="material-symbols-outlined">delete_outline</span>
+            </div>
+            <h3 className="text-lg font-bold text-onyx dark:text-white mb-2 text-center">
+              Delete Address?
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+              This address will be removed from your saved locations.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-white/10 font-bold text-gray-600 dark:text-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirmId)}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Modal */}
       {errorData && (

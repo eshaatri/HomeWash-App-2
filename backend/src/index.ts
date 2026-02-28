@@ -33,6 +33,11 @@ const io = new Server(httpServer, {
 const socketToProfessionalId = new Map<string, string>();
 
 import { setProfessionalLocation } from "./services/professionalLocationStore";
+import {
+  setProfessionalOnline,
+  setProfessionalOffline,
+} from "./services/onlineProfessionalStore";
+import { assignPendingBookingToProfessional } from "./services/bookingAssignmentService";
 
 io.on("connection", (socket) => {
   socket.on("professional:identify", async (payload: { professionalId: string }) => {
@@ -58,12 +63,24 @@ io.on("connection", (socket) => {
       const user = await User.findById(professionalId).select("status").lean();
 
       if (user?.status === "SUSPENDED") {
+        setProfessionalOffline(professionalId);
         io.emit("professional:online", {
           id: professionalId,
           isOnline: false,
         });
         socket.emit("professional:suspended");
         return;
+      }
+
+      if (payload.isOnline) {
+        setProfessionalOnline(professionalId);
+        try {
+          await assignPendingBookingToProfessional(professionalId);
+        } catch (err) {
+          console.error("Assign pending booking on setOnline:", err);
+        }
+      } else {
+        setProfessionalOffline(professionalId);
       }
 
       io.emit("professional:online", {
@@ -97,6 +114,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const professionalId = socketToProfessionalId.get(socket.id);
     if (professionalId) {
+      setProfessionalOffline(professionalId);
       socketToProfessionalId.delete(socket.id);
       io.emit("professional:online", { id: professionalId, isOnline: false });
     }

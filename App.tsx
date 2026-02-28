@@ -41,6 +41,8 @@ export default function App() {
   const [currentLocationLabel, setCurrentLocationLabel] =
     useState<string>("Current Location");
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [currentLat, setCurrentLat] = useState<number | undefined>(undefined);
+  const [currentLng, setCurrentLng] = useState<number | undefined>(undefined);
 
   // Data State
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -156,10 +158,14 @@ export default function App() {
     location: string,
     label: string = "Current Location",
     area: string | null = null,
+    lat?: number,
+    lng?: number,
   ) => {
     setCurrentLocationState(location);
     setCurrentLocationLabel(label);
     setSelectedArea(area);
+    setCurrentLat(lat);
+    setCurrentLng(lng);
   };
 
   // --- Cart & Booking Logic ---
@@ -234,14 +240,19 @@ export default function App() {
     try {
       // Only attempt profile update when we have a Mongo id to patch
       if (profileUpdate && mongoUserId) {
-        const updatedUser = await userService.updateProfile(
-          mongoUserId,
-          profileUpdate,
-        );
-        const finalId =
-          (updatedUser as any)._id || (updatedUser as any).id || mongoUserId;
-        setUser({ ...updatedUser, id: finalId });
-        effectiveCustomerId = finalId;
+        try {
+          const updatedUser = await userService.updateProfile(
+            mongoUserId,
+            profileUpdate,
+          );
+          const finalId =
+            (updatedUser as any)?._id || (updatedUser as any)?.id || mongoUserId;
+          if (updatedUser) setUser({ ...updatedUser, id: finalId });
+          effectiveCustomerId = finalId;
+        } catch (profileErr) {
+          console.warn("Profile update failed, continuing with booking:", profileErr);
+          effectiveCustomerId = mongoUserId;
+        }
       } else if (profileUpdate && !mongoUserId) {
         console.warn(
           "Skipping profile update during payment: no Mongo user id, using phone only.",
@@ -265,6 +276,8 @@ export default function App() {
           amount: item.service.price,
           address: currentLocation,
           serviceArea: selectedArea || currentLocationLabel || undefined,
+          customerLat: currentLat,
+          customerLng: currentLng,
         });
       });
 
@@ -316,6 +329,8 @@ export default function App() {
     currentLocation,
     currentLocationLabel,
     selectedArea,
+    currentLat,
+    currentLng,
     setCurrentLocation,
     bookings,
     cart,

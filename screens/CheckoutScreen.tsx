@@ -1,5 +1,6 @@
 import React from "react";
 import { AppScreen, NavigationProps } from "../types";
+import { areaService } from "../src/services/api";
 
 export const CheckoutScreen: React.FC<NavigationProps> = ({
   navigateTo,
@@ -10,6 +11,8 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
   currentLocation,
   currentLocationLabel,
   selectedArea,
+  currentLat,
+  currentLng,
   removeFromCart,
   user,
 }) => {
@@ -26,6 +29,12 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
   const [userEmail, setUserEmail] = React.useState(user?.email || "");
   const [profileError, setProfileError] = React.useState("");
   const [coverageError, setCoverageError] = React.useState("");
+
+  // Sync from user when it changes (e.g. after login or profile update)
+  React.useEffect(() => {
+    setUserName(user?.name === "New User" ? "" : user?.name || "");
+    setUserEmail(user?.email || "");
+  }, [user?.name, user?.email]);
 
   // If cart is empty, navigate back to home
   React.useEffect(() => {
@@ -409,17 +418,46 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
           </div>
         )}
         <button
-          onClick={() => {
+          onClick={async () => {
             setCoverageError("");
-            if (!userName || userName === "New User") {
+            setProfileError("");
+
+            // 1. Profile check: name mandatory
+            const hasValidName = userName?.trim() && userName !== "New User";
+            if (!hasValidName) {
               setShowProfilePopup(true);
-            } else {
-              setIsProcessing(true);
-              setTimeout(() => {
-                setIsProcessing(false);
-                onPaymentComplete({ name: userName, email: userEmail });
-              }, 2000);
+              return;
             }
+
+            // 2. Coverage check: job area must be in covered/assigned active areas
+            if (currentLat == null || currentLng == null) {
+              setCoverageError(
+                "Please select a saved address or use current location to verify coverage before payment.",
+              );
+              return;
+            }
+            try {
+              const coverage = await areaService.checkCoverage(currentLat, currentLng);
+              if (!coverage.serviceable) {
+                setCoverageError(
+                  "This address is outside our service area. Please change the address to a covered location.",
+                );
+                return;
+              }
+            } catch (err) {
+              console.error("Coverage check failed:", err);
+              setCoverageError(
+                "Unable to verify service area. Please try again or change the address.",
+              );
+              return;
+            }
+
+            // 3. Proceed to payment
+            setIsProcessing(true);
+            setTimeout(() => {
+              setIsProcessing(false);
+              onPaymentComplete({ name: userName.trim(), email: userEmail || "" });
+            }, 2000);
           }}
           disabled={isCustomError || isProcessing}
           className={`group relative w-full overflow-hidden rounded-lg py-4 shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-transform active:scale-[0.98] ${isCustomError || isProcessing ? "bg-gray-400 cursor-not-allowed" : "bg-onyx dark:bg-white"}`}
@@ -491,16 +529,38 @@ export const CheckoutScreen: React.FC<NavigationProps> = ({
               )}
 
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (!userName.trim()) {
                     setProfileError("Full name is mandatory");
                     return;
                   }
+                  setProfileError("");
                   setShowProfilePopup(false);
+
+                  // Coverage check after profile
+                  if (currentLat == null || currentLng == null) {
+                    setCoverageError(
+                      "Please select a saved address or use current location to verify coverage.",
+                    );
+                    return;
+                  }
+                  try {
+                    const coverage = await areaService.checkCoverage(currentLat, currentLng);
+                    if (!coverage.serviceable) {
+                      setCoverageError(
+                        "This address is outside our service area. Please change the address.",
+                      );
+                      return;
+                    }
+                  } catch (err) {
+                    setCoverageError("Unable to verify service area. Please try again.");
+                    return;
+                  }
+
                   setIsProcessing(true);
                   setTimeout(() => {
                     setIsProcessing(false);
-                    onPaymentComplete({ name: userName, email: userEmail });
+                    onPaymentComplete({ name: userName.trim(), email: userEmail || "" });
                   }, 2000);
                 }}
                 className="w-full h-12 bg-black dark:bg-white text-white dark:text-onyx font-bold rounded-xl active:scale-95 transition-transform"
