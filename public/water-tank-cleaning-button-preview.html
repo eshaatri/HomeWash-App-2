@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home Cleaning Nano Banana – v4 Definition</title>
+    <title>Water Tank Cleaning Nano Banana – v4 Orange Theme</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap"
       rel="stylesheet"
@@ -52,17 +52,20 @@
         line-height: 1.6;
       }
 
-      /* —— Banana Button "Minimal_Home_Cleaning" —— */
+      /* —— Banana Button "Minimal_WaterTank_Cleaning" (v4 Orange) —— */
       .banana-btn {
+        --brand-color: #ff7043;
+        --accent-glow: #0288d1; /* Deep Blue Secondary Glow for Water Tank */
+
         width: 180px;
         height: 180px;
-        border-radius: 34px; /* More premium rounding */
+        border-radius: 34px;
         background: radial-gradient(
           circle at 50% 50%,
           #ffffff 0%,
           #fdfdfd 100%
         );
-        border: 2.5px solid #ff7043; /* Vibrant Brand Orange */
+        border: 2.5px solid var(--brand-color);
         position: relative;
         cursor: pointer;
         display: flex;
@@ -76,9 +79,7 @@
         -webkit-tap-highlight-color: transparent;
       }
 
-      /* Hover State: Button glow */
       .banana-btn:hover {
-        /* Distinct glow based on Shadow(8px, #FF7043, 30%) */
         box-shadow: 0 8px 25px rgba(255, 112, 67, 0.3);
       }
 
@@ -87,12 +88,12 @@
         transition-duration: 0.15s;
       }
 
-      /* Banana Layer "Focus_Accent" */
+      /* Banana Layer "Focus_Accent" (Deep Blue Glow) */
       .focus-accent {
         position: absolute;
         width: 100px;
         height: 100px;
-        background: #7e57c2;
+        background: var(--accent-glow);
         border-radius: 50%;
         top: 50%;
         left: 50%;
@@ -114,7 +115,7 @@
       /* Banana Group "Visual_Hero" */
       .visual-hero {
         position: relative;
-        width: 85%; /* Increased from 75% to make the house prominent */
+        width: 85%;
         height: 85%;
         display: flex;
         align-items: center;
@@ -124,47 +125,70 @@
       }
 
       .banana-btn:hover .visual-hero {
-        transform: scale(1.05); /* Pulse scale */
+        transform: scale(1.05); /* Pulse effect */
       }
 
-      /* Banana Icon "Art_House" (Home_Modern_Isometric_Hero) */
-      .art-house {
+      /* Rippling / Wave Animation */
+      @keyframes wave {
+        0%,
+        100% {
+          transform: scaleX(1) translateY(0);
+        }
+        50% {
+          transform: scaleX(1.1) translateY(-2px);
+        }
+      }
+
+      .ripple {
+        animation: wave 2s infinite ease-in-out;
+        transform-origin: center;
+      }
+      .ripple-2 {
+        animation-delay: 0.5s;
+        opacity: 0.4;
+      }
+
+      /* Banana Icon "Art_WaterTank" (Symmetrical Industrial Tank Hero) */
+      .art-watertank {
         width: 100%;
         height: auto;
-        max-width: 110px; /* Keep it nicely constrained but large */
-        /* Floating 3D shadow: Shadow(15px, #000000, 15%) */
-        filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.15));
+        max-width: 100px;
+        filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.1));
         transition: filter 0.5s ease;
       }
 
-      .art-house svg {
+      .art-watertank svg {
         width: 100%;
         height: 100%;
         display: block;
       }
 
-      .banana-btn:hover .art-house {
-        filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.2));
+      .banana-btn:hover .art-watertank {
+        filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.15));
       }
     </style>
   </head>
   <body>
     <div class="header-text">
-      <h1>Home Cleaning</h1>
+      <h1>Water Tank Cleaning</h1>
       <p class="sub">
-        Nano Banana v4 – Minimal Home Cleaning: Enlarged isometric hero house,
-        sleek purple focus accent, and elegant interaction pulse.
+        Nano Banana v4 – Orange Water Tank: Symmetrical industrial tank with
+        rippling water highlight and deep blue focus accent.
       </p>
     </div>
 
-    <button type="button" class="banana-btn" aria-label="Book Home Cleaning">
+    <button
+      type="button"
+      class="banana-btn"
+      aria-label="Book Water Tank Cleaning"
+    >
       <!-- 1. Differentiation Accent -->
       <div class="focus-accent"></div>
 
       <!-- 2. The Enlarged Visual Hero -->
       <div class="visual-hero">
-        <!-- Home_Modern_Isometric_Hero -->
-        <div class="art-house" aria-hidden="true">
+        <!-- Symmetrical_WaterTank_Hero -->
+        <div class="art-watertank" aria-hidden="true">
           <svg
             viewBox="0 0 64 64"
             fill="none"
@@ -172,58 +196,76 @@
           >
             <defs>
               <linearGradient
-                id="gradRoof"
-                x1="8"
-                y1="12"
-                x2="56"
-                y2="34"
+                id="gradTank"
+                x1="12"
+                y1="16"
+                x2="52"
+                y2="52"
                 gradientUnits="userSpaceOnUse"
               >
                 <stop stop-color="#FFAB91" />
                 <stop offset="1" stop-color="#FF7043" />
               </linearGradient>
               <linearGradient
-                id="gradBody"
+                id="gradWave"
                 x1="16"
-                y1="32"
+                y1="36"
                 x2="48"
-                y2="54"
+                y2="48"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stop-color="#FF8A65" />
-                <stop offset="1" stop-color="#F4511E" />
+                <stop stop-color="#0288D1" />
+                <stop offset="1" stop-color="#03A9F4" />
               </linearGradient>
             </defs>
 
-            <!-- Main House Body (Flat Base) -->
-            <path d="M16 32 H48 V54 H16 Z" fill="url(#gradBody)" />
-
-            <!-- Centered Door Cutout -->
-            <path d="M28 42 H36 V54 H28 Z" fill="#FFFFFF" opacity="0.3" />
-
-            <!-- Symmetrical Windows -->
-            <rect
-              x="20"
-              y="36"
-              width="6"
-              height="6"
-              fill="#FFFFFF"
-              opacity="0.4"
-            />
-            <rect
-              x="38"
-              y="36"
-              width="6"
-              height="6"
-              fill="#FFFFFF"
-              opacity="0.4"
+            {/* Symmetrical Tank Main Body (Cylinder) */}
+            <path
+              d="M16 16 C16 12 48 12 48 16 V52 C48 56 16 56 16 52 V16 Z"
+              fill="url(#gradTank)"
             />
 
-            <!-- Classic Pitched Roof with Overhang -->
-            <path d="M8 32 L32 8 L56 32 Z" fill="url(#gradRoof)" />
+            {/* Symmetrical Tank Lid */}
+            <rect x="24" y="10" width="16" height="4" rx="2" fill="#F4511E" />
 
-            <!-- Subtle Roof Detail (Right Shade) -->
-            <path d="M32 8 L56 32 H32 Z" fill="#000000" opacity="0.08" />
+            {/* Tank Ribs (Details) */}
+            <path
+              d="M16 26 H48"
+              stroke="#FFFFFF"
+              stroke-opacity="0.2"
+              stroke-width="2"
+            />
+            <path
+              d="M16 38 H48"
+              stroke="#FFFFFF"
+              stroke-opacity="0.2"
+              stroke-width="2"
+            />
+
+            {/* Symmetrical Rippling Water Highlight (Blue Contrast) */}
+            <g class="ripple">
+              <ellipse
+                cx="32"
+                cy="46"
+                rx="16"
+                ry="4"
+                fill="url(#gradWave)"
+                opacity="0.6"
+              />
+            </g>
+            <g class="ripple ripple-2">
+              <ellipse
+                cx="32"
+                cy="48"
+                rx="12"
+                ry="3"
+                fill="#FFFFFF"
+                opacity="0.2"
+              />
+            </g>
+
+            {/* Symmetrical Outlet Pipe representation at bottom */}
+            <rect x="30" y="54" width="4" height="4" fill="#FF7043" />
           </svg>
         </div>
       </div>

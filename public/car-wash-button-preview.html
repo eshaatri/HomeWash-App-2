@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Wash Nano Banana – v4 Orange Theme</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Outfit",
+          -apple-system,
+          sans-serif;
+        background: radial-gradient(
+          circle at 50% 10%,
+          #fdfdfd 0%,
+          #edf1f7 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        margin: 0;
+        color: #1e293b;
+      }
+
+      .header-text {
+        text-align: center;
+        margin-bottom: 3.5rem;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+      }
+
+      .sub {
+        font-size: 1rem;
+        color: #64748b;
+        max-width: 450px;
+        line-height: 1.6;
+      }
+
+      /* —— Banana Button "Minimal_Car_Wash" (v4 Orange) —— */
+      .banana-btn {
+        --brand-color: #ff7043;
+        --accent-glow: #00b0ff; /* Vibrant Sky Blue Secondary Glow */
+
+        width: 180px;
+        height: 180px;
+        border-radius: 34px;
+        background: radial-gradient(
+          circle at 50% 50%,
+          #ffffff 0%,
+          #fdfdfd 100%
+        );
+        border: 2.5px solid var(--brand-color);
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: all 0.3s ease;
+        outline: none;
+        overflow: hidden;
+        box-shadow: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .banana-btn:hover {
+        box-shadow: 0 8px 25px rgba(255, 112, 67, 0.3);
+      }
+
+      .banana-btn:active {
+        transform: scale(0.97);
+        transition-duration: 0.15s;
+      }
+
+      /* Banana Layer "Focus_Accent" (Blue Glow) */
+      .focus-accent {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: var(--accent-glow);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        filter: blur(50px);
+        opacity: 0.08;
+        pointer-events: none;
+        transition: all 0.5s ease;
+        z-index: 0;
+      }
+
+      .banana-btn:hover .focus-accent {
+        width: 120px;
+        height: 120px;
+        filter: blur(60px);
+        opacity: 0.18;
+      }
+
+      /* Banana Group "Visual_Hero" */
+      .visual-hero {
+        position: relative;
+        width: 85%;
+        height: 85%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 1;
+      }
+
+      .banana-btn:hover .visual-hero {
+        transform: scale(1.05);
+      }
+
+      /* Shimmer/Slide Animation for Speed/Cleanliness */
+      @keyframes slide {
+        0% {
+          transform: translateX(-40px) skewX(-20deg);
+          opacity: 0;
+        }
+        20% {
+          opacity: 0.6;
+        }
+        80% {
+          opacity: 0.6;
+        }
+        100% {
+          transform: translateX(40px) skewX(-20deg);
+          opacity: 0;
+        }
+      }
+
+      .shimmer-line {
+        animation: slide 2s infinite ease-out;
+      }
+      .line-1 {
+        animation-delay: 0s;
+      }
+      .line-2 {
+        animation-delay: 0.6s;
+      }
+      .line-3 {
+        animation-delay: 1.2s;
+      }
+
+      /* Banana Icon "Art_Car" (Symmetrical Modern Car Hero) */
+      .art-car {
+        width: 100%;
+        height: auto;
+        max-width: 110px;
+        filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.1));
+        transition: filter 0.5s ease;
+      }
+
+      .art-car svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .banana-btn:hover .art-car {
+        filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.15));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-text">
+      <h1>Car Wash</h1>
+      <p class="sub">
+        Nano Banana v4 – Premium Car Hero: Symmetrical sleek, wide-stance car
+        with sliding "clean shimmer" lines and a vibrant blue focus accent.
+      </p>
+    </div>
+
+    <button type="button" class="banana-btn" aria-label="Book Car Wash">
+      <!-- 1. Differentiation Accent -->
+      <div class="focus-accent"></div>
+
+      <!-- 2. The Enlarged Visual Hero -->
+      <div class="visual-hero">
+        <!-- Symmetrical_Car_Wash_Hero_v2 (Sleek Modern Silhouette) -->
+        <div class="art-car" aria-hidden="true">
+          <svg
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient
+                id="gradCar"
+                x1="12"
+                y1="20"
+                x2="52"
+                y2="52"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#FFAB91" />
+                <stop offset="1" stop-color="#FF7043" />
+              </linearGradient>
+              <linearGradient
+                id="gradGlass"
+                x1="20"
+                y1="28"
+                x2="44"
+                y2="36"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#03A9F4" stop-opacity="0.4" />
+                <stop offset="1" stop-color="#03A9F4" stop-opacity="0.1" />
+              </linearGradient>
+            </defs>
+
+            {/* Symmetrical Car Structure (Sleek Front View) */} {/* Main Body
+            Lower */}
+            <path
+              d="M10 42 C10 38 14 34 20 34 H44 C50 34 54 38 54 42 V50 C54 52 10 52 10 50 V42 Z"
+              fill="url(#gradCar)"
+            />
+
+            {/* Cabin / Roofline */}
+            <path
+              d="M18 34 C18 24 46 24 46 34"
+              stroke="url(#gradCar)"
+              stroke-width="2"
+              fill="none"
+            />
+            <path d="M20 34 C20 26 44 26 44 34 H20 Z" fill="url(#gradCar)" />
+
+            {/* Windshield */}
+            <path
+              d="M22 27 C22 27 32 24 42 27 L44 34 H20 L22 27 Z"
+              fill="url(#gradGlass)"
+            />
+
+            {/* Symmetrical Headlights (Modern Dual-Bar) */}
+            <rect
+              x="12"
+              y="38"
+              width="10"
+              height="3"
+              rx="1.5"
+              fill="#FFFFFF"
+              fill-opacity="0.9"
+            />
+            <rect
+              x="42"
+              y="38"
+              width="10"
+              height="3"
+              rx="1.5"
+              fill="#FFFFFF"
+              fill-opacity="0.9"
+            />
+            <rect
+              x="13"
+              y="42"
+              width="6"
+              height="1"
+              rx="0.5"
+              fill="#FFFFFF"
+              fill-opacity="0.5"
+            />
+            <rect
+              x="45"
+              y="42"
+              width="6"
+              height="1"
+              rx="0.5"
+              fill="#FFFFFF"
+              fill-opacity="0.5"
+            />
+
+            {/* Symmetrical Side Mirrors */}
+            <path d="M10 36 L6 34 V38 L10 39" fill="#F4511E" />
+            <path d="M54 36 L58 34 V38 L54 39" fill="#F4511E" />
+
+            {/* Lower Grille / Intake */}
+            <rect
+              x="22"
+              y="44"
+              width="20"
+              height="4"
+              rx="2"
+              fill="#F4511E"
+              opacity="0.4"
+            />
+
+            {/* Sliding "Clean Shimmer" Lines Animation */}
+            <g class="shimmer-line line-1">
+              <rect
+                x="10"
+                y="24"
+                width="24"
+                height="2"
+                rx="1"
+                fill="#FFFFFF"
+                fill-opacity="0.5"
+              />
+            </g>
+            <g class="shimmer-line line-2">
+              <rect
+                x="0"
+                y="38"
+                width="20"
+                height="2"
+                rx="1"
+                fill="#FFFFFF"
+                fill-opacity="0.4"
+              />
+            </g>
+            <g class="shimmer-line line-3">
+              <rect
+                x="35"
+                y="48"
+                width="18"
+                height="2"
+                rx="1"
+                fill="#FFFFFF"
+                fill-opacity="0.5"
+              />
+            </g>
+
+            {/* Under-car Shadow */}
+            <ellipse
+              cx="32"
+              cy="54"
+              rx="22"
+              ry="2"
+              fill="#000000"
+              fill-opacity="0.05"
+            />
+          </svg>
+        </div>
+      </div>
+    </button>
+  </body>
+</html>

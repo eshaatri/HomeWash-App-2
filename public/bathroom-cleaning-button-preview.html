@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home Cleaning Nano Banana – v4 Definition</title>
+    <title>Bathroom Cleaning Nano Banana – v4 Orange Theme</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap"
       rel="stylesheet"
@@ -52,17 +52,20 @@
         line-height: 1.6;
       }
 
-      /* —— Banana Button "Minimal_Home_Cleaning" —— */
+      /* —— Banana Button "Minimal_Bathroom_Cleaning" (v4 Orange) —— */
       .banana-btn {
+        --brand-color: #ff7043; /* Unified Orange Theme */
+        --accent-glow: #7e57c2; /* Purple Glow Secondary */
+
         width: 180px;
         height: 180px;
-        border-radius: 34px; /* More premium rounding */
+        border-radius: 34px;
         background: radial-gradient(
           circle at 50% 50%,
           #ffffff 0%,
           #fdfdfd 100%
         );
-        border: 2.5px solid #ff7043; /* Vibrant Brand Orange */
+        border: 2.5px solid var(--brand-color);
         position: relative;
         cursor: pointer;
         display: flex;
@@ -78,7 +81,6 @@
 
       /* Hover State: Button glow */
       .banana-btn:hover {
-        /* Distinct glow based on Shadow(8px, #FF7043, 30%) */
         box-shadow: 0 8px 25px rgba(255, 112, 67, 0.3);
       }
 
@@ -92,7 +94,7 @@
         position: absolute;
         width: 100px;
         height: 100px;
-        background: #7e57c2;
+        background: var(--accent-glow);
         border-radius: 50%;
         top: 50%;
         left: 50%;
@@ -114,7 +116,7 @@
       /* Banana Group "Visual_Hero" */
       .visual-hero {
         position: relative;
-        width: 85%; /* Increased from 75% to make the house prominent */
+        width: 85%;
         height: 85%;
         display: flex;
         align-items: center;
@@ -123,48 +125,83 @@
         z-index: 1;
       }
 
+      /* Pulse scale for the hero group */
       .banana-btn:hover .visual-hero {
-        transform: scale(1.05); /* Pulse scale */
+        transform: scale(1.05);
       }
 
-      /* Banana Icon "Art_House" (Home_Modern_Isometric_Hero) */
-      .art-house {
+      /* Animation specifically for dropping droplets */
+      @keyframes drop {
+        0% {
+          transform: translateY(-10px);
+          opacity: 0;
+        }
+        30% {
+          opacity: 1;
+        }
+        70% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(12px);
+          opacity: 0;
+        }
+      }
+
+      .droplet {
+        animation: drop 1.5s infinite linear;
+      }
+      .droplet-1 {
+        animation-delay: 0s;
+      }
+      .droplet-2 {
+        animation-delay: 0.5s;
+      }
+      .droplet-3 {
+        animation-delay: 1s;
+      }
+
+      /* Banana Icon "Art_Bathroom" */
+      .art-bathroom {
         width: 100%;
         height: auto;
-        max-width: 110px; /* Keep it nicely constrained but large */
-        /* Floating 3D shadow: Shadow(15px, #000000, 15%) */
-        filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.15));
+        max-width: 110px;
+        filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.1));
         transition: filter 0.5s ease;
       }
 
-      .art-house svg {
+      .art-bathroom svg {
         width: 100%;
         height: 100%;
         display: block;
       }
 
-      .banana-btn:hover .art-house {
-        filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.2));
+      .banana-btn:hover .art-bathroom {
+        filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.15));
       }
     </style>
   </head>
   <body>
     <div class="header-text">
-      <h1>Home Cleaning</h1>
+      <h1>Bathroom Cleaning</h1>
       <p class="sub">
-        Nano Banana v4 – Minimal Home Cleaning: Enlarged isometric hero house,
-        sleek purple focus accent, and elegant interaction pulse.
+        Nano Banana v4 – Orange Bathroom Cleaning: Unified orange theme with
+        animated blue droplets for clear recognition.
       </p>
     </div>
 
-    <button type="button" class="banana-btn" aria-label="Book Home Cleaning">
+    <button
+      type="button"
+      class="banana-btn"
+      aria-label="Book Bathroom Cleaning"
+    >
       <!-- 1. Differentiation Accent -->
       <div class="focus-accent"></div>
 
       <!-- 2. The Enlarged Visual Hero -->
       <div class="visual-hero">
-        <!-- Home_Modern_Isometric_Hero -->
-        <div class="art-house" aria-hidden="true">
+        <!-- Symmetrical_Bathtub_Hero -->
+        <div class="art-bathroom" aria-hidden="true">
           <svg
             viewBox="0 0 64 64"
             fill="none"
@@ -172,58 +209,75 @@
           >
             <defs>
               <linearGradient
-                id="gradRoof"
+                id="gradTub"
                 x1="8"
-                y1="12"
+                y1="36"
                 x2="56"
-                y2="34"
+                y2="56"
                 gradientUnits="userSpaceOnUse"
               >
                 <stop stop-color="#FFAB91" />
                 <stop offset="1" stop-color="#FF7043" />
               </linearGradient>
               <linearGradient
-                id="gradBody"
-                x1="16"
-                y1="32"
-                x2="48"
-                y2="54"
+                id="gradWater"
+                x1="12"
+                y1="36"
+                x2="52"
+                y2="44"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stop-color="#FF8A65" />
-                <stop offset="1" stop-color="#F4511E" />
+                <stop stop-color="#80DEEA" />
+                <stop offset="1" stop-color="#4DD0E1" />
               </linearGradient>
             </defs>
 
-            <!-- Main House Body (Flat Base) -->
-            <path d="M16 32 H48 V54 H16 Z" fill="url(#gradBody)" />
+            <!-- The Bathtub Rim (Symmetrical) -->
+            <path
+              d="M8 36 C8 32 12 32 14 32 H50 C52 32 56 32 56 36 V48 C56 52 52 56 48 56 H16 C12 56 8 52 8 48 V36 Z"
+              fill="url(#gradTub)"
+            />
 
-            <!-- Centered Door Cutout -->
-            <path d="M28 42 H36 V54 H28 Z" fill="#FFFFFF" opacity="0.3" />
+            <!-- The Water Surface -->
+            <path
+              d="M14 38 H50 V42 H14 Z"
+              fill="url(#gradWater)"
+              opacity="0.6"
+            />
 
-            <!-- Symmetrical Windows -->
+            <!-- Symmetrical Faucet Head -->
+            <path d="M24 12 H40 V16 H24 Z" fill="#FF7043" />
+
+            <!-- Animated Droplets (Blue Contrast) -->
+            <g class="droplet droplet-1">
+              <circle cx="32" cy="18" r="1.5" fill="#4DD0E1" />
+            </g>
+            <g class="droplet droplet-2">
+              <circle cx="28" cy="22" r="1.5" fill="#4DD0E1" />
+            </g>
+            <g class="droplet droplet-3">
+              <circle cx="36" cy="22" r="1.5" fill="#4DD0E1" />
+            </g>
+
+            <!-- Subtle Shine -->
             <rect
-              x="20"
-              y="36"
-              width="6"
-              height="6"
+              x="14"
+              y="48"
+              width="12"
+              height="2"
+              rx="1"
               fill="#FFFFFF"
-              opacity="0.4"
+              opacity="0.3"
             />
             <rect
               x="38"
-              y="36"
-              width="6"
-              height="6"
+              y="48"
+              width="12"
+              height="2"
+              rx="1"
               fill="#FFFFFF"
-              opacity="0.4"
+              opacity="0.3"
             />
-
-            <!-- Classic Pitched Roof with Overhang -->
-            <path d="M8 32 L32 8 L56 32 Z" fill="url(#gradRoof)" />
-
-            <!-- Subtle Roof Detail (Right Shade) -->
-            <path d="M32 8 L56 32 H32 Z" fill="#000000" opacity="0.08" />
           </svg>
         </div>
       </div>

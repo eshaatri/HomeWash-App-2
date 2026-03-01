@@ -3,6 +3,12 @@ import { AppScreen, NavigationProps } from "../types";
 import { BottomNav } from "../components/BottomNav";
 import { CATEGORIES, MOCK_BOOKINGS } from "../mockData";
 import { areaService } from "../src/services/api";
+import { CustomHouseIcon } from "../components/CustomHouseIcon";
+import { CustomBathroomIcon } from "../components/CustomBathroomIcon";
+import { CustomKitchenIcon } from "../components/CustomKitchenIcon";
+import { CustomWaterTankIcon } from "../components/CustomWaterTankIcon";
+import { CustomSofaIcon } from "../components/CustomSofaIcon";
+import { CustomCarWashIcon } from "../components/CustomCarWashIcon";
 
 export const HomeScreen: React.FC<NavigationProps> = (props) => {
   const {
@@ -100,11 +106,23 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     longitude,
                   );
                 } else {
-                  setCurrentLocation(formatted, "Current Location", null, latitude, longitude);
+                  setCurrentLocation(
+                    formatted,
+                    "Current Location",
+                    null,
+                    latitude,
+                    longitude,
+                  );
                 }
               } catch (e) {
                 console.error("Coverage check on mount failed:", e);
-                setCurrentLocation(formatted, "Current Location", undefined, latitude, longitude);
+                setCurrentLocation(
+                  formatted,
+                  "Current Location",
+                  undefined,
+                  latitude,
+                  longitude,
+                );
               }
             } else {
               setCurrentLocation(
@@ -317,77 +335,147 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
       {/* 3-Column Categories Grid */}
       <section className="px-6 py-6">
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-7">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setSelectedCategory(cat);
-                navigateTo(AppScreen.SUB_CATEGORY);
-              }}
-              className="flex flex-col items-center group"
-            >
-              {/* Conditional Rendering: Custom Images for All Categories */}
-              {["c1", "c2", "c3", "c4", "c5", "c6"].includes(cat.id) ? (
-                <div className="relative w-full aspect-square mb-3 transition-transform duration-300 group-hover:scale-105 active:scale-95 drop-shadow-[0_10px_15px_rgba(0,0,0,0.2)]">
-                  <img
-                    src={
-                      cat.id === "c1"
-                        ? "/assets/home-cleaning-3d.png"
-                        : cat.id === "c2"
-                          ? "/assets/bathroom-cleaning.png"
-                          : cat.id === "c3"
-                            ? "/assets/kitchen-cleaning.png"
-                            : cat.id === "c4"
-                              ? "/assets/water-tank-cleaning.png"
-                              : cat.id === "c5"
-                                ? "/assets/sofa-cleaning.png"
-                                : "/assets/car-wash.png"
-                    }
-                    alt={cat.name}
-                    className="w-full h-full object-cover rounded-[2rem] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2)]"
-                    onError={(e) => {
-                      // Fallback to CSS style if image missing
-                      e.currentTarget.style.display = "none";
-                      e.currentTarget.parentElement?.classList.add(
-                        ...get3DStyle(cat.id).split(" "),
-                      );
-                      e.currentTarget.parentElement?.classList.add(
-                        "flex",
-                        "items-center",
-                        "justify-center",
-                      );
-                      const icon = document.createElement("span");
-                      icon.className =
-                        "material-symbols-outlined text-[36px] text-white drop-shadow-md";
-                      icon.innerText = cat.icon;
-                      e.currentTarget.parentElement?.appendChild(icon);
-                    }}
-                  />
-                </div>
-              ) : (
-                <div
-                  className={`flex items-center justify-center mb-3 ${get3DStyle(cat.id)}`}
-                >
-                  {/* Shimmer/Reflection Layer */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-black/10 pointer-events-none"></div>
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-2 bg-white/40 rounded-full blur-[2px]"></div>
+          {CATEGORIES.map((cat) => {
+            const isHomeCleaning = cat.id === "c1";
+            const isBathroomCleaning = cat.id === "c2";
+            const isKitchenCleaning = cat.id === "c3";
+            const isWaterTankCleaning = cat.id === "c4";
+            const isSofaCleaning = cat.id === "c5";
+            const isCarWash = cat.id === "c6";
 
-                  {/* Icon Styling */}
-                  <div className="relative z-10 flex items-center justify-center transition-transform group-hover:scale-110 duration-300 drop-shadow-[0_5px_5px_rgba(0,0,0,0.2)]">
-                    <span
-                      className="material-symbols-outlined text-[36px] text-white filter drop-shadow-md"
-                      style={{ fontVariationSettings: "'FILL' 1, 'wght' 600" }}
-                    >
-                      {cat.icon}
-                    </span>
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  navigateTo(AppScreen.SUB_CATEGORY);
+                }}
+                className={`flex flex-col items-center group relative ${isHomeCleaning || isBathroomCleaning || isKitchenCleaning || isWaterTankCleaning || isSofaCleaning || isCarWash ? "overflow-visible" : ""}`}
+              >
+                {/* Custom Labeling logic for specific icons */}
+                {isHomeCleaning ? (
+                  /* Premium Nano Banana Button Implementation for v4 */
+                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" (The subtle purple glow) */}
+                    <div className="absolute inset-0 bg-[#7E57C2] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-20 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
+
+                    {/* Visual Base for Category Card - Premium White/Gray Gradient */}
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+
+                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
+                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                      <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
+                        <CustomHouseIcon />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
-              <span className="text-[11px] font-bold text-center leading-tight text-onyx/80 dark:text-alabaster/80 group-hover:text-onyx dark:group-hover:text-alabaster transition-colors uppercase tracking-wider">
-                {cat.name}
-              </span>
-            </button>
-          ))}
+                ) : isBathroomCleaning ? (
+                  /* Premium Nano Banana Button: Bathroom Cleaning Edition */
+                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" (Subtle Purple Accent for differentiator) */}
+                    <div className="absolute inset-0 bg-[#7E57C2] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-20 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
+
+                    {/* Visual Base for Category Card - Brand Orange Border */}
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+
+                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
+                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                      <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
+                        <CustomBathroomIcon />
+                      </div>
+                    </div>
+                  </div>
+                ) : isKitchenCleaning ? (
+                  /* Premium Nano Banana Button: Kitchen Cleaning Edition */
+                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" (Subtle Golden Accent for Kitchen) */}
+                    <div className="absolute inset-0 bg-[#FFD54F] rounded-full blur-[20px] opacity-[0.12] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
+
+                    {/* Visual Base for Category Card - Brand Orange Border */}
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+
+                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
+                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                      <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
+                        <CustomKitchenIcon />
+                      </div>
+                    </div>
+                  </div>
+                ) : isWaterTankCleaning ? (
+                  /* Premium Nano Banana Button: Water Tank Cleaning Edition */
+                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" (Subtle Deep Blue Accent for Water Tank) */}
+                    <div className="absolute inset-0 bg-[#0288D1] rounded-full blur-[20px] opacity-[0.10] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
+
+                    {/* Visual Base for Category Card - Brand Orange Border */}
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+
+                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
+                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                      <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
+                        <CustomWaterTankIcon />
+                      </div>
+                    </div>
+                  </div>
+                ) : isSofaCleaning ? (
+                  /* Premium Nano Banana Button: Sofa Cleaning Edition */
+                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" (Subtle Fresh Teal Accent for Sofa) */}
+                    <div className="absolute inset-0 bg-[#26A69A] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
+
+                    {/* Visual Base for Category Card - Brand Orange Border */}
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+
+                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
+                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                      <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
+                        <CustomSofaIcon />
+                      </div>
+                    </div>
+                  </div>
+                ) : isCarWash ? (
+                  /* Premium Nano Banana Button: Car Wash Edition */
+                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" (Subtle Sky Blue Accent for Car Wash) */}
+                    <div className="absolute inset-0 bg-[#00B0FF] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
+
+                    {/* Visual Base for Category Card - Brand Orange Border */}
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+
+                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
+                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                      <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
+                        <CustomCarWashIcon />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className={`flex items-center justify-center mb-3 ${get3DStyle(cat.id)}`}
+                  >
+                    {/* Shimmer/Reflection Layer */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-black/10 pointer-events-none"></div>
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-2 bg-white/40 rounded-full blur-[2px]"></div>
+
+                    {/* Icon Styling */}
+                    <div className="relative z-10 flex items-center justify-center transition-transform group-hover:scale-110 duration-300 drop-shadow-[0_5px_5px_rgba(0,0,0,0.2)]">
+                      <span
+                        className="material-symbols-outlined text-[36px] text-white filter drop-shadow-md"
+                        style={{
+                          fontVariationSettings: "'FILL' 1, 'wght' 600",
+                        }}
+                      >
+                        {cat.icon}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <span className="text-[11px] font-bold text-center leading-tight text-onyx/80 dark:text-alabaster/80 group-hover:text-onyx dark:group-hover:text-alabaster transition-colors uppercase tracking-wider">
+                  {cat.name}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 

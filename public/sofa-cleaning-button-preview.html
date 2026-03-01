@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sofa Cleaning Nano Banana – v4 Orange Theme</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Outfit",
+          -apple-system,
+          sans-serif;
+        background: radial-gradient(
+          circle at 50% 10%,
+          #fdfdfd 0%,
+          #edf1f7 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        margin: 0;
+        color: #1e293b;
+      }
+
+      .header-text {
+        text-align: center;
+        margin-bottom: 3.5rem;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+      }
+
+      .sub {
+        font-size: 1rem;
+        color: #64748b;
+        max-width: 450px;
+        line-height: 1.6;
+      }
+
+      /* —— Banana Button "Minimal_Sofa_Cleaning" (v4 Orange) —— */
+      .banana-btn {
+        --brand-color: #ff7043;
+        --accent-glow: #26a69a; /* Teal/Sage Secondary Glow for Fabric Freshness */
+
+        width: 180px;
+        height: 180px;
+        border-radius: 34px;
+        background: radial-gradient(
+          circle at 50% 50%,
+          #ffffff 0%,
+          #fdfdfd 100%
+        );
+        border: 2.5px solid var(--brand-color);
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: all 0.3s ease;
+        outline: none;
+        overflow: hidden;
+        box-shadow: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .banana-btn:hover {
+        box-shadow: 0 8px 25px rgba(255, 112, 67, 0.3);
+      }
+
+      .banana-btn:active {
+        transform: scale(0.97);
+        transition-duration: 0.15s;
+      }
+
+      /* Banana Layer "Focus_Accent" (Teal Glow) */
+      .focus-accent {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: var(--accent-glow);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        filter: blur(50px);
+        opacity: 0.08;
+        pointer-events: none;
+        transition: all 0.5s ease;
+        z-index: 0;
+      }
+
+      .banana-btn:hover .focus-accent {
+        width: 120px;
+        height: 120px;
+        filter: blur(60px);
+        opacity: 0.15;
+      }
+
+      /* Banana Group "Visual_Hero" */
+      .visual-hero {
+        position: relative;
+        width: 85%;
+        height: 85%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 1;
+      }
+
+      .banana-btn:hover .visual-hero {
+        transform: scale(1.05);
+      }
+
+      /* Sparkle Animation */
+      @keyframes sparkle {
+        0%,
+        100% {
+          transform: scale(0) rotate(0deg);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1) rotate(45deg);
+          opacity: 1;
+        }
+      }
+
+      .sparkle {
+        animation: sparkle 2s infinite ease-in-out;
+        transform-origin: center;
+      }
+      .sparkle-1 {
+        animation-delay: 0s;
+      }
+      .sparkle-2 {
+        animation-delay: 0.7s;
+      }
+      .sparkle-3 {
+        animation-delay: 1.4s;
+      }
+
+      /* Banana Icon "Art_Sofa" (Symmetrical Modern Sofa Hero) */
+      .art-sofa {
+        width: 100%;
+        height: auto;
+        max-width: 110px;
+        filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.1));
+        transition: filter 0.5s ease;
+      }
+
+      .art-sofa svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .banana-btn:hover .art-sofa {
+        filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.15));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-text">
+      <h1>Sofa Cleaning</h1>
+      <p class="sub">
+        Nano Banana v4 – Premium Sofa Hero: Symmetrical modern sofa with
+        animated sparkles and a fresh teal focus accent.
+      </p>
+    </div>
+
+    <button type="button" class="banana-btn" aria-label="Book Sofa Cleaning">
+      <!-- 1. Differentiation Accent -->
+      <div class="focus-accent"></div>
+
+      <!-- 2. The Enlarged Visual Hero -->
+      <div class="visual-hero">
+        <!-- Symmetrical_Sofa_Hero -->
+        <div class="art-sofa" aria-hidden="true">
+          <svg
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient
+                id="gradSofa"
+                x1="8"
+                y1="24"
+                x2="56"
+                y2="52"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#FFAB91" />
+                <stop offset="1" stop-color="#FF7043" />
+              </linearGradient>
+              <linearGradient
+                id="gradCushion"
+                x1="16"
+                y1="36"
+                x2="48"
+                y2="44"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#FFFFFF" stop-opacity="0.3" />
+                <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.1" />
+              </linearGradient>
+            </defs>
+
+            {/* Symmetrical Sofa Backrest */}
+            <path
+              d="M10 28 C10 24 54 24 54 28 V48 H10 V28 Z"
+              fill="url(#gradSofa)"
+            />
+
+            {/* Symmetrical Armrests */}
+            <rect x="6" y="36" width="8" height="16" rx="4" fill="#F4511E" />
+            <rect x="50" y="36" width="8" height="16" rx="4" fill="#F4511E" />
+
+            {/* Symmetrical Seat / Main Cushion */}
+            <rect
+              x="12"
+              y="40"
+              width="40"
+              height="12"
+              rx="4"
+              fill="url(#gradSofa)"
+            />
+            <path d="M12 40 H52 V44 H12 V40 Z" fill="url(#gradCushion)" />
+            {/* Top Surface highlight */} {/* Symmetrical Cushion Division Line
+            */}
+            <path
+              d="M32 40 V52"
+              stroke="#F4511E"
+              stroke-width="1.5"
+              opacity="0.3"
+            />
+
+            {/* Symmetrical Legs */}
+            <path
+              d="M14 52 L12 58"
+              stroke="#FF7043"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+            <path
+              d="M50 52 L52 58"
+              stroke="#FF7043"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+
+            {/* Animated Sparkles for "Cleanliness" effect */}
+            <g class="sparkle sparkle-1">
+              <path d="M18 20 L20 18 L22 20 L20 22 Z" fill="#FFD54F" />
+              <path
+                d="M20 16 V24 M16 20 H24"
+                stroke="#FFD54F"
+                stroke-width="0.5"
+              />
+            </g>
+            <g class="sparkle sparkle-2">
+              <path d="M44 26 L46 24 L48 26 L46 28 Z" fill="#FFFFFF" />
+              <path
+                d="M46 22 V30 M42 26 H50"
+                stroke="#FFFFFF"
+                stroke-width="0.5"
+                opacity="0.8"
+              />
+            </g>
+            <g class="sparkle sparkle-3">
+              <path d="M32 32 L34 30 L36 32 L34 34 Z" fill="#26A69A" />
+              <path
+                d="M34 28 V36 M30 32 H38"
+                stroke="#26A69A"
+                stroke-width="0.5"
+                opacity="0.6"
+              />
+            </g>
+
+            {/* Subtle Fabric Detail */}
+            <circle cx="20" cy="46" r="0.5" fill="#FFFFFF" opacity="0.5" />
+            <circle cx="44" cy="46" r="0.5" fill="#FFFFFF" opacity="0.5" />
+            <circle cx="32" cy="46" r="0.5" fill="#FFFFFF" opacity="0.5" />
+          </svg>
+        </div>
+      </div>
+    </button>
+  </body>
+</html>
