@@ -45,14 +45,18 @@ function professionalServesArea(
 /**
  * Try to assign a newly created booking to the closest online professional in the same service area.
  * If none is online, the booking remains PENDING.
+ * @param excludeProfessionalId - Optional; when set (e.g. after reject), this professional is not considered for assignment.
  */
 export async function tryAssignBookingToClosestOnline(
-  booking: IBooking
+  booking: IBooking,
+  excludeProfessionalId?: string
 ): Promise<IBooking | null> {
   const serviceArea = booking.serviceArea;
   if (!serviceArea) return null;
 
-  const onlineIds = getOnlineProfessionalIds();
+  let onlineIds = getOnlineProfessionalIds();
+  if (excludeProfessionalId)
+    onlineIds = onlineIds.filter((id) => id !== excludeProfessionalId);
   if (onlineIds.length === 0) return null;
 
   const professionals = await User.find({

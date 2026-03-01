@@ -96,4 +96,47 @@ router.patch("/:id/status", async (req, res) => {
   }
 });
 
+router.patch("/:id/reject", async (req, res) => {
+  const { professionalId } = req.body;
+  try {
+    const booking = await Booking.findById(req.params.id).lean();
+    if (!booking)
+      return res.status(404).json({ message: "Booking not found" });
+    if (booking.professionalId !== professionalId)
+      return res
+        .status(403)
+        .json({ message: "Booking is not assigned to this professional" });
+    if (booking.status !== "PROFESSIONAL_ASSIGNED")
+      return res
+        .status(400)
+        .json({ message: "Only assigned bookings can be rejected" });
+
+    const unassigned = await Booking.findByIdAndUpdate(
+      req.params.id,
+      {
+        $unset: {
+          professionalId: "",
+          professionalName: "",
+          professionalImage: "",
+        },
+        status: "PENDING",
+      },
+      { new: true },
+    );
+    if (!unassigned) return res.status(404).json({ message: "Booking not found" });
+
+    const reassigned = await tryAssignBookingToClosestOnline(
+      unassigned,
+      professionalId,
+    );
+    const result = reassigned ?? unassigned;
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : "Error rejecting booking",
+    });
+  }
+});
+
 export default router;

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Cleaning Button Preview – Nano Banana v3 (Artistic)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, sans-serif;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      margin: 0;
+    }
+    h1 { font-size: 0.95rem; color: #424242; margin-bottom: 0.5rem; }
+    .sub { font-size: 0.75rem; color: #757575; margin-bottom: 2rem; }
+
+    /* —— Banana Button "Artistic_Home_Cleaning" v3 —— */
+    .banana-btn {
+      --orange: #FF7043;
+      --purple: #7E57C2;
+      width: 150px;
+      height: 170px;
+      border-radius: 34px;
+      background: radial-gradient(ellipse 80% 80% at 50% 50%, #FFFFFF 0%, #FDFDFD 100%);
+      border: 2.5px solid var(--orange);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: border-color 0.3s ease, border-width 0.3s ease;
+    }
+    .banana-btn:hover {
+      border: 3px solid var(--purple);
+    }
+
+    /* Banana Layer "Depth_Accent" – BlurCircle(50px, #7E57C2), 12% */
+    .banana-btn::before {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--purple);
+      border-radius: 50%;
+      opacity: 0.12;
+      filter: blur(24px);
+      pointer-events: none;
+    }
+
+    /* Banana Group "Visual_Hero" – Center, MaxWidth 75% */
+    .visual-hero {
+      position: relative;
+      width: 75%;
+      max-width: 100px;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s ease;
+    }
+    .banana-btn:hover .visual-hero {
+      transform: translateY(-5px);
+    }
+
+    /* Art_House – Center, isometric, orange, floating shadow */
+    .art-house {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 58%;
+      height: auto;
+      filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.1));
+    }
+    .art-house svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Art_Broom – CenterRight(10%) Bottom(5%), 15deg, purple, 45% */
+    .art-broom {
+      position: absolute;
+      right: 10%;
+      bottom: 5%;
+      width: 45%;
+      height: auto;
+      transform: rotate(15deg);
+      color: var(--purple);
+      transition: filter 0.3s ease;
+    }
+    .banana-btn:hover .art-broom {
+      filter: drop-shadow(0 5px 8px rgba(126, 87, 194, 0.4));
+    }
+    .art-broom svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Home Cleaning Button Preview (v3)</h1>
+  <p class="sub">Nano Banana – Artistic: radial bg, purple depth, isometric house + purple broom, hover float & purple border</p>
+
+  <button type="button" class="banana-btn" aria-label="Home Cleaning">
+    <div class="visual-hero">
+      <!-- Art_House: Home_Modern_Isometric, #FF7043 -->
+      <span class="art-house" aria-hidden="true">
+        <svg viewBox="0 0 56 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Isometric house: left roof, right roof, front face, left face -->
+          <path d="M28 6L8 24v18h18V32h12v10h18V24L28 6z" fill="#FF7043"/>
+          <path d="M28 6l20 18H8L28 6z" fill="#FF7043" opacity="0.85"/>
+          <path d="M8 24l20 18v-18L8 24z" fill="#FF7043" opacity="0.7"/>
+          <rect x="22" y="28" width="12" height="14" fill="#FF7043" opacity="0.5"/>
+        </svg>
+      </span>
+      <!-- Art_Broom: Broom_Bristle_Detailed, #7E57C2 -->
+      <span class="art-broom" aria-hidden="true">
+        <svg viewBox="0 0 28 44" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="2" width="4" height="34" rx="2"/>
+          <path d="M6 34h16v2H6z"/>
+          <path d="M7 30h14v1.5H7z"/>
+          <path d="M8 26h12v1.2H8z"/>
+          <path d="M9 22h10v1H9z"/>
+          <path d="M10 18h8v.8H10z"/>
+        </svg>
+      </span>
+    </div>
+  </button>
+
+  <p class="sub" style="margin-top: 2rem;">Hover: icon group floats up, broom purple glow, border → purple</p>
+</body>
+</html>

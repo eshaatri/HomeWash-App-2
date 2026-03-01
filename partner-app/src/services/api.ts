@@ -32,6 +32,12 @@ export const professionalService = {
     });
     return response.data;
   },
+  rejectBooking: async (jobId: string, professionalId: string) => {
+    const response = await api.patch(`/bookings/${jobId}/reject`, {
+      professionalId,
+    });
+    return response.data;
+  },
   getWalletHistory: async (_professionalId: string) => {
     return [];
   },

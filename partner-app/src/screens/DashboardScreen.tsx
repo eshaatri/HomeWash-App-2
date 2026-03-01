@@ -21,7 +21,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   setProfessionalOnline,
 }) => {
   const [showTestAddress, setShowTestAddress] = useState(false);
-  const pendingJobs = jobs.filter((j) => j.status === JobStatus.PENDING);
+  // New jobs = only those assigned to you awaiting accept/reject (home shows only new jobs)
+  const newJobs = jobs.filter((j) => j.status === "PROFESSIONAL_ASSIGNED");
   const isSuspended = professional?.status === "SUSPENDED";
   const showAsOffline = isSuspended || !isProfessionalOnline;
 
@@ -170,8 +171,11 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         )}
       </div>
 
-      {/* Active Job Card */}
-      {activeJob && (
+      {/* Active Job Card – only when professional has accepted (CONFIRMED or in progress) */}
+      {activeJob &&
+        ["CONFIRMED", "PROFESSIONAL_EN_ROUTE", "IN_PROGRESS"].includes(
+          activeJob.status as string,
+        ) && (
         <div className="px-4 mb-4">
           <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">
             Active Job
@@ -216,24 +220,24 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         </div>
       )}
 
-      {/* New Leads */}
-      {pendingJobs.length > 0 && (
+      {/* New Jobs – assigned to you, accept/reject in Jobs screen */}
+      {newJobs.length > 0 && (
         <div className="px-4 flex-1">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500">
-              New Leads ({pendingJobs.length})
+              New Jobs ({newJobs.length})
             </h3>
             <button
-              onClick={refreshJobs}
+              onClick={() => navigateTo(ProfessionalScreen.JOBS)}
               className="text-primary text-xs font-bold hover:opacity-70 transition-opacity"
             >
-              Refresh
+              View all
             </button>
           </div>
           <div className="space-y-3">
-            {pendingJobs.slice(0, 3).map((job) => (
+            {newJobs.slice(0, 3).map((job) => (
               <div
-                key={job.id}
+                key={job.id || job._id}
                 onClick={() => navigateTo(ProfessionalScreen.JOBS)}
                 className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-gray-100 dark:border-white/5 cursor-pointer hover:border-primary/50 transition-colors"
               >
@@ -253,7 +257,13 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
       )}
 
       {/* Empty State */}
-      {pendingJobs.length === 0 && !activeJob && (
+      {newJobs.length === 0 &&
+        !(
+          activeJob &&
+          ["CONFIRMED", "PROFESSIONAL_EN_ROUTE", "IN_PROGRESS"].includes(
+            activeJob.status as string,
+          )
+        ) && (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">
             work_off

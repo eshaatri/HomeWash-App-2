@@ -13,14 +13,19 @@ export const JobsScreen: React.FC<NavigationProps> = ({
     "available",
   );
 
-  const pendingJobs = jobs.filter((j) => j.status === JobStatus.PENDING);
+  const pendingJobs = jobs.filter(
+    (j) =>
+      j.status === JobStatus.PENDING || j.status === "PROFESSIONAL_ASSIGNED",
+  );
   const acceptedJobs = jobs.filter((j) =>
     [
       JobStatus.ACCEPTED,
+      "CONFIRMED",
       JobStatus.EN_ROUTE,
+      "PROFESSIONAL_EN_ROUTE",
       JobStatus.ARRIVED,
       JobStatus.IN_PROGRESS,
-    ].includes(j.status),
+    ].includes(j.status as string),
   );
   const completedJobs = jobs.filter((j) => j.status === JobStatus.COMPLETED);
 
@@ -128,18 +133,30 @@ export const JobsScreen: React.FC<NavigationProps> = ({
 
             {filter === "available" && (
               <div className="flex gap-2">
-                <button
-                  onClick={() => rejectJob(job.id || job._id || "")}
-                  className="flex-1 border border-gray-200 dark:border-white/20 py-3 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                >
-                  Reject
-                </button>
-                <button
-                  onClick={() => acceptJob(job.id || job._id || "")}
-                  className="flex-1 bg-green-500 text-white py-3 rounded-lg text-sm font-bold shadow-lg shadow-green-500/20 hover:bg-green-600 transition-colors"
-                >
-                  Accept
-                </button>
+                {job.status === "PROFESSIONAL_ASSIGNED" ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => rejectJob(job.id ?? job._id ?? "")}
+                      className="flex-1 border border-gray-200 dark:border-white/20 py-3 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!(job.id ?? job._id)}
+                    >
+                      Reject
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => acceptJob(job.id ?? job._id ?? "")}
+                      className="flex-1 bg-green-500 text-white py-3 rounded-lg text-sm font-bold shadow-lg shadow-green-500/20 hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!(job.id ?? job._id)}
+                    >
+                      Accept
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 py-2">
+                    Unassigned – will be offered when you’re online
+                  </p>
+                )}
               </div>
             )}
 

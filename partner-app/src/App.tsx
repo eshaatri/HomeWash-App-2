@@ -172,17 +172,20 @@ export default function App() {
       // Map back to our view format if needed
       const mappedJobs = data.map((j: any) => ({
         ...j,
-        id: j._id, // Ensure frontend uses .id
+        id: j.id ?? j._id, // Backend sends .id; keep it so Accept/Reject work
       }));
       setJobs(mappedJobs);
-      // Check for active job
-      const active = mappedJobs.find(
-        (j: any) =>
-          j.status !== "COMPLETED" &&
-          j.status !== "CANCELLED" &&
-          j.status !== "PENDING",
+      // Active job = only accepted and in-progress (CONFIRMED, EN_ROUTE, IN_PROGRESS), not just assigned
+      const acceptedStatuses = [
+        "CONFIRMED",
+        "PROFESSIONAL_EN_ROUTE",
+        "IN_PROGRESS",
+      ];
+      const active = mappedJobs.find((j: any) =>
+        acceptedStatuses.includes(j.status),
       );
       if (active) setActiveJob(active);
+      else setActiveJob(null);
     } catch (error) {
       console.error("Failed to fetch jobs:", error);
     }
@@ -244,34 +247,51 @@ export default function App() {
   };
 
   const acceptJob = async (jobId: string) => {
+    if (!jobId) {
+      alert("Invalid job.");
+      return;
+    }
     try {
       const updatedJob = await professionalService.updateJobStatus(
         jobId,
-        "PROFESSIONAL_ASSIGNED" as any,
+        "CONFIRMED",
       );
       setJobs((prev) =>
         prev.map((job) =>
-          job.id === jobId ? { ...job, status: JobStatus.ACCEPTED } : job,
+          job.id === jobId || job._id === jobId
+            ? { ...job, status: JobStatus.ACCEPTED }
+            : job,
         ),
       );
       if (updatedJob) {
         setActiveJob({
           ...updatedJob,
-          id: updatedJob._id,
+          id: updatedJob.id ?? updatedJob._id,
           status: JobStatus.ACCEPTED,
         });
         navigateTo(ProfessionalScreen.ACTIVE_JOB);
       }
-    } catch (error) {
-      console.error("Failed to accept job:", error);
+    } catch (err: any) {
+      console.error("Failed to accept job:", err);
+      alert(err?.response?.data?.message || "Failed to accept job.");
     }
   };
 
   const rejectJob = async (jobId: string) => {
-    if (confirm("Are you sure you want to reject this job?")) {
-      // For now, we just filter it out locally to simulate rejection
-      setJobs((prev) => prev.filter((j) => j.id !== jobId));
-      alert("Job rejected.");
+    if (!confirm("Are you sure you want to reject this job?")) return;
+    const professionalId = professional?.id || professional?._id;
+    if (!professionalId) {
+      alert("Cannot reject: professional not loaded.");
+      return;
+    }
+    try {
+      await professionalService.rejectBooking(jobId, professionalId);
+      setJobs((prev) => prev.filter((j) => j.id !== jobId && j._id !== jobId));
+      if (activeJob?.id === jobId || activeJob?._id === jobId) setActiveJob(null);
+      alert("Job rejected. It has been offered to another professional.");
+    } catch (err: any) {
+      console.error("Failed to reject job:", err);
+      alert(err?.response?.data?.message || "Failed to reject job.");
     }
   };
 
