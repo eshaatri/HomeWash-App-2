@@ -26,6 +26,11 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
     selectedSubCategoryId || categoryMeta.sections[0].items[0].id,
   );
 
+  const isApartmentSubCategory =
+    catId === "c1" &&
+    (activeSubId === "furnished_apartment" ||
+      activeSubId === "unfurnished_apartment");
+
   useEffect(() => {
     const resolveAllPrices = async () => {
       if (!selectedArea) return;
@@ -34,9 +39,35 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
       const newPrices: Record<string, number> = {};
 
       try {
-        const servicesToResolve = SERVICES.filter(
-          (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
-        );
+        let servicesToResolve: ExtendedService[] = [];
+
+        if (isApartmentSubCategory) {
+          const apartmentChildren = SERVICES.filter(
+            (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
+          );
+          if (apartmentChildren.length > 0) {
+            const minPrice = Math.min(
+              ...apartmentChildren.map((s) => s.price),
+            );
+            const base = apartmentChildren[0];
+            servicesToResolve = [
+              {
+                ...base,
+                id:
+                  activeSubId === "furnished_apartment" ? "s1" : "s1_un",
+                title:
+                  activeSubId === "furnished_apartment"
+                    ? "Furnished Apartment"
+                    : "Unfurnished Apartment",
+                price: minPrice,
+              },
+            ];
+          }
+        } else {
+          servicesToResolve = SERVICES.filter(
+            (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
+          );
+        }
 
         await Promise.all(
           servicesToResolve.map(async (s) => {
@@ -63,9 +94,31 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
   }, [selectedArea, activeSubId, catId]);
 
   // Filter services based on category and sub-category
-  const filteredServices = SERVICES.filter(
-    (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
-  );
+  let filteredServices: ExtendedService[] = [];
+  if (isApartmentSubCategory) {
+    const apartmentChildren = SERVICES.filter(
+      (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
+    );
+    if (apartmentChildren.length > 0) {
+      const minPrice = Math.min(...apartmentChildren.map((s) => s.price));
+      const base = apartmentChildren[0];
+      filteredServices = [
+        {
+          ...base,
+          id: activeSubId === "furnished_apartment" ? "s1" : "s1_un",
+          title:
+            activeSubId === "furnished_apartment"
+              ? "Furnished Apartment"
+              : "Unfurnished Apartment",
+          price: minPrice,
+        },
+      ];
+    }
+  } else {
+    filteredServices = SERVICES.filter(
+      (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
+    );
+  }
 
   const cartTotal = cart.reduce((sum, item) => {
     const price = resolvedPrices[item.service.id] || item.service.price;

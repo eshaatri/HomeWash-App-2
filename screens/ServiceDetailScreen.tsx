@@ -5,7 +5,7 @@ interface ConfigOption {
   id: string;
   label: string;
   price: number;
-  description?: string;
+  description?: string; // For extra helper text (e.g. sqft range or notes)
 }
 
 interface BathroomOption {
@@ -51,11 +51,30 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
 
   // --- Mock Configuration Data ---
   const SIZES: ConfigOption[] = [
-    { id: "1bhk", label: "1 BHK", price: 3499 },
-    { id: "2bhk", label: "2 BHK", price: 3899 },
-    { id: "3bhk", label: "3 BHK", price: 4799 },
-    { id: "4bhk", label: "4 BHK", price: 5699 },
-    { id: "5bhk", label: "5 BHK", price: 6599 },
+    {
+      id: "1bhk",
+      label: "1 BHK",
+      price: 3499,
+      description: "up to 700 sq ft",
+    },
+    {
+      id: "2bhk",
+      label: "2 BHK",
+      price: 3899,
+      description: "up to 900 sq ft",
+    },
+    {
+      id: "3bhk",
+      label: "3 BHK",
+      price: 4799,
+      description: "up to 1100 sq ft",
+    },
+    {
+      id: "4bhk",
+      label: "4 BHK",
+      price: 5699,
+      description: "up to 1500 sq ft only",
+    },
   ];
 
   const KITCHEN_OPTS: ConfigOption[] = [
@@ -113,8 +132,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
   const INCLUDED_ITEMS = [
     {
       label: "Room floor scrubbing",
-      image:
-        "https://images.unsplash.com/photo-1581578731117-104f2a412c54?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/room-floor-scrubbing.jpg",
     },
     {
       label: "Cabinets & furniture exterior wiping",
@@ -183,6 +201,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
     "Glue/paint stains/sticker removal",
     "Cleaning of terrace & inaccessible areas",
     "Wet wiping of walls & ceiling",
+    "Paint gum marks, movement of heavy items, construction items are not moved",
   ];
 
   const EQUIPMENTS = [
@@ -500,10 +519,22 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                       <div className="text-xs font-medium opacity-70">
                         ₹{size.price.toLocaleString()}
                       </div>
+                      {size.description && (
+                        <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                          {size.description}
+                        </div>
+                      )}
                     </button>
                   );
                 })}
               </div>
+
+              <p className="text-xs text-gray-600 dark:text-gray-300 pl-10">
+                <span className="font-bold">Home deep cleaning: </span>
+                It will include rooms, hall, kitchen, bathrooms, floor area,
+                furniture, switch board, vacuuming, fans, stairs, porch area,
+                doors, windows, balcony.
+              </p>
             </div>
 
             <div className="h-px bg-gray-200 dark:bg-white/10 w-full"></div>
