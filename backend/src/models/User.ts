@@ -25,6 +25,7 @@ export interface IUser extends Document {
   lastKnownLat?: number;
   lastKnownLng?: number;
   lastLocationAt?: Date;
+  isInhouse?: boolean; // true when this professional is part of the in-house team
 }
 
 const UserSchema: Schema = new Schema(
@@ -46,6 +47,7 @@ const UserSchema: Schema = new Schema(
     lastKnownLat: { type: Number },
     lastKnownLng: { type: Number },
     lastLocationAt: { type: Date },
+    isInhouse: { type: Boolean, default: false },
   },
   {
     timestamps: true,

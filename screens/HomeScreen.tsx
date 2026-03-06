@@ -175,8 +175,8 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
         return `${base} bg-gradient-to-b from-rose-300 via-rose-400 to-red-500 shadow-rose-500/40`;
       case "c4": // Water - Ocean Blue
         return `${base} bg-gradient-to-b from-sky-300 via-sky-400 to-blue-600 shadow-sky-500/40`;
-      case "c5": // Sofa - Sunset Gold
-        return `${base} bg-gradient-to-b from-amber-200 via-amber-300 to-orange-500 shadow-amber-500/40`;
+      case "c5": // Sofa - Teal Accent
+        return `${base} bg-gradient-to-b from-[#66d6d6] via-[#33bfbf] to-[#009a9a] shadow-teal-500/40`;
       case "c6": // Car - Cool Lavender
         return `${base} bg-gradient-to-b from-indigo-200 via-indigo-300 to-indigo-500 shadow-indigo-500/40`;
       default:
@@ -360,7 +360,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     <div className="absolute inset-0 bg-[#7E57C2] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-20 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
                     {/* Visual Base for Category Card - Premium White/Gray Gradient */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
 
                     {/* Banana Group "Visual_Hero" with Pulse on Hover */}
                     <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
@@ -376,7 +376,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     <div className="absolute inset-0 bg-[#7E57C2] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-20 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
                     {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
 
                     {/* Banana Group "Visual_Hero" with Pulse on Hover */}
                     <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
@@ -392,7 +392,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     <div className="absolute inset-0 bg-[#FFD54F] rounded-full blur-[20px] opacity-[0.12] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
                     {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
 
                     {/* Banana Group "Visual_Hero" with Pulse on Hover */}
                     <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
@@ -408,7 +408,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     <div className="absolute inset-0 bg-[#0288D1] rounded-full blur-[20px] opacity-[0.10] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
                     {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
 
                     {/* Banana Group "Visual_Hero" with Pulse on Hover */}
                     <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
@@ -424,7 +424,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     <div className="absolute inset-0 bg-[#26A69A] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
                     {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
 
                     {/* Banana Group "Visual_Hero" with Pulse on Hover */}
                     <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
@@ -440,7 +440,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     <div className="absolute inset-0 bg-[#00B0FF] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
                     {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#FF7043] shadow-[0_4px_10px_rgba(255,112,67,0.1)] group-hover:shadow-[0_8px_25px_rgba(255,112,67,0.3)] transition-all duration-500"></div>
+                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
 
                     {/* Banana Group "Visual_Hero" with Pulse on Hover */}
                     <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">

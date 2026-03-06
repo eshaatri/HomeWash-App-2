@@ -17,8 +17,8 @@ export const CustomKitchenIcon: React.FC = () => {
           y2="18"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FFAB91" />
-          <stop offset="1" stopColor="#FF7043" />
+          <stop stopColor="#7BE0E0" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
         <linearGradient
           id="gradCounter"
@@ -39,8 +39,8 @@ export const CustomKitchenIcon: React.FC = () => {
           y2="42"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FF8A65" />
-          <stop offset="1" stopColor="#F4511E" />
+          <stop stopColor="#7BE0E0" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
       </defs>
 
@@ -48,24 +48,24 @@ export const CustomKitchenIcon: React.FC = () => {
       <path
         d="M4 48 H60 V56 H4 Z"
         fill="url(#gradCounter)"
-        stroke="#FF7043"
+        stroke="#009a9a"
         strokeWidth="0.5"
         opacity="0.8"
       />
-      <path d="M8 48 H56 V50 H8 Z" fill="#FF7043" opacity="0.1" />
+      <path d="M8 48 H56 V50 H8 Z" fill="#009a9a" opacity="0.1" />
 
       {/* Symmetrical Chimney / Range Hood (Top) */}
       <path d="M18 4 H46 L42 18 H22 L18 4 Z" fill="url(#gradChimney)" />
-      <path d="M22 18 H42 V20 H22 V18 Z" fill="#FF7043" opacity="0.5" />
+      <path d="M22 18 H42 V20 H22 V18 Z" fill="#009a9a" opacity="0.5" />
 
       {/* Symmetrical Cooking Pot on the Stove */}
       <rect x="22" y="34" width="20" height="14" rx="3" fill="url(#gradPot)" />
       <path d="M22 34 H42 L40 32 H24 L22 34 Z" fill="#F4511E" />
 
       {/* Symmetrical Knobs on Counter edge */}
-      <circle cx="20" cy="52" r="2" fill="#FF7043" opacity="0.4" />
-      <circle cx="44" cy="52" r="2" fill="#FF7043" opacity="0.4" />
-      <circle cx="32" cy="52" r="2" fill="#FF7043" opacity="0.6" />
+      <circle cx="20" cy="52" r="2" fill="#009a9a" opacity="0.4" />
+      <circle cx="44" cy="52" r="2" fill="#009a9a" opacity="0.4" />
+      <circle cx="32" cy="52" r="2" fill="#009a9a" opacity="0.6" />
 
       {/* Animated Steam (Handled via CSS classes in the parent) */}
       <g className="animate-steam-1">

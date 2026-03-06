@@ -204,7 +204,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
                   <div
                     className={`relative h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-300 overflow-hidden ${
                       isActive
-                        ? "bg-white dark:bg-[#1a1a1a] shadow-md ring-2 ring-orange-500"
+                        ? "bg-white dark:bg-[#1a1a1a] shadow-md ring-2 ring-[#009a9a]"
                         : "bg-white dark:bg-[#111] border border-gray-200 dark:border-white/5 grayscale-[0.5]"
                     }`}
                   >
@@ -217,7 +217,9 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
                       alt=""
                     />
                     <span
-                      className={`material-symbols-outlined text-[28px] relative z-10 ${isActive ? "text-orange-600" : "text-gray-400"}`}
+                      className={`material-symbols-outlined text-[28px] relative z-10 ${
+                        isActive ? "text-[#009a9a]" : "text-gray-400"
+                      }`}
                     >
                       {item.icon}
                     </span>
@@ -460,7 +462,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
             </div>
             <div className="flex items-start gap-4">
               <div className="h-10 w-10 rounded-full bg-white dark:bg-[#1a1a1a] flex items-center justify-center shadow-sm">
-                <span className="material-symbols-outlined text-orange-500">
+                <span className="material-symbols-outlined text-[#009a9a]">
                   cleaning_services
                 </span>
               </div>

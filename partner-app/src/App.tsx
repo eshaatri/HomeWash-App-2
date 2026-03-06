@@ -30,6 +30,7 @@ export default function App() {
   const LOCATION_THROTTLE_MS = 10000; // send at most every 10s
 
   const [isProfessionalOnline, setIsProfessionalOnline] = useState(true);
+  const [hasNewLead, setHasNewLead] = useState(false);
 
   const setProfessionalOnline = (online: boolean) => {
     setIsProfessionalOnline(online);
@@ -133,7 +134,9 @@ export default function App() {
       }
       return;
     }
-    const socket = io("http://localhost:5000", { transports: ["websocket", "polling"] });
+    const socket = io("http://localhost:5000", {
+      transports: ["websocket", "polling"],
+    });
     socketRef.current = socket;
     socket.emit("professional:identify", { professionalId: id });
     socket.emit("professional:setOnline", { isOnline: isProfessionalOnline });
@@ -155,9 +158,27 @@ export default function App() {
       }
     });
 
+    socket.on("lead:new", () => {
+      fetchJobs();
+      setHasNewLead(true);
+      try {
+        const audio = new Audio("/sounds/new-lead.mp3");
+        // Browsers may block autoplay until user interacts; ignore errors.
+        audio.play().catch(() => {});
+      } catch {
+        // ignore
+      }
+    });
+
+    socket.on("lead:closed", () => {
+      fetchJobs();
+    });
+
     return () => {
       socket.off("professional:suspended");
       socket.off("professional:status");
+      socket.off("lead:new");
+      socket.off("lead:closed");
       socket.disconnect();
       socketRef.current = null;
     };
@@ -211,6 +232,9 @@ export default function App() {
   const navigateTo = (screen: ProfessionalScreen) => {
     window.scrollTo(0, 0);
     setCurrentScreen(screen);
+    if (screen === ProfessionalScreen.JOBS) {
+      setHasNewLead(false);
+    }
   };
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
@@ -251,10 +275,16 @@ export default function App() {
       alert("Invalid job.");
       return;
     }
+    const professionalId = professional?.id || professional?._id;
+    if (!professionalId) {
+      alert("Cannot accept: professional not loaded.");
+      return;
+    }
     try {
       const updatedJob = await professionalService.updateJobStatus(
         jobId,
         "CONFIRMED",
+        { professionalId },
       );
       setJobs((prev) =>
         prev.map((job) =>
@@ -378,6 +408,22 @@ export default function App() {
   return (
     <div className="flex min-h-screen bg-gray-200 dark:bg-[#050505] justify-center transition-colors duration-300">
       <div className="w-full max-w-md h-full min-h-screen bg-white dark:bg-black shadow-2xl overflow-hidden relative">
+        {hasNewLead && professional && (
+          <div className="absolute top-0 inset-x-0 z-40">
+            <button
+              onClick={() => {
+                setHasNewLead(false);
+                setCurrentScreen(ProfessionalScreen.JOBS);
+              }}
+              className="w-full bg-green-500 text-white text-xs font-bold px-3 py-2 flex items-center justify-center gap-2 shadow-md"
+            >
+              <span className="material-symbols-outlined text-sm">
+                notifications_active
+              </span>
+              <span>New job available in your area. Tap to view.</span>
+            </button>
+          </div>
+        )}
         {renderScreen()}
         {showBottomNav && <BottomNav {...commonProps} />}
       </div>

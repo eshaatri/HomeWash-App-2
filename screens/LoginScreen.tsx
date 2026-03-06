@@ -24,13 +24,12 @@ export const LoginScreen: React.FC<NavigationProps> = ({ login }) => {
         <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm">
             
             {/* Logo Section */}
-            <div className="text-center mb-12">
-                <h1 className="text-4xl font-black tracking-tighter text-black">
-                    HOME<span className="text-primary">WASH</span>
-                </h1>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mt-2">
-                    Luxury Home Services
-                </p>
+            <div className="text-center mb-8">
+              <img
+                src="/assets/homewash-logo.png"
+                alt="HomeWash"
+                className="mx-auto w-56 sm:w-64 md:w-72 lg:w-80 h-auto max-h-[45vh] object-contain"
+              />
             </div>
 
             {/* Form Section */}

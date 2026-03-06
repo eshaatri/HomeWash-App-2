@@ -173,11 +173,35 @@ export const partnerService = {
     return response.data;
   },
   getBookings: async (partnerId: string) => {
-    const response = await api.get(`/partners/${partnerId}/bookings`);
+    // Use booking-centric endpoint that returns both new leads and owned bookings
+    const response = await api.get(`/bookings/partner/${partnerId}`);
     return response.data;
   },
   getProfessionals: async (partnerId: string) => {
     const response = await api.get(`/partners/${partnerId}/professionals`);
+    return response.data;
+  },
+  acceptBooking: async (partnerId: string, bookingId: string) => {
+    const response = await api.patch(`/bookings/${bookingId}/partner-accept`, {
+      partnerId,
+    });
+    return response.data;
+  },
+  rejectBooking: async (partnerId: string, bookingId: string) => {
+    const response = await api.patch(`/bookings/${bookingId}/partner-reject`, {
+      partnerId,
+    });
+    return response.data;
+  },
+  assignProfessional: async (
+    partnerId: string,
+    bookingId: string,
+    professionalId: string,
+  ) => {
+    const response = await api.patch(
+      `/bookings/${bookingId}/assign-professional`,
+      { partnerId, professionalId },
+    );
     return response.data;
   },
 };

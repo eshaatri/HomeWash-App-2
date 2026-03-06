@@ -17,8 +17,8 @@ export const CustomBathroomIcon: React.FC = () => {
           y2="56"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FFAB91" />
-          <stop offset="1" stopColor="#FF7043" />
+          <stop stopColor="#7BE0E0" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
         <linearGradient
           id="gradWater"
@@ -43,7 +43,7 @@ export const CustomBathroomIcon: React.FC = () => {
       <path d="M14 38 H50 V42 H14 Z" fill="url(#gradWater)" opacity="0.6" />
 
       {/* Symmetrical Faucet Head */}
-      <path d="M24 12 H40 V16 H24 Z" fill="#FF7043" />
+      <path d="M24 12 H40 V16 H24 Z" fill="#009a9a" />
 
       {/* Animated Droplets (Handled via CSS classes in the parent) */}
       <g className="animate-droplet-1">

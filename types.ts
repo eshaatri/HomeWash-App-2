@@ -32,6 +32,8 @@ export enum BookingStatus {
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
+  NEW_FOR_PARTNERS = "NEW_FOR_PARTNERS",
+  PARTNER_ACCEPTED = "PARTNER_ACCEPTED",
 }
 
 export interface User {

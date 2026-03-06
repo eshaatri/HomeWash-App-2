@@ -179,35 +179,6 @@ export const AreasPage: React.FC<NavigationProps> = () => {
       payload.geoJson = null; // Clear if empty
     }
 
-    // Overlap validation: Prevent saving if it overlaps with an existing partner-assigned area
-    if (payload.geoJson) {
-      try {
-        const overlappingArea = areas.find((area) => {
-          // Skip if comparing against self (editing)
-          const areaId = area.id || (area as any)._id;
-          const currentId = editingArea
-            ? editingArea.id || (editingArea as any)._id
-            : null;
-          if (currentId && areaId === currentId) return false;
-
-          // Check for overlap if the existing area has an assigned partner
-          if (area.assignedPartnerId && area.geoJson) {
-            return booleanIntersects(payload.geoJson, area.geoJson);
-          }
-          return false;
-        });
-
-        if (overlappingArea) {
-          alert(
-            `OVERLAP DETECTED: This area overlaps with "${overlappingArea.name}", which is already assigned to a partner (${overlappingArea.assignedPartnerName}). Please adjust the boundaries to avoid overlap.`,
-          );
-          return;
-        }
-      } catch (err) {
-        console.warn("Overlap check failed (likely invalid geometry):", err);
-      }
-    }
-
     try {
       if (editingArea) {
         await adminService.updateArea(

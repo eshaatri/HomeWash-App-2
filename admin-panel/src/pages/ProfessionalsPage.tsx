@@ -23,6 +23,7 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
     address: string;
     partnerId: string;
     serviceAreaIds: string[];
+    isInhouse: boolean;
   }>({
     name: "",
     phone: "",
@@ -30,6 +31,7 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
     address: "",
     partnerId: "",
     serviceAreaIds: [],
+    isInhouse: false,
   });
 
   const fetchProfessionals = async () => {
@@ -115,6 +117,7 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
           ? (partners[0].id || (partners[0] as any)._id) ?? ""
           : "",
       serviceAreaIds: [],
+      isInhouse: false,
     });
     setIsModalOpen(true);
   };
@@ -129,6 +132,7 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
       address: professional.address || "",
       partnerId: professional.partnerId || "",
       serviceAreaIds: professional.serviceAreaIds || [],
+      isInhouse: professional.isInhouse || false,
     });
     setIsModalOpen(true);
   };
@@ -538,6 +542,7 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                     formData.serviceAreaIds.length > 0
                       ? formData.serviceAreaIds
                       : undefined,
+                  isInhouse: formData.isInhouse,
                 });
               } else {
                 await adminService.createUser({
@@ -552,6 +557,7 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
                     formData.serviceAreaIds.length > 0
                       ? formData.serviceAreaIds
                       : undefined,
+                  isInhouse: formData.isInhouse,
                 });
               }
               setIsModalOpen(false);
@@ -712,6 +718,26 @@ export const ProfessionalsPage: React.FC<NavigationProps> = () => {
               )}
             </div>
           )}
+          <div className="flex items-center gap-2 pt-2">
+            <input
+              id="isInhouse"
+              type="checkbox"
+              checked={formData.isInhouse}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  isInhouse: e.target.checked,
+                }))
+              }
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <label
+              htmlFor="isInhouse"
+              className="text-xs font-semibold text-gray-700 dark:text-gray-200"
+            >
+              In-house team member (priority for jobs)
+            </label>
+          </div>
           <div className="flex justify-end gap-2 pt-4">
             <button
               type="button"

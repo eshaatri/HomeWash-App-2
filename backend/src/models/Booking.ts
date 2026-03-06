@@ -8,6 +8,9 @@ export enum BookingStatus {
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
+  // Partner-driven flow
+  NEW_FOR_PARTNERS = "NEW_FOR_PARTNERS",
+  PARTNER_ACCEPTED = "PARTNER_ACCEPTED",
 }
 
 export interface IBooking extends Document {
@@ -29,6 +32,9 @@ export interface IBooking extends Document {
   serviceArea?: string;
   customerLat?: number;
   customerLng?: number;
+  attemptedPartnerIds?: string[];
+  priority?: "NORMAL" | "HIGH";
+  escalationReason?: string;
 }
 
 const BookingSchema: Schema = new Schema(
@@ -55,6 +61,13 @@ const BookingSchema: Schema = new Schema(
     serviceArea: { type: String },
     customerLat: { type: Number },
     customerLng: { type: Number },
+    attemptedPartnerIds: [{ type: String }],
+    priority: {
+      type: String,
+      enum: ["NORMAL", "HIGH"],
+      default: "NORMAL",
+    },
+    escalationReason: { type: String },
   },
   {
     timestamps: true,

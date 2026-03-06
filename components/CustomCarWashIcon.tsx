@@ -17,8 +17,8 @@ export const CustomCarWashIcon: React.FC = () => {
           y2="52"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FFAB91" />
-          <stop offset="1" stopColor="#FF7043" />
+          <stop stopColor="#7BE0E0" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
         <linearGradient
           id="gradGlass"

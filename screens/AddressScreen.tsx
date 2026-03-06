@@ -709,7 +709,7 @@ export const AddressScreen: React.FC<NavigationProps> = ({
           onClick={handleUseCurrentLocation}
           className="flex items-center gap-3 p-4 bg-white dark:bg-[#1a1a1a] rounded-xl border border-gray-200 dark:border-white/5 shadow-sm active:scale-[0.98] transition-all hover:border-primary/30"
         >
-          <div className="flex items-center justify-center size-10 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500">
+          <div className="flex items-center justify-center size-10 rounded-full bg-[#009a9a]/10 dark:bg-[#009a9a]/15 text-[#009a9a]">
             <span
               className={`material-symbols-outlined ${isLocating ? "animate-spin" : ""}`}
               style={{ fontVariationSettings: "'FILL' 0" }}
@@ -718,7 +718,7 @@ export const AddressScreen: React.FC<NavigationProps> = ({
             </span>
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-bold text-orange-500">
+            <h3 className="text-sm font-bold text-[#009a9a]">
               Use Current Location
             </h3>
             <p className="text-xs text-gray-400 dark:text-gray-500">
@@ -750,7 +750,11 @@ export const AddressScreen: React.FC<NavigationProps> = ({
               <div className="flex items-start gap-4">
                 {/* Icon */}
                 <div
-                  className={`flex items-center justify-center size-10 rounded-full shrink-0 ${item.id === "1" ? "bg-orange-50 text-orange-500" : "bg-gray-100 dark:bg-white/5 text-gray-500"}`}
+                  className={`flex items-center justify-center size-10 rounded-full shrink-0 ${
+                    item.id === "1"
+                      ? "bg-[#009a9a]/10 text-[#009a9a]"
+                      : "bg-gray-100 dark:bg-white/5 text-gray-500"
+                  }`}
                 >
                   <span
                     className="material-symbols-outlined text-[20px]"
@@ -998,12 +1002,12 @@ export const AddressScreen: React.FC<NavigationProps> = ({
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className="group flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-dashed border-orange-200 dark:border-orange-500/30 hover:border-orange-400 dark:hover:border-orange-500/50 hover:bg-orange-50 dark:hover:bg-orange-500/5 transition-all mt-2"
+            className="group flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-dashed border-[#009a9a]/30 dark:border-[#009a9a]/40 hover:border-[#009a9a] dark:hover:border-[#00b3b3] hover:bg-[#009a9a]/5 dark:hover:bg-[#009a9a]/10 transition-all mt-2"
           >
-            <span className="material-symbols-outlined text-orange-500 text-lg">
+            <span className="material-symbols-outlined text-[#009a9a] text-lg">
               add_location_alt
             </span>
-            <span className="text-sm font-bold text-orange-500">
+            <span className="text-sm font-bold text-[#009a9a]">
               Add New Address
             </span>
           </button>

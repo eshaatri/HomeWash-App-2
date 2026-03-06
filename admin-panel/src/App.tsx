@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AdminPage, Admin, NavigationProps } from "./types";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -16,6 +16,7 @@ import { PartnerProfilePage } from "./pages/PartnerProfilePage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { Sidebar } from "./components/Sidebar";
+import { io, Socket } from "socket.io-client";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<AdminPage>(AdminPage.LOGIN);
@@ -25,6 +26,9 @@ export default function App() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<
     string | undefined
   >();
+  const [hasPartnerNewBooking, setHasPartnerNewBooking] = useState(false);
+  const [hasEscalatedAlert, setHasEscalatedAlert] = useState(false);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -59,6 +63,47 @@ export default function App() {
     setAdmin(null);
     setCurrentPage(AdminPage.LOGIN);
   };
+
+  // Realtime notifications for partners and admins
+  useEffect(() => {
+    if (!admin) {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      return;
+    }
+
+    const socket = io("http://localhost:5000", {
+      transports: ["websocket", "polling"],
+    });
+    socketRef.current = socket;
+
+    if (admin.role === "PARTNER" && admin.partnerId) {
+      socket.emit("partner:identify", { partnerId: admin.partnerId });
+    } else {
+      socket.emit("admin:identify", { adminId: admin.id });
+    }
+
+    socket.on("partner:booking:new", () => {
+      if (admin.role === "PARTNER") {
+        setHasPartnerNewBooking(true);
+      }
+    });
+
+    socket.on("admin:booking:escalated", () => {
+      if (admin.role !== "PARTNER") {
+        setHasEscalatedAlert(true);
+      }
+    });
+
+    return () => {
+      socket.off("partner:booking:new");
+      socket.off("admin:booking:escalated");
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [admin]);
 
   const commonProps: NavigationProps = {
     currentPage,
@@ -141,6 +186,36 @@ export default function App() {
       <main
         className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? "ml-20" : "ml-64"}`}
       >
+        {admin.role === "PARTNER" && hasPartnerNewBooking && (
+          <button
+            onClick={() => {
+              setHasPartnerNewBooking(false);
+              setCurrentPage(AdminPage.PARTNER_BOOKINGS);
+            }}
+            className="w-full bg-green-500 text-white text-xs font-bold px-3 py-2 flex items-center justify-center gap-2 shadow-md"
+          >
+            <span className="material-symbols-outlined text-sm">
+              notifications_active
+            </span>
+            <span>New booking available in your areas. Tap to view.</span>
+          </button>
+        )}
+        {admin.role !== "PARTNER" && hasEscalatedAlert && (
+          <button
+            onClick={() => {
+              setHasEscalatedAlert(false);
+              setCurrentPage(AdminPage.BOOKINGS);
+            }}
+            className="w-full bg-red-600 text-white text-xs font-bold px-3 py-2 flex items-center justify-center gap-2 shadow-md"
+          >
+            <span className="material-symbols-outlined text-sm">
+              warning
+            </span>
+            <span>
+              High-priority booking needs attention. Tap to view in Bookings.
+            </span>
+          </button>
+        )}
         {renderPage()}
       </main>
     </div>

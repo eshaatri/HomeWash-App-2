@@ -17,8 +17,8 @@ export const CustomHouseIcon: React.FC = () => {
           y2="34"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FFAB91" />
-          <stop offset="1" stopColor="#FF7043" />
+          <stop stopColor="#7BE0E0" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
         <linearGradient
           id="gradBody"
@@ -28,8 +28,8 @@ export const CustomHouseIcon: React.FC = () => {
           y2="54"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FF8A65" />
-          <stop offset="1" stopColor="#F4511E" />
+          <stop stopColor="#80E5E5" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
       </defs>
 

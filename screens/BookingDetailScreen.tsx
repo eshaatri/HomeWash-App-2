@@ -29,7 +29,24 @@ export const BookingDetailScreen: React.FC<Props> = ({
     { status: BookingStatus.COMPLETED, label: "Completed", time: null },
   ];
 
-  const currentStepIndex = steps.findIndex((s) => s.status === booking.status);
+  const currentStepIndex = (() => {
+    // Map new partner flow statuses onto the existing steps
+    if (
+      booking.status === BookingStatus.PENDING ||
+      booking.status === BookingStatus.NEW_FOR_PARTNERS
+    ) {
+      return 0;
+    }
+    if (
+      booking.status === BookingStatus.PROFESSIONAL_ASSIGNED ||
+      booking.status === BookingStatus.CONFIRMED ||
+      booking.status === BookingStatus.PARTNER_ACCEPTED
+    ) {
+      return 1;
+    }
+    const idx = steps.findIndex((s) => s.status === booking.status);
+    return idx >= 0 ? idx : 0;
+  })();
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#121212] font-display text-onyx dark:text-white pb-safe">
@@ -77,15 +94,27 @@ export const BookingDetailScreen: React.FC<Props> = ({
             />
           </svg>
         </div>
-        {/* Professional Marker */}
+        {/* Professional Marker & status */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
           <div className="bg-primary p-2 rounded-full shadow-lg border-2 border-white dark:border-black animate-bounce">
             <span className="material-symbols-outlined text-black">
               directions_car
             </span>
           </div>
-          <div className="bg-black/70 text-white text-[10px] px-2 py-1 rounded mt-1 font-bold">
-            Professional is arriving in 5 mins
+          <div className="bg-black/70 text-white text-[10px] px-2 py-1 rounded mt-1 font-bold text-center">
+            {booking.status === BookingStatus.PENDING &&
+            !booking.professionalName
+              ? "We are finding a professional in your area"
+              : booking.status === BookingStatus.NEW_FOR_PARTNERS
+                ? "We are confirming your booking with our local partner"
+                : booking.status === BookingStatus.PARTNER_ACCEPTED &&
+                    !booking.professionalName
+                  ? "Our partner is assigning a professional for your booking"
+                  : booking.status === BookingStatus.PROFESSIONAL_ASSIGNED ||
+                      booking.status === BookingStatus.CONFIRMED ||
+                      booking.status === BookingStatus.PROFESSIONAL_EN_ROUTE
+                    ? "Professional is arriving soon"
+                    : "Professional is arriving soon"}
           </div>
         </div>
       </div>

@@ -38,6 +38,7 @@ import {
   setProfessionalOffline,
 } from "./services/onlineProfessionalStore";
 import { assignPendingBookingToProfessional } from "./services/bookingAssignmentService";
+import { startLeadWaveScheduler } from "./services/leadWaveScheduler";
 
 io.on("connection", (socket: any) => {
   socket.on(
@@ -46,6 +47,7 @@ io.on("connection", (socket: any) => {
       const id = payload?.professionalId;
       if (!id) return;
       socketToProfessionalId.set(socket.id, id);
+      socket.join(id);
 
       const User = (await import("./models/User")).default;
       const user = await User.findById(id).select("status").lean();
@@ -114,6 +116,21 @@ io.on("connection", (socket: any) => {
     },
   );
 
+  // Partner/admin identification for realtime booking alerts
+  socket.on(
+    "partner:identify",
+    (payload: { partnerId: string } | undefined) => {
+      const id = payload?.partnerId;
+      if (!id) return;
+      socket.join(`partner:${id}`);
+    },
+  );
+
+  socket.on("admin:identify", () => {
+    // Join a shared admin room for high-priority alerts
+    socket.join("admin");
+  });
+
   socket.on("disconnect", () => {
     const professionalId = socketToProfessionalId.get(socket.id);
     if (professionalId) {
@@ -164,6 +181,7 @@ connectDB()
     httpServer.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
+    startLeadWaveScheduler(io);
   })
   .catch((err) => {
     console.error("Startup failed:", err);

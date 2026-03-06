@@ -17,8 +17,8 @@ export const CustomWaterTankIcon: React.FC = () => {
           y2="52"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FFAB91" />
-          <stop offset="1" stopColor="#FF7043" />
+          <stop stopColor="#7BE0E0" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
         <linearGradient
           id="gradWave"
@@ -40,7 +40,7 @@ export const CustomWaterTankIcon: React.FC = () => {
       />
 
       {/* Symmetrical Tank Lid */}
-      <rect x="24" y="10" width="16" height="4" rx="2" fill="#F4511E" />
+      <rect x="24" y="10" width="16" height="4" rx="2" fill="#009a9a" />
 
       {/* Tank Ribs (Details) */}
       <path
@@ -72,7 +72,7 @@ export const CustomWaterTankIcon: React.FC = () => {
       </g>
 
       {/* Symmetrical Outlet Pipe representation at bottom */}
-      <rect x="30" y="54" width="4" height="4" fill="#FF7043" />
+      <rect x="30" y="54" width="4" height="4" fill="#009a9a" />
     </svg>
   );
 };

@@ -75,13 +75,13 @@ export default function App() {
       root.style.setProperty("--gradient-start", "#ffd633");
       root.style.setProperty("--gradient-end", "#e6c229");
     } else {
-      // Freemium Theme: #e68a00 (Orange)
-      root.style.setProperty("--primary-r", "230");
-      root.style.setProperty("--primary-g", "138");
-      root.style.setProperty("--primary-b", "0");
-      root.style.setProperty("--primary-dim", "#b36b00");
-      root.style.setProperty("--gradient-start", "#e68a00");
-      root.style.setProperty("--gradient-end", "#cc7a00");
+      // Freemium Theme: #009a9a (Teal)
+      root.style.setProperty("--primary-r", "0");
+      root.style.setProperty("--primary-g", "154");
+      root.style.setProperty("--primary-b", "154");
+      root.style.setProperty("--primary-dim", "#006b6b");
+      root.style.setProperty("--gradient-start", "#009a9a");
+      root.style.setProperty("--gradient-end", "#007f7f");
     }
   }, [isPremium]);
 

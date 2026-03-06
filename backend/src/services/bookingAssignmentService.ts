@@ -1,10 +1,7 @@
-/**
- * Assigns new bookings to the closest online professional in the same service area.
- * If no one is online, booking stays PENDING until a professional goes online.
- */
-
+import { Types } from "mongoose";
 import Booking, { BookingStatus, IBooking } from "../models/Booking";
 import User from "../models/User";
+import Lead, { ILead } from "../models/Lead";
 import { getOnlineProfessionalIds } from "./onlineProfessionalStore";
 import { getProfessionalLocation } from "./professionalLocationStore";
 
@@ -26,7 +23,7 @@ function haversineDistanceKm(
   return R * c;
 }
 
-function professionalServesArea(
+export function professionalServesArea(
   professional: { serviceArea?: string; serviceAreaIds?: string[] },
   bookingServiceArea: string | undefined
 ): boolean {
@@ -43,42 +40,59 @@ function professionalServesArea(
 }
 
 /**
- * Try to assign a newly created booking to the closest online professional in the same service area.
- * If none is online, the booking remains PENDING.
- * @param excludeProfessionalId - Optional; when set (e.g. after reject), this professional is not considered for assignment.
+ * Lead-based assignment helpers.
+ * We create waves of leads instead of assigning directly.
  */
-export async function tryAssignBookingToClosestOnline(
-  booking: IBooking,
-  excludeProfessionalId?: string
-): Promise<IBooking | null> {
-  const serviceArea = booking.serviceArea;
-  if (!serviceArea) return null;
 
-  let onlineIds = getOnlineProfessionalIds();
-  if (excludeProfessionalId)
-    onlineIds = onlineIds.filter((id) => id !== excludeProfessionalId);
-  if (onlineIds.length === 0) return null;
+async function createLeadsForProfessionals(
+  booking: IBooking,
+  professionalIds: string[],
+  wave: number,
+  ttlMinutes: number
+): Promise<ILead[]> {
+  if (professionalIds.length === 0) return [];
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ttlMinutes * 60 * 1000);
+
+  const payloads = professionalIds.map((pid) => ({
+    bookingId: booking._id,
+    professionalId: new Types.ObjectId(pid),
+    wave,
+    expiresAt,
+  }));
+
+  const leads = await Lead.insertMany(payloads);
+  return leads;
+}
+
+export async function createInitialLeadsForBooking(
+  booking: IBooking
+): Promise<void> {
+  const serviceArea = booking.serviceArea;
+  if (!serviceArea) return;
+
+  const onlineIds = getOnlineProfessionalIds();
+  if (onlineIds.length === 0) return;
 
   const professionals = await User.find({
     _id: { $in: onlineIds },
     role: "PROFESSIONAL",
     status: { $ne: "SUSPENDED" },
   })
-    .select("_id name serviceArea serviceAreaIds lastKnownLat lastKnownLng image")
+    .select(
+      "_id name serviceArea serviceAreaIds lastKnownLat lastKnownLng image isInhouse"
+    )
     .lean();
 
   const inArea = professionals.filter((p) =>
     professionalServesArea(p, serviceArea)
   );
-  if (inArea.length === 0) return null;
+  if (inArea.length === 0) return;
 
   const bookingLat = booking.customerLat;
   const bookingLng = booking.customerLng;
 
-  let closest: { id: string; name: string; image?: string; distance: number } | null =
-    null;
-
-  for (const p of inArea) {
+  const withDistance = inArea.map((p) => {
     let lat: number | undefined;
     let lng: number | undefined;
     const fromStore = getProfessionalLocation(String(p._id));
@@ -86,39 +100,37 @@ export async function tryAssignBookingToClosestOnline(
       lat = fromStore.lat;
       lng = fromStore.lng;
     } else {
-      lat = p.lastKnownLat;
-      lng = p.lastKnownLng;
+      lat = (p as any).lastKnownLat;
+      lng = (p as any).lastKnownLng;
     }
-    if (lat == null || lng == null) continue;
-
     const distance =
-      bookingLat != null && bookingLng != null
+      bookingLat != null && bookingLng != null && lat != null && lng != null
         ? haversineDistanceKm(bookingLat, bookingLng, lat, lng)
-        : 0;
+        : Number.MAX_SAFE_INTEGER;
+    return { ...p, distance };
+  });
 
-    if (closest == null || distance < closest.distance) {
-      closest = {
-        id: String(p._id),
-        name: p.name,
-        image: (p as any).image,
-        distance,
-      };
-    }
+  const inhouse = withDistance.filter((p) => (p as any).isInhouse);
+  const others = withDistance.filter((p) => !(p as any).isInhouse);
+
+  if (inhouse.length > 0) {
+    await createLeadsForProfessionals(
+      booking,
+      inhouse.map((p) => String(p._id)),
+      1,
+      5
+    );
+  } else {
+    // No in-house team: send to closest 10 professionals directly
+    const sortedOthers = others.sort((a, b) => a.distance - b.distance);
+    const closest = sortedOthers.slice(0, 10);
+    await createLeadsForProfessionals(
+      booking,
+      closest.map((p) => String(p._id)),
+      2,
+      5
+    );
   }
-
-  if (!closest) return null;
-
-  const updated = await Booking.findByIdAndUpdate(
-    booking._id,
-    {
-      professionalId: closest.id,
-      professionalName: closest.name,
-      professionalImage: closest.image,
-      status: BookingStatus.PROFESSIONAL_ASSIGNED,
-    },
-    { new: true }
-  );
-  return updated;
 }
 
 /**

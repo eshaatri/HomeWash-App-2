@@ -17,8 +17,8 @@ export const CustomSofaIcon: React.FC = () => {
           y2="52"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FFAB91" />
-          <stop offset="1" stopColor="#FF7043" />
+          <stop stopColor="#7BE0E0" />
+          <stop offset="1" stopColor="#009a9a" />
         </linearGradient>
         <linearGradient
           id="gradCushion"
@@ -37,26 +37,26 @@ export const CustomSofaIcon: React.FC = () => {
       <path d="M10 28 C10 24 54 24 54 28 V48 H10 V28 Z" fill="url(#gradSofa)" />
 
       {/* Symmetrical Armrests */}
-      <rect x="6" y="36" width="8" height="16" rx="4" fill="#F4511E" />
-      <rect x="50" y="36" width="8" height="16" rx="4" fill="#F4511E" />
+      <rect x="6" y="36" width="8" height="16" rx="4" fill="#009a9a" />
+      <rect x="50" y="36" width="8" height="16" rx="4" fill="#009a9a" />
 
       {/* Symmetrical Seat / Main Cushion */}
       <rect x="12" y="40" width="40" height="12" rx="4" fill="url(#gradSofa)" />
       <path d="M12 40 H52 V44 H12 V40 Z" fill="url(#gradCushion)" />
 
       {/* Symmetrical Cushion Division Line */}
-      <path d="M32 40 V52" stroke="#F4511E" strokeWidth="1.5" opacity="0.3" />
+      <path d="M32 40 V52" stroke="#009a9a" strokeWidth="1.5" opacity="0.3" />
 
       {/* Symmetrical Legs */}
       <path
         d="M14 52 L12 58"
-        stroke="#FF7043"
+        stroke="#009a9a"
         strokeWidth="3"
         strokeLinecap="round"
       />
       <path
         d="M50 52 L52 58"
-        stroke="#FF7043"
+        stroke="#009a9a"
         strokeWidth="3"
         strokeLinecap="round"
       />

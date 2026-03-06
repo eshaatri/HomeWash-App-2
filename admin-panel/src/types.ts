@@ -24,6 +24,8 @@ export enum BookingStatus {
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
+  NEW_FOR_PARTNERS = "NEW_FOR_PARTNERS",
+  PARTNER_ACCEPTED = "PARTNER_ACCEPTED",
 }
 
 export enum ProfessionalStatus {
@@ -72,6 +74,7 @@ export interface Booking {
   customerName: string;
   professionalId?: string; // Formerly partnerId
   professionalName?: string; // Formerly partnerName
+  partnerId?: string;
   serviceName: string;
   amount: number;
   status: BookingStatus;
@@ -81,6 +84,8 @@ export interface Booking {
   createdAt: string;
   lat?: number;
   lng?: number;
+   serviceArea?: string;
+   priority?: "NORMAL" | "HIGH";
 }
 
 export interface ServiceCategory {

@@ -199,7 +199,7 @@ export const ProfileScreen: React.FC<NavigationProps> = (props) => {
               onClick={() => navigateTo(AppScreen.ADDRESSES)}
               className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-gray-100 dark:border-white/5"
             >
-              <div className="h-10 w-10 rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-[#009a9a]/10 dark:bg-[#009a9a]/20 text-[#009a9a] flex items-center justify-center">
                 <span className="material-symbols-outlined">location_on</span>
               </div>
               <div className="text-left flex-1">

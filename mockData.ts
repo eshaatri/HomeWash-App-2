@@ -104,7 +104,7 @@ export const SUB_CATEGORIES_DB: Record<
             id: "unfurnished_apartment",
             name: "Unfurnished Apartment",
             icon: "home_work",
-            color: "bg-orange-50 text-orange-600",
+            color: "bg-[#009a9a]/10 text-[#009a9a]",
             image:
               "https://images.unsplash.com/photo-1560416313-2d126435f308?auto=format&fit=crop&q=80&w=200",
           },
@@ -112,7 +112,7 @@ export const SUB_CATEGORIES_DB: Record<
             id: "bungalow",
             name: "Bungalow / Duplex",
             icon: "cottage",
-            color: "bg-orange-50 text-orange-600",
+            color: "bg-[#009a9a]/10 text-[#009a9a]",
           },
           {
             id: "room",
@@ -140,7 +140,7 @@ export const SUB_CATEGORIES_DB: Record<
             id: "intense",
             name: "Intense Cleaning",
             icon: "cleaning_services",
-            color: "bg-orange-50 text-orange-600",
+            color: "bg-[#009a9a]/10 text-[#009a9a]",
           },
         ],
       },
@@ -156,7 +156,7 @@ export const SUB_CATEGORIES_DB: Record<
             id: "complete",
             name: "Complete Kitchen Cleaning",
             icon: "countertops",
-            color: "bg-orange-50 text-orange-600",
+            color: "bg-[#009a9a]/10 text-[#009a9a]",
           },
           {
             id: "mini",
@@ -200,13 +200,13 @@ export const SUB_CATEGORIES_DB: Record<
             id: "sofa",
             name: "Sofa",
             icon: "weekend",
-            color: "from-amber-300 to-amber-500",
+            color: "from-[#33bfbf] to-[#009a9a]",
           },
           {
             id: "carpet",
             name: "Carpet",
             icon: "texture",
-            color: "bg-orange-50 text-orange-600",
+            color: "bg-[#009a9a]/10 text-[#009a9a]",
           },
           {
             id: "mattress",
