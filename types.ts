@@ -46,6 +46,9 @@ export interface User {
   rating?: number; // For professionals/partners
   isVerified?: boolean; // For professionals/partners
   earningsToday?: number; // For professionals/partners
+  // Optional saved addresses synced with backend profile
+  // Kept as any[] to avoid tight coupling with UI AddressItem
+  addresses?: any[];
 }
 
 export interface Service {
@@ -96,6 +99,8 @@ export interface CartItem {
 export interface NavigationProps {
   currentScreen: AppScreen;
   navigateTo: (screen: AppScreen) => void;
+  // Screen that should be used when going "back" from Addresses
+  addressReturnScreen: AppScreen;
   isPremium: boolean;
   togglePremium: () => void;
   isDarkMode: boolean;
@@ -145,5 +150,5 @@ export interface NavigationProps {
     name: string;
     email: string;
   }) => Promise<void>;
-  updateProfile: (update: { name: string; email?: string }) => Promise<void>;
+  updateProfile: (update: Partial<User>) => Promise<void>;
 }

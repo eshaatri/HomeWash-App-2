@@ -56,20 +56,12 @@ const SUB_CATEGORIES_RAW = {
         title: "Select Property Type",
         items: [
           {
-            originalId: "furnished_apartment",
-            name: "Furnished Apartment",
+            originalId: "apartment",
+            name: "Apartment Cleaning",
             icon: "apartment",
-            color: "bg-blue-50 text-blue-600",
-            image:
-              "https://images.unsplash.com/photo-1502005229762-cf1e253c96bd?q=80&w=200&auto=format&fit=crop",
-          },
-          {
-            originalId: "unfurnished_apartment",
-            name: "Unfurnished Apartment",
-            icon: "home_work",
             color: "bg-[#009a9a]/10 text-[#009a9a]",
             image:
-              "https://images.unsplash.com/photo-1560416313-2d126435f308?auto=format&fit=crop&q=80&w=200",
+              "https://images.unsplash.com/photo-1502005229762-cf1e253c96bd?q=80&w=200&auto=format&fit=crop",
           },
           {
             originalId: "bungalow",
@@ -266,6 +258,26 @@ const SERVICES_RAW = [
       "Empty space cleaning focusing on deep floors and wall dusting.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDhMOlSsEXRDt3sDDyty-vRXWr9jTMfio4HeOZi-wMf023A4X41bpDbxNoMTChDF3Q7UsnfNjf4uO9K3KvdwtLVUq9OsiWgG827dJOoZ8asEZ3pr14pe72BEq5VkZ82epmnm4AUhIuDiL6TM_ev5YD5WhGGC2EWBxbosU6TMvisuWQs2qtTKt-f2FcexXRiQUbbC0IAy9oUDhO3H4gH-aDNn_C25obcofREoGJcAnmog7P2vfTgtxgrAvoJ1XCfM1K14feVlYB71eo",
+  },
+  {
+    title: "Furnished bungalow",
+    categoryId: "c1",
+    subCategoryId: "bungalow",
+    price: 4499,
+    duration: "5 hrs 50 mins",
+    description: "Ideal for furnished, occupied homes.",
+    image:
+      "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&q=80&w=500",
+  },
+  {
+    title: "Unfurnished bungalow",
+    categoryId: "c1",
+    subCategoryId: "bungalow",
+    price: 3999,
+    duration: "5 hrs",
+    description: "Ideal for vacant, unoccupied homes.",
+    image:
+      "https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&q=80&w=500",
   },
 
   // Bathroom Cleaning -> Intense

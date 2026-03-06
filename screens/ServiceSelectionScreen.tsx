@@ -27,9 +27,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
   );
 
   const isApartmentSubCategory =
-    catId === "c1" &&
-    (activeSubId === "furnished_apartment" ||
-      activeSubId === "unfurnished_apartment");
+    catId === "c1" && activeSubId === "apartment";
 
   useEffect(() => {
     const resolveAllPrices = async () => {
@@ -42,27 +40,39 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
         let servicesToResolve: ExtendedService[] = [];
 
         if (isApartmentSubCategory) {
-          const apartmentChildren = SERVICES.filter(
-            (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
+          const furnishedChildren = SERVICES.filter(
+            (s) => s.categoryId === catId && s.subCategoryId === "furnished_apartment",
           );
-          if (apartmentChildren.length > 0) {
-            const minPrice = Math.min(
-              ...apartmentChildren.map((s) => s.price),
-            );
-            const base = apartmentChildren[0];
-            servicesToResolve = [
-              {
-                ...base,
-                id:
-                  activeSubId === "furnished_apartment" ? "s1" : "s1_un",
-                title:
-                  activeSubId === "furnished_apartment"
-                    ? "Furnished Apartment"
-                    : "Unfurnished Apartment",
-                price: minPrice,
-              },
-            ];
+          const unfurnishedChildren = SERVICES.filter(
+            (s) =>
+              s.categoryId === catId && s.subCategoryId === "unfurnished_apartment",
+          );
+
+          const apartmentCards: ExtendedService[] = [];
+
+          if (furnishedChildren.length > 0) {
+            const base = furnishedChildren[0];
+            const minPrice = Math.min(...furnishedChildren.map((s) => s.price));
+            apartmentCards.push({
+              ...base,
+              id: "s1",
+              title: "Furnished Apartment",
+              price: minPrice,
+            });
           }
+
+          if (unfurnishedChildren.length > 0) {
+            const base = unfurnishedChildren[0];
+            const minPrice = Math.min(...unfurnishedChildren.map((s) => s.price));
+            apartmentCards.push({
+              ...base,
+              id: "s1_un",
+              title: "Unfurnished Apartment",
+              price: minPrice,
+            });
+          }
+
+          servicesToResolve = apartmentCards;
         } else {
           servicesToResolve = SERVICES.filter(
             (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
@@ -96,23 +106,33 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
   // Filter services based on category and sub-category
   let filteredServices: ExtendedService[] = [];
   if (isApartmentSubCategory) {
-    const apartmentChildren = SERVICES.filter(
-      (s) => s.categoryId === catId && s.subCategoryId === activeSubId,
+    const furnishedChildren = SERVICES.filter(
+      (s) => s.categoryId === catId && s.subCategoryId === "furnished_apartment",
     );
-    if (apartmentChildren.length > 0) {
-      const minPrice = Math.min(...apartmentChildren.map((s) => s.price));
-      const base = apartmentChildren[0];
-      filteredServices = [
-        {
-          ...base,
-          id: activeSubId === "furnished_apartment" ? "s1" : "s1_un",
-          title:
-            activeSubId === "furnished_apartment"
-              ? "Furnished Apartment"
-              : "Unfurnished Apartment",
-          price: minPrice,
-        },
-      ];
+    const unfurnishedChildren = SERVICES.filter(
+      (s) => s.categoryId === catId && s.subCategoryId === "unfurnished_apartment",
+    );
+
+    if (furnishedChildren.length > 0) {
+      const minPrice = Math.min(...furnishedChildren.map((s) => s.price));
+      const base = furnishedChildren[0];
+      filteredServices.push({
+        ...base,
+        id: "s1",
+        title: "Furnished Apartment",
+        price: minPrice,
+      });
+    }
+
+    if (unfurnishedChildren.length > 0) {
+      const minPrice = Math.min(...unfurnishedChildren.map((s) => s.price));
+      const base = unfurnishedChildren[0];
+      filteredServices.push({
+        ...base,
+        id: "s1_un",
+        title: "Unfurnished Apartment",
+        price: minPrice,
+      });
     }
   } else {
     filteredServices = SERVICES.filter(
@@ -131,6 +151,8 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
     if (
       service.id === "s1" ||
       service.id === "s1_un" ||
+      service.id === "s2_bun_furnished" ||
+      service.id === "s2_bun_unfurnished" ||
       service.id === "s_bath_intense"
     ) {
       setSelectedService(service);
@@ -254,6 +276,8 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
               const isConfigurable =
                 service.id === "s1" ||
                 service.id === "s1_un" ||
+                service.id === "s2_bun_furnished" ||
+                service.id === "s2_bun_unfurnished" ||
                 service.id === "s_bath_intense";
 
               return (
@@ -281,7 +305,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
 
                       <div className="flex items-center gap-1.5 mb-2">
                         <span
-                          className="material-symbols-outlined text-[16px] text-[#7c3aed] fill-1"
+                          className="material-symbols-outlined text-[16px] text-[#009a9a] fill-1"
                           style={{ fontVariationSettings: "'FILL' 1" }}
                         >
                           stars
@@ -342,7 +366,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
                         onClick={() =>
                           isConfigurable ? handleServiceClick(service) : null
                         }
-                        className="text-xs font-bold text-[#7c3aed] hover:underline"
+                        className="text-xs font-bold text-[#009a9a] hover:underline"
                       >
                         View details
                       </button>
@@ -361,7 +385,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
                       {isConfigurable ? (
                         <button
                           onClick={() => handleServiceClick(service)}
-                          className="w-24 h-9 bg-white dark:bg-[#1a1a1a] text-[#7c3aed] border border-[#7c3aed]/30 rounded-lg font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all hover:bg-[#7c3aed]/5"
+                          className="w-24 h-9 bg-white dark:bg-[#1a1a1a] text-[#009a9a] border border-[#009a9a]/30 rounded-lg font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 transition-all hover:bg-[#009a9a]/5"
                         >
                           Select
                         </button>
@@ -371,7 +395,7 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
                             onClick={() =>
                               addToCart(service, resolvedPrices[service.id])
                             }
-                            className="w-24 h-9 bg-white dark:bg-[#1a1a1a] text-[#7c3aed] border border-[#7c3aed]/30 rounded-lg font-black text-xs uppercase tracking-widest shadow-lg shadow-[#7c3aed]/10 active:scale-95 transition-all hover:bg-[#7c3aed]/5"
+                            className="w-24 h-9 bg-white dark:bg-[#1a1a1a] text-[#009a9a] border border-[#009a9a]/30 rounded-lg font-black text-xs uppercase tracking-widest shadow-lg shadow-teal-500/10 active:scale-95 transition-all hover:bg-[#009a9a]/5"
                           >
                             Add
                           </button>
@@ -383,23 +407,23 @@ export const ServiceSelectionScreen: React.FC<NavigationProps> = ({
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-2">
-                          <div className="flex items-center w-24 h-9 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 rounded-lg overflow-hidden border border-[#7c3aed]/30">
+                          <div className="flex items-center w-24 h-9 bg-[#d9f5f5] dark:bg-[#009a9a]/20 rounded-lg overflow-hidden border border-[#009a9a]/30">
                             <button
                               onClick={() => decreaseQuantity(service)}
-                              className="flex-1 h-full flex items-center justify-center text-[#7c3aed] hover:bg-[#7c3aed]/10"
+                              className="flex-1 h-full flex items-center justify-center text-[#009a9a] hover:bg-[#009a9a]/10"
                             >
                               <span className="material-symbols-outlined text-sm font-bold">
                                 remove
                               </span>
                             </button>
-                            <span className="px-1 text-[#7c3aed] font-black text-xs">
+                            <span className="px-1 text-[#009a9a] font-black text-xs">
                               {qty}
                             </span>
                             <button
                               onClick={() =>
                                 addToCart(service, resolvedPrices[service.id])
                               }
-                              className="flex-1 h-full flex items-center justify-center text-[#7c3aed] hover:bg-[#7c3aed]/10"
+                              className="flex-1 h-full flex items-center justify-center text-[#009a9a] hover:bg-[#009a9a]/10"
                             >
                               <span className="material-symbols-outlined text-sm font-bold">
                                 add

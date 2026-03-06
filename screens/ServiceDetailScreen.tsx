@@ -132,69 +132,68 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
   const INCLUDED_ITEMS = [
     {
       label: "Room floor scrubbing",
-      image: "/assets/room-floor-scrubbing.jpg",
+      image: "/assets/room-floor-scrubbing.png",
+      imageOnly: true,
     },
     {
       label: "Cabinets & furniture exterior wiping",
-      image:
-        "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/cabinet-furniture-wiping.png",
+      imageOnly: true,
     },
     {
       label: "Ceiling & fan dusting",
-      image:
-        "https://images.unsplash.com/photo-1632984589945-883a45c61335?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/ceiling-fan-dusting.png",
+      imageOnly: true,
     },
     {
       label: "Sofa* & mattress*",
-      image:
-        "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/sofa-mattress.png",
+      imageOnly: true,
+      imageFit: "contain" as const,
     },
     {
       label: "Doors, windows & mirrors",
-      image:
-        "https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/doors-windows-mirrors.png",
+      imageOnly: true,
+      imageFit: "contain" as const,
     },
     {
       label: "Switch board & fixtures",
-      image:
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/switchboards-fixtures.png",
+      imageOnly: true,
+      imageFit: "contain" as const,
     },
     {
       label: "Kitchen sink area, tiles & slabs",
-      image:
-        "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=300",
-    },
-    {
-      label: "Stove & kitchen appliances*",
-      image:
-        "https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&q=80&w=300",
-    },
-    {
-      label: "Cabinet exterior & interior*",
-      image:
-        "https://images.unsplash.com/photo-1556912173-3db496beee71?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/kitchen-sink-tiles-slab.png",
+      imageOnly: true,
+      imageFit: "contain" as const,
     },
     {
       label: "Bathroom floor scrubbing",
-      image:
-        "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/bathroom-floor-scrubbing.png",
+      imageOnly: true,
+      imageFit: "contain" as const,
+      imagePosition: "left center" as const,
     },
     {
       label: "Toilet seat & fixtures",
-      image:
-        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/toilet-seat-fixtures.png",
+      imageOnly: true,
+      imageFit: "contain" as const,
     },
     {
       label: "Balcony",
-      image:
-        "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&q=80&w=300",
+      image: "/assets/balcony.png",
+      imageOnly: true,
+      imageFit: "contain" as const,
     },
   ];
 
   const NEEDED_ITEMS = [
     { label: "Bucket & water", icon: "water_drop" },
     { label: "Power point", icon: "power" },
-    { label: "Ladder or Stool", icon: "ladder" },
+    { label: "Ladder or Stool", icon: "ladder_or_stool" },
   ];
 
   const EXCLUDED_ITEMS = [
@@ -207,18 +206,15 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
   const EQUIPMENTS = [
     {
       label: "Floor scrubbing machine",
-      image:
-        "https://images.unsplash.com/photo-1581578731117-104f2a412c54?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/floor-scrubbing-machine.png",
     },
     {
       label: "Dry & wet vacuum cleaner",
-      image:
-        "https://images.unsplash.com/photo-1558317374-a354d5f6d4da?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/dry-wet-vacuum-cleaner.png",
     },
     {
       label: "Hand scrubber",
-      image:
-        "https://images.unsplash.com/photo-1585664811087-47f65f68c34b?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/hand-scrubber.png",
     },
     {
       label: "Different type of attachments",
@@ -227,33 +223,23 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
     },
     {
       label: "Microfibre cloths",
-      image:
-        "https://images.unsplash.com/photo-1516766453986-e8d19760775d?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/microfibre-cloths.png",
     },
     {
       label: "Sponge",
-      image:
-        "https://images.unsplash.com/photo-1533561052604-c3be19d755f7?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/sponge.png",
     },
     {
       label: "Cleaning solutions",
-      image:
-        "https://images.unsplash.com/photo-1628191010210-a59de33e5941?auto=format&fit=crop&q=80&w=200",
-    },
-    {
-      label: "Grout brushes",
-      image:
-        "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/cleaning-solutions.png",
     },
     {
       label: "Wiper",
-      image:
-        "https://images.unsplash.com/photo-1517154238510-720610f43887?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/wiper.png",
     },
     {
       label: "Dusting broomstick",
-      image:
-        "https://images.unsplash.com/photo-1585514022832-6a161f36473e?auto=format&fit=crop&q=80&w=200",
+      image: "/assets/dusting-broomstick.png",
     },
   ];
 
@@ -401,7 +387,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
           <h2 className="text-xl font-black">{selectedService.title}</h2>
           <div className="flex items-center gap-1.5 mt-1">
             <span
-              className="material-symbols-outlined text-sm text-[#7c3aed] fill-1"
+              className="material-symbols-outlined text-sm text-[#009a9a] fill-1"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
               stars
@@ -440,7 +426,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                     key={opt.count}
                     className={`snap-start min-w-[160px] w-[160px] p-4 rounded-2xl border shrink-0 flex flex-col justify-between h-[180px] bg-white dark:bg-[#1a1a1a] transition-all duration-300 ${
                       isSelected
-                        ? "border-[#9333EA] ring-1 ring-[#9333EA] shadow-lg shadow-purple-500/10"
+                        ? "border-[#009a9a] ring-1 ring-[#009a9a] shadow-lg shadow-teal-500/10"
                         : "border-gray-200 dark:border-white/10"
                     }`}
                   >
@@ -461,16 +447,16 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                     </div>
 
                     {isSelected ? (
-                      <div className="flex items-center justify-between bg-[#F3E8FF] dark:bg-[#9333EA]/20 rounded-lg h-9 px-1">
-                        <button className="w-8 flex items-center justify-center text-[#9333EA] opacity-50 cursor-default">
+                      <div className="flex items-center justify-between bg-[#d9f5f5] dark:bg-[#009a9a]/20 rounded-lg h-9 px-1">
+                        <button className="w-8 flex items-center justify-center text-[#009a9a] opacity-50 cursor-default">
                           <span className="material-symbols-outlined text-sm font-bold">
                             remove
                           </span>
                         </button>
-                        <span className="text-sm font-bold text-[#9333EA]">
+                        <span className="text-sm font-bold text-[#009a9a]">
                           1
                         </span>
-                        <button className="w-8 flex items-center justify-center text-[#9333EA] opacity-50 cursor-default">
+                        <button className="w-8 flex items-center justify-center text-[#009a9a] opacity-50 cursor-default">
                           <span className="material-symbols-outlined text-sm font-bold">
                             add
                           </span>
@@ -479,7 +465,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                     ) : (
                       <button
                         onClick={() => setSelectedBathroomOption(opt)}
-                        className="w-full h-9 bg-white dark:bg-[#1a1a1a] text-[#7c3aed] border border-[#7c3aed]/30 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-[#7c3aed]/5 active:scale-95 transition-all"
+                        className="w-full h-9 bg-white dark:bg-[#1a1a1a] text-[#009a9a] border border-[#009a9a]/30 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-[#009a9a]/5 active:scale-95 transition-all"
                       >
                         Add
                       </button>
@@ -511,7 +497,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                       onClick={() => setSelectedSize(size)}
                       className={`text-left p-3 rounded-xl border transition-all ${
                         isSelected
-                          ? "bg-[#F3E8FF] border-[#9333EA] dark:bg-[#9333EA]/20 dark:border-[#9333EA]"
+                          ? "bg-[#d9f5f5] border-[#009a9a] dark:bg-[#009a9a]/20 dark:border-[#009a9a]"
                           : "bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10"
                       }`}
                     >
@@ -564,7 +550,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                       onClick={() => setKitchenSelection(opt.id)}
                       className={`snap-start min-w-[140px] w-[140px] text-left p-3 rounded-xl border shrink-0 flex flex-col justify-between h-[100px] transition-all ${
                         isSelected
-                          ? "bg-[#F3E8FF] border-[#9333EA] dark:bg-[#9333EA]/20 dark:border-[#9333EA]"
+                          ? "bg-[#d9f5f5] border-[#009a9a] dark:bg-[#009a9a]/20 dark:border-[#009a9a]"
                           : "bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10"
                       }`}
                     >
@@ -605,7 +591,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                       key={opt.id}
                       className={`snap-start min-w-[150px] w-[150px] p-3 rounded-xl border shrink-0 flex flex-col justify-between h-[140px] bg-white dark:bg-[#1a1a1a] ${
                         hasQty
-                          ? "border-[#9333EA] ring-1 ring-[#9333EA]"
+                          ? "border-[#009a9a] ring-1 ring-[#009a9a]"
                           : "border-gray-200 dark:border-white/10"
                       }`}
                     >
@@ -625,26 +611,26 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                         {qty === 0 ? (
                           <button
                             onClick={() => handleAddOnToggle(opt.id)}
-                            className="w-full py-1.5 rounded-lg text-xs font-bold text-[#9333EA] border border-[#9333EA]/30 hover:bg-[#9333EA]/5"
+                            className="w-full py-1.5 rounded-lg text-xs font-bold text-[#009a9a] border border-[#009a9a]/30 hover:bg-[#009a9a]/5"
                           >
                             Add
                           </button>
                         ) : (
-                          <div className="flex items-center justify-between bg-[#F3E8FF] dark:bg-[#9333EA]/20 rounded-lg h-8 px-1">
+                          <div className="flex items-center justify-between bg-[#d9f5f5] dark:bg-[#009a9a]/20 rounded-lg h-8 px-1">
                             <button
                               onClick={() => decrementAddOn(opt.id)}
-                              className="w-8 flex items-center justify-center text-[#9333EA]"
+                              className="w-8 flex items-center justify-center text-[#009a9a]"
                             >
                               <span className="material-symbols-outlined text-sm font-bold">
                                 remove
                               </span>
                             </button>
-                            <span className="text-xs font-bold text-[#9333EA]">
+                            <span className="text-xs font-bold text-[#009a9a]">
                               {qty}
                             </span>
                             <button
                               onClick={() => incrementAddOn(opt.id)}
-                              className="w-8 flex items-center justify-center text-[#9333EA]"
+                              className="w-8 flex items-center justify-center text-[#009a9a]"
                             >
                               <span className="material-symbols-outlined text-sm font-bold">
                                 add
@@ -688,26 +674,42 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
             {/* What is included Section */}
             <div>
               <h3 className="text-xl font-black mb-6">What is included</h3>
-              <div className="grid grid-cols-3 gap-3">
-                {INCLUDED_ITEMS.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden flex flex-col h-36 shadow-sm"
-                  >
-                    <div className="p-3 pb-0 flex-1">
-                      <p className="text-[11px] font-bold leading-tight text-onyx dark:text-gray-200 line-clamp-3">
-                        {item.label}
-                      </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {INCLUDED_ITEMS.map((item, idx) => {
+                  const imageOnly = (item as { imageOnly?: boolean }).imageOnly;
+                  const imagePosition = (item as { imagePosition?: string })
+                    .imagePosition;
+                  return (
+                    <div
+                      key={idx}
+                      className={`bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden flex flex-col shadow-sm ${
+                        imageOnly ? "aspect-square" : "h-36"
+                      }`}
+                    >
+                      {!imageOnly && (
+                        <div className="p-3 pb-0 flex-1 shrink-0">
+                          <p className="text-[11px] font-bold leading-tight text-onyx dark:text-gray-200 line-clamp-3">
+                            {item.label}
+                          </p>
+                        </div>
+                      )}
+                      <div
+                        className={
+                          imageOnly
+                            ? "flex-1 w-full min-h-0"
+                            : "h-16 w-full shrink-0"
+                        }
+                      >
+                        <img
+                          src={item.image}
+                          className="w-full h-full object-cover"
+                          alt={imageOnly ? item.label : ""}
+                          style={imagePosition ? { objectPosition: imagePosition } : undefined}
+                        />
+                      </div>
                     </div>
-                    <div className="h-16 w-full relative">
-                      <img
-                        src={item.image}
-                        className="w-full h-full object-cover"
-                        alt=""
-                      />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -741,9 +743,32 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
                     key={i}
                     className="snap-start min-w-[120px] bg-gray-50 dark:bg-[#1a1a1a] rounded-xl p-4 flex flex-col items-center justify-center text-center gap-3 border border-gray-100 dark:border-white/5"
                   >
-                    <span className="material-symbols-outlined text-3xl text-gray-700 dark:text-gray-300">
-                      {item.icon}
-                    </span>
+                    {item.icon === "ladder_or_stool" ? (
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="w-8 h-8 text-gray-700 dark:text-gray-300"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M6 20V7M18 20V7M9 10H15M9 13H15M9 16H15"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M4.8 20H19.2"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    ) : (
+                      <span className="material-symbols-outlined text-3xl text-gray-700 dark:text-gray-300">
+                        {item.icon}
+                      </span>
+                    )}
                     <span className="text-xs font-bold leading-tight">
                       {item.label}
                     </span>
@@ -793,7 +818,7 @@ export const ServiceDetailScreen: React.FC<NavigationProps> = ({
         <div className="font-black text-xl">₹{totalPrice.toLocaleString()}</div>
         <button
           onClick={handleDone}
-          className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white px-10 py-3 rounded-xl font-bold text-sm transition-colors shadow-lg shadow-purple-500/30"
+          className="bg-[#009a9a] hover:bg-[#007f7f] text-white px-10 py-3 rounded-xl font-bold text-sm transition-colors shadow-lg shadow-teal-500/30"
         >
           Checkout
         </button>

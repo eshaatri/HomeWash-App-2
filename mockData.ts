@@ -93,20 +93,12 @@ export const SUB_CATEGORIES_DB: Record<
         title: "Select Property Type",
         items: [
           {
-            id: "furnished_apartment",
-            name: "Furnished Apartment",
+            id: "apartment",
+            name: "Apartment Cleaning",
             icon: "apartment",
-            color: "bg-blue-50 text-blue-600",
-            image:
-              "https://images.unsplash.com/photo-1502005229762-cf1e253c96bd?q=80&w=200&auto=format&fit=crop",
-          },
-          {
-            id: "unfurnished_apartment",
-            name: "Unfurnished Apartment",
-            icon: "home_work",
             color: "bg-[#009a9a]/10 text-[#009a9a]",
             image:
-              "https://images.unsplash.com/photo-1560416313-2d126435f308?auto=format&fit=crop&q=80&w=200",
+              "https://images.unsplash.com/photo-1502005229762-cf1e253c96bd?q=80&w=200&auto=format&fit=crop",
           },
           {
             id: "bungalow",
@@ -274,8 +266,7 @@ export const SERVICES: ExtendedService[] = [
     rating: 4.82,
     reviews: "380K reviews",
     reviewCount: 380000,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5c6hvQ269iGoWpfvLQDj7bmbtgQqliAJq7BfBgfU8BHSZcE672IWwFIUyJwLcXTmRxl-d_6CJGFY8mrBW_yYweVNb0Z8pwQMyLnSDTo0OkDBx3H2C6kv7t6i8CmM--y6OgboO4_hRAVdAPLhRcmW5Iwf_tTuBbeplYcIo5l2upmHCwrLpjiX4GjFVevtkalgAkoM7Zmx65Lz5m_wtRsf-iJCLDXu9twEi1DRlqL1TtgrE-tHdbGkjNlYM0C2O5h4WFVNfyD4uPNY",
+    image: "/assets/furnished-apartment.png",
     bestseller: true,
     inclusions: [
       "Cleaning & stain removal from rooms, kitchen, bathroom & balcony",
@@ -371,29 +362,46 @@ export const SERVICES: ExtendedService[] = [
     rating: 4.82,
     reviews: "176K reviews",
     reviewCount: 176000,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDhMOlSsEXRDt3sDDyty-vRXWr9jTMfio4HeOZi-wMf023A4X41bpDbxNoMTChDF3Q7UsnfNjf4uO9K3KvdwtLVUq9OsiWgG827dJOoZ8asEZ3pr14pe72BEq5VkZ82epmnm4AUhIuDiL6TM_ev5YD5WhGGC2EWBxbosU6TMvisuWQs2qtTKt-f2FcexXRiQUbbC0IAy9oUDhO3H4gH-aDNn_C25obcofREoGJcAnmog7P2vfTgtxgrAvoJ1XCfM1K14feVlYB71eo",
+    image: "/assets/unfurnished-apartment.png",
     inclusions: [
       "Cleaning & stain removal from floors and skirting",
       "Dry vacuuming of walls and ceiling",
     ],
   },
   {
-    id: "s2_bun",
-    title: "Bungalow Deep Clean",
+    id: "s2_bun_furnished",
+    title: "Furnished bungalow",
     categoryId: "c1",
     subCategoryId: "bungalow",
-    price: 5499,
-    duration: "6 hrs",
-    description: "Specialized cleaning for large multi-story homes.",
-    rating: 4.9,
-    reviews: "12K reviews",
-    reviewCount: 12000,
+    price: 4499,
+    duration: "5 hrs 50 mins",
+    description: "Ideal for furnished, occupied homes.",
+    rating: 4.81,
+    reviews: "290K reviews",
+    reviewCount: 290000,
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBQyKII_vIaYbueglrCgh8F-6OF2PmOkj_bk4X1NuaRUaG6y4NFTB8zkvoUBZifEDIflhH_vZTPVTbUi9ppddj_PADLZ0Il4Vsmr9H9nVcoY0k-neYBhDNDzKMHL24IdQyDdjbg9z_AA9ueRIAis-0JpNbTycooHUHFjvfvfW12Ph2DWiEhKPP_W2nkZpSEYQ4K-opYDnVrif3S7JtLwW5khRfD5qc-wFSUznoff5_xsW1tqqLI73qRV4Sx0ZH-fvpasYD6YzS7f20",
+      "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&q=80&w=500",
     inclusions: [
-      "Staircase and railing cleaning",
-      "Extensive glass window cleaning",
+      "Ideal for furnished, occupied homes.",
+      "Machine floor scrubbing & stain removal across rooms, kitchen, baths & balcony.",
+    ],
+  },
+  {
+    id: "s2_bun_unfurnished",
+    title: "Unfurnished bungalow",
+    categoryId: "c1",
+    subCategoryId: "bungalow",
+    price: 3999,
+    duration: "5 hrs",
+    description: "Ideal for vacant, unoccupied homes.",
+    rating: 4.81,
+    reviews: "133K reviews",
+    reviewCount: 133000,
+    image:
+      "https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&q=80&w=500",
+    inclusions: [
+      "Ideal for vacant, unoccupied homes.",
+      "Machine floor scrubbing & stain removal across rooms, kitchen, baths & balcony.",
     ],
   },
   // Bathroom Services Replacement

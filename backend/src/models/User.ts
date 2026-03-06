@@ -20,6 +20,9 @@ export interface IUser extends Document {
   serviceArea?: string;
   serviceAreaIds?: string[]; // area IDs this professional serves
   address?: string;
+  // Optional array of saved addresses for customers
+  // Shape is kept flexible to mirror frontend AddressItem
+  addresses?: any[];
   city?: string;
   status?: string; // e.g. ONBOARDING | ACTIVE | SUSPENDED for professionals
   lastKnownLat?: number;
@@ -42,6 +45,10 @@ const UserSchema: Schema = new Schema(
     serviceArea: { type: String },
     serviceAreaIds: [{ type: String }],
     address: { type: String },
+    addresses: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
     city: { type: String },
     status: { type: String },
     lastKnownLat: { type: Number },

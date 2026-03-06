@@ -19,8 +19,15 @@ export const AddressScreen: React.FC<NavigationProps> = ({
   isPremium,
   setCurrentLocation,
   cart,
+  user,
+  updateProfile,
+  addressReturnScreen,
 }) => {
   const [addresses, setAddresses] = useState<AddressItem[]>(() => {
+    // Prefer profile-synced addresses when available
+    if (user && Array.isArray((user as any).addresses)) {
+      return (user as any).addresses as AddressItem[];
+    }
     try {
       const raw = localStorage.getItem("hw_saved_addresses_v1");
       if (raw) {
@@ -577,6 +584,18 @@ export const AddressScreen: React.FC<NavigationProps> = ({
     }
   }, [addresses]);
 
+  // Sync addresses to user profile when they change
+  React.useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        await updateProfile({ addresses });
+      } catch (e) {
+        console.warn("Failed to sync addresses to profile:", e);
+      }
+    })();
+  }, [addresses, user, updateProfile]);
+
   // Debounced address search to move map (Google Maps JS Geocoder)
   React.useEffect(() => {
     if (!newAddress || newAddress.length < 3 || isLocating) return;
@@ -612,11 +631,13 @@ export const AddressScreen: React.FC<NavigationProps> = ({
       {/* Header */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-[#f8f7f6]/95 dark:bg-[#121212]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
         <button
-          onClick={() =>
-            cart && cart.length > 0
-              ? navigateTo(AppScreen.CHECKOUT)
-              : navigateTo(AppScreen.HOME)
-          }
+          onClick={() => {
+            const target =
+              addressReturnScreen && addressReturnScreen !== AppScreen.ADDRESSES
+                ? addressReturnScreen
+                : AppScreen.HOME;
+            navigateTo(target);
+          }}
           className="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
         >
           <span className="material-symbols-outlined text-onyx dark:text-white">

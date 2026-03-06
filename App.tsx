@@ -62,6 +62,9 @@ export default function App() {
     Record<string, { date: string; time: string }>
   >({});
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  // Last screen from which we navigated to Addresses, used for contextual back navigation
+  const [addressReturnScreen, setAddressReturnScreen] =
+    useState<AppScreen>(AppScreen.HOME);
 
   // Apply theme colors via CSS variables
   useEffect(() => {
@@ -125,6 +128,9 @@ export default function App() {
 
   const navigateTo = (screen: AppScreen) => {
     window.scrollTo(0, 0);
+    if (screen === AppScreen.ADDRESSES) {
+      setAddressReturnScreen(currentScreen);
+    }
     setCurrentScreen(screen);
   };
 
@@ -296,7 +302,7 @@ export default function App() {
     }
   };
 
-  const updateProfile = async (update: { name: string; email?: string }) => {
+  const updateProfile = async (update: Partial<User>) => {
     if (!user) return;
     const baseUserId = (user as any).id || (user as any)._id;
     if (!baseUserId) {
@@ -319,6 +325,7 @@ export default function App() {
   const commonProps = {
     currentScreen,
     navigateTo,
+    addressReturnScreen,
     isPremium,
     togglePremium,
     isDarkMode,

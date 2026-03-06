@@ -28,7 +28,7 @@ export const userService = {
   },
   updateProfile: async (
     id: string,
-    update: { name: string; email?: string },
+    update: Partial<User>,
   ) => {
     console.log(`Updating profile for ID: ${id}`, update);
     const response = await api.patch(`/users/${id}`, update);
