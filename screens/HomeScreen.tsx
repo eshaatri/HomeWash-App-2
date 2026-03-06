@@ -334,7 +334,7 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
 
       {/* 3-Column Categories Grid */}
       <section className="px-6 py-6">
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-7">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-8 items-start">
           {CATEGORIES.map((cat) => {
             const isHomeCleaning = cat.id === "c1";
             const isBathroomCleaning = cat.id === "c2";
@@ -355,99 +355,87 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                 {/* Custom Labeling logic for specific icons */}
                 {isHomeCleaning ? (
                   /* Premium Nano Banana Button Implementation for v4 */
-                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
-                    {/* Banana Layer "Focus_Accent" (The subtle purple glow) */}
+                  <div className="relative w-full pb-[100%] mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" */}
                     <div className="absolute inset-0 bg-[#7E57C2] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-20 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
-                    {/* Visual Base for Category Card - Premium White/Gray Gradient */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
-
-                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
-                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                    {/* Banana Group "Visual_Hero" */}
+                    <div className="absolute inset-0 flex items-center justify-center p-0 transition-transform duration-500 group-hover:animate-pulse-subtle overflow-hidden rounded-[1.25rem]">
                       <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
                         <CustomHouseIcon />
                       </div>
                     </div>
+
+                    {/* Visual Base for Category Card */}
+                    <div className="absolute inset-0 rounded-[1.25rem] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500 pointer-events-none"></div>
                   </div>
                 ) : isBathroomCleaning ? (
                   /* Premium Nano Banana Button: Bathroom Cleaning Edition */
-                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
-                    {/* Banana Layer "Focus_Accent" (Subtle Purple Accent for differentiator) */}
+                  <div className="relative w-full pb-[100%] mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
                     <div className="absolute inset-0 bg-[#7E57C2] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-20 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
-                    {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
-
-                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
-                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                    <div className="absolute inset-0 flex items-center justify-center p-0 transition-transform duration-500 group-hover:animate-pulse-subtle overflow-hidden rounded-[1.25rem]">
                       <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
                         <CustomBathroomIcon />
                       </div>
                     </div>
+
+                    <div className="absolute inset-0 rounded-[1.25rem] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500 pointer-events-none"></div>
                   </div>
                 ) : isKitchenCleaning ? (
                   /* Premium Nano Banana Button: Kitchen Cleaning Edition */
-                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
-                    {/* Banana Layer "Focus_Accent" (Subtle Golden Accent for Kitchen) */}
+                  <div className="relative w-full pb-[100%] mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
                     <div className="absolute inset-0 bg-[#FFD54F] rounded-full blur-[20px] opacity-[0.12] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
-                    {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
-
-                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
-                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                    <div className="absolute inset-0 flex items-center justify-center p-0 transition-transform duration-500 group-hover:animate-pulse-subtle overflow-hidden rounded-[1.25rem]">
                       <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
                         <CustomKitchenIcon />
                       </div>
                     </div>
+
+                    <div className="absolute inset-0 rounded-[1.25rem] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500 pointer-events-none"></div>
                   </div>
                 ) : isWaterTankCleaning ? (
                   /* Premium Nano Banana Button: Water Tank Cleaning Edition */
-                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
-                    {/* Banana Layer "Focus_Accent" (Subtle Deep Blue Accent for Water Tank) */}
+                  <div className="relative w-full pb-[100%] mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
                     <div className="absolute inset-0 bg-[#0288D1] rounded-full blur-[20px] opacity-[0.10] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
-                    {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
-
-                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
-                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                    <div className="absolute inset-0 flex items-center justify-center p-0 transition-transform duration-500 group-hover:animate-pulse-subtle overflow-hidden rounded-[1.25rem]">
                       <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
                         <CustomWaterTankIcon />
                       </div>
                     </div>
+
+                    <div className="absolute inset-0 rounded-[1.25rem] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500 pointer-events-none"></div>
                   </div>
                 ) : isSofaCleaning ? (
                   /* Premium Nano Banana Button: Sofa Cleaning Edition */
-                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
-                    {/* Banana Layer "Focus_Accent" (Subtle Fresh Teal Accent for Sofa) */}
+                  <div className="relative w-full pb-[100%] mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
+                    {/* Banana Layer "Focus_Accent" */}
                     <div className="absolute inset-0 bg-[#26A69A] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
-                    {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
-
-                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
-                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                    {/* Banana Group "Visual_Hero" */}
+                    <div className="absolute inset-0 flex items-center justify-center p-0 transition-transform duration-500 group-hover:animate-pulse-subtle overflow-hidden rounded-[1.25rem]">
                       <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
                         <CustomSofaIcon />
                       </div>
                     </div>
+
+                    {/* Visual Base for Category Card - Brand Orange Border on Top */}
+                    <div className="absolute inset-0 rounded-[1.25rem] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500 pointer-events-none"></div>
                   </div>
                 ) : isCarWash ? (
                   /* Premium Nano Banana Button: Car Wash Edition */
-                  <div className="relative w-full aspect-square mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
-                    {/* Banana Layer "Focus_Accent" (Subtle Sky Blue Accent for Car Wash) */}
+                  <div className="relative w-full pb-[100%] mb-3 transition-all duration-500 group-hover:scale-105 active:scale-95">
                     <div className="absolute inset-0 bg-[#00B0FF] rounded-full blur-[20px] opacity-[0.08] group-hover:opacity-25 group-hover:blur-[25px] transition-all duration-500 scale-75 group-hover:scale-110 pointer-events-none"></div>
 
-                    {/* Visual Base for Category Card - Brand Orange Border */}
-                    <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white to-[#FDFDFD] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500"></div>
-
-                    {/* Banana Group "Visual_Hero" with Pulse on Hover */}
-                    <div className="relative w-full h-full flex items-center justify-center p-[15%] transition-transform duration-500 group-hover:animate-pulse-subtle">
+                    <div className="absolute inset-0 flex items-center justify-center p-0 transition-transform duration-500 group-hover:animate-pulse-subtle overflow-hidden rounded-[1.25rem]">
                       <div className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_20px_20px_rgba(0,0,0,0.2)] transition-all">
                         <CustomCarWashIcon />
                       </div>
                     </div>
+
+                    <div className="absolute inset-0 rounded-[1.25rem] border-[2.5px] border-[#009a9a] shadow-[0_4px_10px_rgba(0,154,154,0.1)] group-hover:shadow-[0_8px_25px_rgba(0,154,154,0.3)] transition-all duration-500 pointer-events-none"></div>
                   </div>
                 ) : (
                   <div
@@ -470,9 +458,11 @@ export const HomeScreen: React.FC<NavigationProps> = (props) => {
                     </div>
                   </div>
                 )}
-                <span className="text-[11px] font-bold text-center leading-tight text-onyx/80 dark:text-alabaster/80 group-hover:text-onyx dark:group-hover:text-alabaster transition-colors uppercase tracking-wider">
-                  {cat.name}
-                </span>
+                <div className="flex-1 w-full flex flex-col items-center">
+                  <div className="text-[11px] font-extrabold text-center leading-[1.1] text-onyx/80 dark:text-alabaster/80 group-hover:text-onyx dark:group-hover:text-alabaster transition-colors uppercase tracking-tight h-[2.2rem] flex items-center justify-center px-1">
+                    {cat.name}
+                  </div>
+                </div>
               </button>
             );
           })}

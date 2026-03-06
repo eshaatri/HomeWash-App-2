@@ -59,7 +59,7 @@
 
         width: 180px;
         height: 180px;
-        border-radius: 34px;
+        border-radius: 20px;
         background: radial-gradient(
           circle at 50% 50%,
           #ffffff 0%,
@@ -116,8 +116,8 @@
       /* Banana Group "Visual_Hero" */
       .visual-hero {
         position: relative;
-        width: 85%;
-        height: 85%;
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -164,8 +164,7 @@
       /* Banana Icon "Art_Bathroom" */
       .art-bathroom {
         width: 100%;
-        height: auto;
-        max-width: 110px;
+        height: 100%;
         filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.1));
         transition: filter 0.5s ease;
       }
@@ -201,84 +200,24 @@
       <!-- 2. The Enlarged Visual Hero -->
       <div class="visual-hero">
         <!-- Symmetrical_Bathtub_Hero -->
-        <div class="art-bathroom" aria-hidden="true">
-          <svg
-            viewBox="0 0 64 64"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient
-                id="gradTub"
-                x1="8"
-                y1="36"
-                x2="56"
-                y2="56"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#7be0e0" />
-                <stop offset="1" stop-color="#009a9a" />
-              </linearGradient>
-              <linearGradient
-                id="gradWater"
-                x1="12"
-                y1="36"
-                x2="52"
-                y2="44"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#80DEEA" />
-                <stop offset="1" stop-color="#4DD0E1" />
-              </linearGradient>
-            </defs>
-
-            <!-- The Bathtub Rim (Symmetrical) -->
-            <path
-              d="M8 36 C8 32 12 32 14 32 H50 C52 32 56 32 56 36 V48 C56 52 52 56 48 56 H16 C12 56 8 52 8 48 V36 Z"
-              fill="url(#gradTub)"
-            />
-
-            <!-- The Water Surface -->
-            <path
-              d="M14 38 H50 V42 H14 Z"
-              fill="url(#gradWater)"
-              opacity="0.6"
-            />
-
-            <!-- Symmetrical Faucet Head -->
-            <path d="M24 12 H40 V16 H24 Z" fill="#009a9a" />
-
-            <!-- Animated Droplets (Blue Contrast) -->
-            <g class="droplet droplet-1">
-              <circle cx="32" cy="18" r="1.5" fill="#4DD0E1" />
-            </g>
-            <g class="droplet droplet-2">
-              <circle cx="28" cy="22" r="1.5" fill="#4DD0E1" />
-            </g>
-            <g class="droplet droplet-3">
-              <circle cx="36" cy="22" r="1.5" fill="#4DD0E1" />
-            </g>
-
-            <!-- Subtle Shine -->
-            <rect
-              x="14"
-              y="48"
-              width="12"
-              height="2"
-              rx="1"
-              fill="#FFFFFF"
-              opacity="0.3"
-            />
-            <rect
-              x="38"
-              y="48"
-              width="12"
-              height="2"
-              rx="1"
-              fill="#FFFFFF"
-              opacity="0.3"
-            />
-          </svg>
+        <div
+          class="art-bathroom"
+          aria-hidden="true"
+          style="
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <img
+            src="/assets/bathroom-cleaning-premium.jpg"
+            alt="Premium Bathroom"
+            style="width: 100%; height: 100%; object-fit: cover"
+          />
         </div>
       </div>
     </button>
